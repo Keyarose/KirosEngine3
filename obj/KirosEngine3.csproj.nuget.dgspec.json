@@ -44,6 +44,16 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "opentk": {
+              "target": "Package",
+              "version": "[4.8.2, )"
+            },
+            "stbimagesharp": {
+              "target": "Package",
+              "version": "[2.27.13, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
