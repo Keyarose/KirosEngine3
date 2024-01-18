@@ -1,3 +1,5 @@
 *.vsidx
 *.suo
 obj/Debug/
+bin/Debug/
+.editorconfig

@@ -12,10 +12,11 @@ namespace KirosEngine3
     public class Logger
     {
         protected static Logger? _instance;
+        protected bool _enabled = true;
 
-        protected string _filePath = "log/"; //default filepath
+        protected string _filePath = "log/"; //default file path
         protected FileInfo? _fileInfo;
-        protected int _maxLogSizeMB = 512;
+        protected int _maxLogSizeMB = 512; //default log size in mb
         protected int _maxLogSizeL = 10000; //max log size in lines
 
         protected int _currentLineCount = 0;
@@ -33,7 +34,7 @@ namespace KirosEngine3
         }
 
         /// <summary>
-        /// The maximum logsize in MB
+        /// The maximum log size in MB
         /// </summary>
         public int MaxLogSizeMB
         {
@@ -41,7 +42,7 @@ namespace KirosEngine3
         }
 
         /// <summary>
-        /// The maximum logsize in lines
+        /// The maximum log size in lines
         /// </summary>
         public int MaxLogSizeL
         {
@@ -78,7 +79,7 @@ namespace KirosEngine3
                 //todo: write to in game console
             }
 
-            //if fileinfo is not null continue log setup else write an error to the consoles
+            //if file info is not null continue log setup else write an error to the consoles
             if (_fileInfo != null)
             {
                 _fileInfo.Directory?.Create();
@@ -87,7 +88,7 @@ namespace KirosEngine3
                 {
                     try
                     {
-                        //create the file and write intial data to it
+                        //create the file and write initial data to it
                         using StreamWriter sw = _fileInfo.CreateText();
                         sw.WriteLine(string.Format("Log File for: {0}", now.ToString("MM/dd/yyyy-HH:mm:ss.fff")));
                         sw.WriteLine("Log Init");
@@ -123,13 +124,13 @@ namespace KirosEngine3
         /// <param name="message">The string to write</param>
         public void WriteToLog(string message)
         {
-            if(_fileInfo != null)
+            if(_enabled && (_fileInfo != null))
             {
                 if(!IsLogFull())
                 {
                     try
                     {
-                        //append the message to the log prefixed by the datetime to milisecond
+                        //append the message to the log prefixed by the datetime to millisecond
                         using StreamWriter sw = _fileInfo.AppendText();
                         sw.WriteLine(string.Format("{0} : {1}", DateTime.Now.ToString("MM/dd/yy-HH:mm:ss.fff"), message));
                         _currentLineCount++;
@@ -146,7 +147,7 @@ namespace KirosEngine3
 
                     try
                     {
-                        //append the message to the log prefixed by the datetime to milisecond
+                        //append the message to the log prefixed by the datetime to millisecond
                         using StreamWriter sw = _fileInfo.AppendText();
                         sw.WriteLine(string.Format("{0} : {1}", DateTime.Now.ToString("MM/dd/yy-HH:mm:ss.fff"), message));
                         _currentLineCount++;
@@ -158,6 +159,21 @@ namespace KirosEngine3
                     }
                 }
             }
+        }
+
+        public void WriteToLog(int i)
+        {
+            WriteToLog(i.ToString());
+        }
+
+        public void WriteToLog(float f)
+        {
+            WriteToLog(f.ToString());
+        }
+
+        public void WriteToLog(Exception ex)
+        {
+            WriteToLog(ex.ToString());
         }
 
         /// <summary>
@@ -183,7 +199,7 @@ namespace KirosEngine3
             {
                 try
                 {
-                    //create the file and write intial data to it
+                    //create the file and write initial data to it
                     using StreamWriter sw = _fileInfo.CreateText();
                     sw.WriteLine(string.Format("Log File for: {0}", now.ToString("MM/dd/yyyy-HH:mm:ss.fff")));
                     sw.WriteLine("Log Init");
