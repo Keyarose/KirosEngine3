@@ -1,6 +1,4 @@
-﻿using KirosEngine3.Math.Vector;
-
-namespace KirosEngine3
+﻿namespace KirosEngine3
 {
     internal class Program
     {
