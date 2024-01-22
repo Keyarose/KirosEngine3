@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Vector
 {
-    public struct Vec3 : IEquatable<Vec3>
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Vec3 : IEquatable<Vec3>, IFormattable
     {
         public float X;
         public float Y; 
@@ -71,6 +74,54 @@ namespace KirosEngine3.Math.Vector
         /// Size of the Vec3 struct in bytes
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<Vec3>();
+
+        /// <summary>
+        /// Index accessor for the vector
+        /// </summary>
+        /// <param name="index">Index that corresponds to the X,Y, or Z component</param>
+        /// <returns>The value of X, Y, or Z depending on the index value</returns>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public float this[int index]
+        {
+            readonly get
+            {
+                if (index == 0)
+                {
+                    return X;
+                }
+                else if(index == 1) 
+                {
+                    return Y;
+                }
+                else if(index == 2)
+                {
+                    return Z;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("Index out of range for Vec3.");
+                }
+            }
+            set
+            {
+                if (index == 0) 
+                {
+                    X = value;
+                }
+                else if (index == 1)
+                {
+                    Y = value;
+                }
+                else if (index == 2)
+                {
+                    Z = value;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("Vec3 only has an index range from 0 - 2 inclusive.");
+                }
+            }
+        }
 
         /// <summary>
         /// Construct a 3D vector with identical components
@@ -139,6 +190,36 @@ namespace KirosEngine3.Math.Vector
             var c = this;
             c.Normalize();
             return c;
+        }
+
+        /// <summary>
+        /// Normalize the given vector, should be checked by IsFinite afterwards
+        /// </summary>
+        /// <param name="v">The vector to normalize</param>
+        /// <returns>The normalized vector</returns>
+        public static Vec3 Normalize(Vec3 v)
+        {
+            float ratio = 1.0f / v.Length;
+
+            v.X *= ratio;
+            v.Y *= ratio;
+            v.Z *= ratio;
+
+            return v;
+        }
+
+        /// <summary>
+        /// Normalize the given vector, should be checked by IsFinite afterwards
+        /// </summary>
+        /// <param name="v">The vector to normalize</param>
+        /// <param name="result">The normalized vector</param>
+        public static void Normalize(Vec3 v, out Vec3 result)
+        {
+            float ratio = 1.0f / v.Length;
+
+            result.X = v.X * ratio;
+            result.Y = v.Y * ratio;
+            result.Z = v.Z * ratio;
         }
 
         /// <summary>
@@ -396,6 +477,88 @@ namespace KirosEngine3.Math.Vector
             left.Z *= right.Z;
             return left;
         }
+
+        /// <summary>
+        /// Multiply a 3D matrix by a column vector
+        /// </summary>
+        /// <param name="m">The matrix</param>
+        /// <param name="v">The vector</param>
+        /// <returns>The resulting vector</returns>
+        public static Vec3 MultiplyC(Matrix.Matrix3 m, Vec3 v)
+        {
+            var r = new Vec3
+            {
+                X = (m.Row0.X * v.X) + (m.Row0.Y * v.X) + (m.Row0.Z * v.X),
+                Y = (m.Row1.X * v.Y) + (m.Row1.Y * v.Y) + (m.Row1.Z * v.Y),
+                Z = (m.Row2.X * v.Z) + (m.Row2.Y * v.Z) + (m.Row2.Z * v.Z)
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Multiply a 3D matrix by a column vector
+        /// </summary>
+        /// <param name="m">The matrix</param>
+        /// <param name="v">The vector</param>
+        /// <param name="result">The resulting vector</param>
+        public static void MultiplyC(Matrix.Matrix3 m, Vec3 v, out Vec3 result)
+        {
+            result = MultiplyC(m, v);
+        }
+
+        /// <summary>
+        /// Define the multiplication operator for a 3D matrix times a column vector3
+        /// </summary>
+        /// <param name="left">The matrix on the left</param>
+        /// <param name="right">The vector on the right</param>
+        /// <returns>The resulting vector</returns>
+        public static Vec3 operator *(Matrix.Matrix3 left, Vec3 right)
+        {
+            return MultiplyC(left, right);
+        }
+
+        /// <summary>
+        /// Multiply a row vector by a 3D matrix
+        /// </summary>
+        /// <param name="v">The vector</param>
+        /// <param name="m">The matrix</param>
+        /// <returns>The resulting vector</returns>
+        public static Vec3 MultiplyR(Vec3 v, Matrix.Matrix3 m)
+        {
+            var r = new Vec3
+            {
+                X = (m.Row0.X * v.X) + (m.Row1.X * v.X) + (m.Row2.X * v.X),
+                Y = (m.Row0.Y * v.Y) + (m.Row1.Y * v.Y) + (m.Row2.Y * v.Y),
+                Z = (m.Row0.Z * v.Z) + (m.Row1.Z * v.Z) + (m.Row2.Z * v.Z)
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Multiply a row vector by a 3D matrix
+        /// </summary>
+        /// <param name="v">The vector</param>
+        /// <param name="m">The matrix</param>
+        /// <param name="result">The resulting vector</param>
+        public static void MultiplyR(Vec3 v, Matrix.Matrix3 m, out Vec3 result)
+        {
+            result = MultiplyR(v, m);
+        }
+
+        /// <summary>
+        /// Define the multiplication operator for a row vector3 times a 3D matrix
+        /// </summary>
+        /// <param name="v">The vector</param>
+        /// <param name="m">The matrix</param>
+        /// <returns>The resulting vector</returns>
+        public static Vec3 operator *(Vec3 v, Matrix.Matrix3 m)
+        {
+            return MultiplyR(v, m);
+        }
+
+        //todo: matrix4 * vector, quaternion * vector
         #endregion
 
         #region Divide
@@ -682,6 +845,173 @@ namespace KirosEngine3.Math.Vector
         }
         #endregion
 
+        /// <summary>
+        /// Calculate the distance between two points as represented by vectors
+        /// </summary>
+        /// <param name="v1">The first point</param>
+        /// <param name="v2">The second point</param>
+        /// <returns>The straight line distance between two points</returns>
+        public static float Distance(Vec3 v1, Vec3 v2)
+        {
+            return MathF.Sqrt(((v2.X - v1.X) * (v2.X - v1.Y)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)) + ((v2.Z - v1.Z) * (v2.Z - v1.Z)));
+        }
+
+        /// <summary>
+        /// Calculate the distance between two points as represented by vectors
+        /// </summary>
+        /// <param name="v1">The first point</param>
+        /// <param name="v2">The second point</param>
+        /// <param name="result">The straight line distance between two points</param>
+        public static void Distance(Vec3 v1, Vec3 v2, out float result)
+        {
+            result = MathF.Sqrt(((v2.X - v1.X) * (v2.X - v1.Y)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)) + ((v2.Z - v1.Z) * (v2.Z - v1.Z)));
+        }
+
+        /// <summary>
+        /// Calculate the distance between two points as represented by vectors squared
+        /// </summary>
+        /// <param name="v1">The first point</param>
+        /// <param name="v2">The second point</param>
+        /// <returns>The straight line distance between two points squared</returns>
+        public static float DistanceSqu(Vec3 v1, Vec3 v2)
+        {
+            return ((v2.X - v1.X) * (v2.X - v1.Y)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)) + ((v2.Z - v1.Z) * (v2.Z - v1.Z));
+        }
+
+        /// <summary>
+        /// Calculate the distance between two points as represented by vectors squared
+        /// </summary>
+        /// <param name="v1">The first point</param>
+        /// <param name="v2">The second point</param>
+        /// <param name="result">The straight line distance between two points squared</param>
+        public static void DistanceSqu(Vec3 v1, Vec3 v2, out float result)
+        {
+            result = ((v2.X - v1.X) * (v2.X - v1.Y)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)) + ((v2.Z - v1.Z) * (v2.Z - v1.Z));
+        }
+
+        #region Lerp
+        /// <summary>
+        /// Linear interpolation between two points as represented by vectors
+        /// </summary>
+        /// <param name="v1">The starting point</param>
+        /// <param name="v2">The ending point</param>
+        /// <param name="t">The fractional position along the interpolation between 0 and 1</param>
+        /// <returns>The point along the interpolation for the value of t</returns>
+        public static Vec3 Lerp(Vec3 v1, Vec3 v2, float t)
+        {
+            float x = v1.X + (t * v2.X - v1.X);
+            float y = v1.Y + (t * v2.Y - v1.Y);
+            float z = v1.Z + (t * v2.Z - v1.Z);
+
+            return new Vec3(x, y, z);
+        }
+
+        /// <summary>
+        /// Linear interpolation between two points as represented by vectors
+        /// </summary>
+        /// <param name="v1">The starting point</param>
+        /// <param name="v2">The ending point</param>
+        /// <param name="t">The fractional position along the interpolation between 0 and 1</param>
+        /// <param name="result">The point along the interpolation for the value of t</param>
+        public static void Lerp(Vec3 v1, Vec3 v2, float t, out Vec3 result)
+        {
+            result.X = v1.X + (t * v2.X - v1.X);
+            result.Y = v1.Y + (t * v2.Y - v1.Y);
+            result.Z = v1.Z + (t * v2.Z - v1.Z);
+        }
+
+        /// <summary>
+        /// Linear interpolation between two points on a component wise basis
+        /// </summary>
+        /// <param name="v1">The starting point</param>
+        /// <param name="v2">The ending point</param>
+        /// <param name="t">The fractional position along the interpolation between 0 and 1</param>
+        /// <returns>The point along the interpolation for the value of t component wise</returns>
+        public static Vec3 Lerp(Vec3 v1, Vec3 v2, Vec3 t)
+        {
+            float x = v1.X + (t.X * v2.X - v1.X);
+            float y = v1.Y + (t.Y * v2.Y - v1.Y);
+            float z = v1.Z + (t.Z * v2.Z - v1.Z);
+
+            return new Vec3(x, y, z);
+        }
+
+        /// <summary>
+        /// Linear interpolation between two points on a component wise basis
+        /// </summary>
+        /// <param name="v1">The starting point</param>
+        /// <param name="v2">The ending point</param>
+        /// <param name="t">The fractional position along the interpolation between 0 and 1</param>
+        /// <param name="result">The point along the interpolation for the value of t component wise</param>
+        public static void Lerp(Vec3 v1, Vec3 v2, Vec3 t, out Vec3 result)
+        {
+            result.X = v1.X + (t.X * v2.X - v1.X);
+            result.Y = v1.Y + (t.Y * v2.Y - v1.Y);
+            result.Z = v1.Z + (t.Z * v2.Z - v1.Z);
+        }
+
+        /// <summary>
+        /// Interpolate between 3 vectors using barycentric coords
+        /// </summary>
+        /// <param name="v1">The first vector</param>
+        /// <param name="v2">The second vector</param>
+        /// <param name="v3">The third vector</param>
+        /// <param name="u">First barycentric coordinate</param>
+        /// <param name="v">Second barycentric coordinate</param>
+        /// <returns>v1 where u=v=0, v2 where u=1, v=0, v3 where u=0, v=1, otherwise a linear interpolation of v1,v2,v3</returns>
+        public static Vec3 BarycentricInterp(Vec3 v1, Vec3 v2, Vec3 v3, float u, float v)
+        {
+            return v1 + ((v2 - v1) * u) + ((v3 - v1) * v);
+        }
+
+        /// <summary>
+        /// Interpolate between 3 vectors using barycentric coords
+        /// </summary>
+        /// <param name="v1">The first vector</param>
+        /// <param name="v2">The second vector</param>
+        /// <param name="v3">The third vector</param>
+        /// <param name="u">First barycentric coordinate</param>
+        /// <param name="v">Second barycentric coordinate</param>
+        /// <param name="result">v1 where u=v=0, v2 where u=1, v=0, v3 where u=0, v=1, otherwise a linear interpolation of v1,v2,v3</param>
+        public static void BarycentricInterp(Vec3 v1, Vec3 v2, Vec3 v3, float u, float v, out Vec3 result)
+        {
+            result = v1 + ((v2 - v1) * u) + ((v3 - v1) * v);
+        }
+        #endregion
+        
+        //todo: transform methods
+
+        /// <summary>
+        /// Calculate the angle between two vectors in radians
+        /// </summary>
+        /// <param name="v1">The first vector</param>
+        /// <param name="v2">The second vector</param>
+        /// <returns>The angle between the two in radians, never larger than Pi</returns>
+        public static float CalcAngle(Vec3 v1, Vec3 v2)
+        {
+            float dot = Dot(v1, v2);
+            return MathF.Acos(float.Clamp(dot / (v1.Length * v2.Length), -1.0f, 1.0f));
+        }
+
+        /// <summary>
+        /// Calculate the angle between two vectors in radians
+        /// </summary>
+        /// <param name="v1">The first vector</param>
+        /// <param name="v2">The second vector</param>
+        /// <param name="result">The angle between the two in radians, never larger than Pi</param>
+        public static void CalcAngle(Vec3 v1, Vec3 v2, out float result)
+        {
+            float dot = Dot(v1, v2);
+            result = MathF.Acos(float.Clamp(dot / (v1.Length * v2.Length), -1.0f, 1.0f));
+        }
+
+        /// <inheritdoc/>
+        public readonly string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return string.Format("({0},{1},{2})", X.ToString(format, formatProvider), Y.ToString(format, formatProvider), Z.ToString(format, formatProvider));
+        }
+
+#if OPENTK
         #region OpenTKCompat
         /// <summary>
         /// Handle conversion from OpenTK's Vector3 to Vec3
@@ -701,5 +1031,6 @@ namespace KirosEngine3.Math.Vector
             return new Vector3(v.X, v.Y, v.Z);
         }
         #endregion
+#endif
     }
 }
