@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace KirosEngine3
 {
     /// <summary>
-    /// Abstract class to be inherited by indivdual works using the engine
+    /// Abstract class to be inherited by individual works using the engine
     /// </summary>
     public abstract class Client : GameWindow
     {
@@ -20,7 +20,7 @@ namespace KirosEngine3
         }
 
         /// <summary>
-        /// Load any data needed for the inital screen
+        /// Load any data needed for the initial screen
         /// </summary>
         protected override void OnLoad()
         {
@@ -39,7 +39,7 @@ namespace KirosEngine3
         /// <summary>
         /// Render the frame, making draw calls to any objects to be drawn
         /// </summary>
-        /// <param name="args">Frame event arguemnts</param>
+        /// <param name="args">Frame event arguments</param>
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             base.OnRenderFrame(args);

@@ -3,3 +3,5 @@
 obj/Debug/
 bin/Debug/
 .editorconfig
+.vs/KirosEngine3/DesignTimeBuild/.dtbcache.v2
+.vs/KirosEngine3/v17/.futdcache.v2

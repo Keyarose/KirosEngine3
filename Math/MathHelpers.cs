@@ -12,5 +12,10 @@ namespace KirosEngine3.Math
         {
             return MathF.Abs(a) < float.Epsilon;
         }
+
+        public static float Clamp(this float a, float min, float max)
+        {
+            return a < min ? min : (a > max ? max : a);
+        }
     }
 }

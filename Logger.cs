@@ -11,7 +11,7 @@ namespace KirosEngine3
     /// </summary>
     public class Logger
     {
-        protected static Logger? _instance;
+        private static Logger? _instance;
         protected bool _enabled = true;
 
         protected string _filePath = "log/"; //default file path
