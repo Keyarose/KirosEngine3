@@ -256,9 +256,9 @@ namespace KirosEngine3.Math.Matrix
         public readonly Matrix3 ClearScale()
         {
             var c = this;
-            c.Row0 = c.Row0.NormalizeCopy();
-            c.Row1 = c.Row1.NormalizeCopy();
-            c.Row2 = c.Row2.NormalizeCopy();
+            c.Row0 = c.Row0.NormalizedCopy();
+            c.Row1 = c.Row1.NormalizedCopy();
+            c.Row2 = c.Row2.NormalizedCopy();
             return c;
         }
 

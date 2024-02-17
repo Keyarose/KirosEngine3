@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace KirosEngine3.Math.Vector
 {
@@ -80,7 +81,7 @@ namespace KirosEngine3.Math.Vector
         /// </summary>
         /// <param name="index">Index that corresponds to the X,Y, or Z component</param>
         /// <returns>The value of X, Y, or Z depending on the index value</returns>
-        /// <exception cref="IndexOutOfRangeException"></exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the index is not a value from 0-2 inclusive</exception>
         public float this[int index]
         {
             readonly get
@@ -99,7 +100,7 @@ namespace KirosEngine3.Math.Vector
                 }
                 else
                 {
-                    throw new IndexOutOfRangeException("Index out of range for Vec3.");
+                    throw new IndexOutOfRangeException(string.Format("Index: {0} out of range for Vec3.", index));
                 }
             }
             set
@@ -118,11 +119,12 @@ namespace KirosEngine3.Math.Vector
                 }
                 else
                 {
-                    throw new IndexOutOfRangeException("Vec3 only has an index range from 0 - 2 inclusive.");
+                    throw new IndexOutOfRangeException(string.Format("Index: {0} out of range for Vec3.", index));
                 }
             }
         }
 
+        #region Constructors
         /// <summary>
         /// Construct a 3D vector with identical components
         /// </summary>
@@ -169,6 +171,9 @@ namespace KirosEngine3.Math.Vector
             Y = v.Y;
             Z = z;
         }
+        #endregion
+
+        #region Normalize
         /// <summary>
         /// Normalize the vector, should be checked by IsFinite afterwards
         /// </summary>
@@ -185,7 +190,7 @@ namespace KirosEngine3.Math.Vector
         /// Get a normalized copy of the vector, should be checked by IsFinite afterwards
         /// </summary>
         /// <returns>A normalized copy of the vector</returns>
-        public readonly Vec3 NormalizeCopy()
+        public readonly Vec3 NormalizedCopy()
         {
             var c = this;
             c.Normalize();
@@ -221,6 +226,7 @@ namespace KirosEngine3.Math.Vector
             result.Y = v.Y * ratio;
             result.Z = v.Z * ratio;
         }
+        #endregion
 
         /// <summary>
         /// Check for a zero vector
@@ -275,23 +281,23 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Equivalence operator definition
         /// </summary>
-        /// <param name="left">The left vector to compare</param>
-        /// <param name="right">The right vector to compare</param>
+        /// <param name="lhs">The left vector to compare</param>
+        /// <param name="rhs">The right vector to compare</param>
         /// <returns>True if equivalent, false otherwise</returns>
-        public static bool operator ==(Vec3 left, Vec3 right)
+        public static bool operator ==(Vec3 lhs, Vec3 rhs)
         {
-            return left.Equals(right);
+            return lhs.Equals(rhs);
         }
 
         /// <summary>
         /// Non-equivalence operator definition
         /// </summary>
-        /// <param name="left">The left vector to compare</param>
-        /// <param name="right">The right vector to compare</param>
+        /// <param name="lhs">The left vector to compare</param>
+        /// <param name="rhs">The right vector to compare</param>
         /// <returns>False if equivalent, true otherwise</returns>
-        public static bool operator !=(Vec3 left, Vec3 right) 
+        public static bool operator !=(Vec3 lhs, Vec3 rhs) 
         {
-            return !(left == right);
+            return !(lhs == rhs);
         }
 
         #region Add
@@ -899,9 +905,9 @@ namespace KirosEngine3.Math.Vector
         /// <returns>The point along the interpolation for the value of t</returns>
         public static Vec3 Lerp(Vec3 v1, Vec3 v2, float t)
         {
-            float x = v1.X + (t * v2.X - v1.X);
-            float y = v1.Y + (t * v2.Y - v1.Y);
-            float z = v1.Z + (t * v2.Z - v1.Z);
+            float x = v1.X + (t * (v2.X - v1.X));
+            float y = v1.Y + (t * (v2.Y - v1.Y));
+            float z = v1.Z + (t * (v2.Z - v1.Z));
 
             return new Vec3(x, y, z);
         }
@@ -915,9 +921,9 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The point along the interpolation for the value of t</param>
         public static void Lerp(Vec3 v1, Vec3 v2, float t, out Vec3 result)
         {
-            result.X = v1.X + (t * v2.X - v1.X);
-            result.Y = v1.Y + (t * v2.Y - v1.Y);
-            result.Z = v1.Z + (t * v2.Z - v1.Z);
+            result.X = v1.X + (t * (v2.X - v1.X));
+            result.Y = v1.Y + (t * (v2.Y - v1.Y));
+            result.Z = v1.Z + (t * (v2.Z - v1.Z));
         }
 
         /// <summary>
@@ -929,9 +935,9 @@ namespace KirosEngine3.Math.Vector
         /// <returns>The point along the interpolation for the value of t component wise</returns>
         public static Vec3 Lerp(Vec3 v1, Vec3 v2, Vec3 t)
         {
-            float x = v1.X + (t.X * v2.X - v1.X);
-            float y = v1.Y + (t.Y * v2.Y - v1.Y);
-            float z = v1.Z + (t.Z * v2.Z - v1.Z);
+            float x = v1.X + (t.X * (v2.X - v1.X));
+            float y = v1.Y + (t.Y * (v2.Y - v1.Y));
+            float z = v1.Z + (t.Z * (v2.Z - v1.Z));
 
             return new Vec3(x, y, z);
         }
@@ -945,9 +951,9 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The point along the interpolation for the value of t component wise</param>
         public static void Lerp(Vec3 v1, Vec3 v2, Vec3 t, out Vec3 result)
         {
-            result.X = v1.X + (t.X * v2.X - v1.X);
-            result.Y = v1.Y + (t.Y * v2.Y - v1.Y);
-            result.Z = v1.Z + (t.Z * v2.Z - v1.Z);
+            result.X = v1.X + (t.X * (v2.X - v1.X));
+            result.Y = v1.Y + (t.Y * (v2.Y - v1.Y));
+            result.Z = v1.Z + (t.Z * (v2.Z - v1.Z));
         }
 
         /// <summary>
@@ -1006,10 +1012,92 @@ namespace KirosEngine3.Math.Vector
         }
 
         /// <inheritdoc/>
+        public override readonly string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
             return string.Format("({0},{1},{2})", X.ToString(format, formatProvider), Y.ToString(format, formatProvider), Z.ToString(format, formatProvider));
         }
+
+        #region ComponentAccessors
+        /// <summary>
+        /// Get a vec2 with this vector's x and y or set them with a vec2
+        /// </summary>
+        [XmlIgnore]
+        public Vec2 Xy
+        {
+            get { return new Vec2(X, Y); }
+            set { X = value.X; Y = value.Y; }
+        }
+
+        /// <summary>
+        /// Get a vec2 with this vector's x and z or set them with a vec2
+        /// </summary>
+        [XmlIgnore]
+        public Vec2 Xz
+        {
+            get { return new Vec2(X, Z); }
+            set { X = value.X; Z = value.Y; }
+        }
+
+        /// <summary>
+        /// Get a vec2 with this vector's y and x or set them with a vec2
+        /// </summary>
+        [XmlIgnore]
+        public Vec2 Yx
+        {
+            get { return new Vec2(Y, X); }
+            set { Y = value.X; X = value.Y; }
+        }
+
+        /// <summary>
+        /// Get a vec2 with this vector's y and z or set them with a vec2
+        /// </summary>
+        [XmlIgnore]
+        public Vec2 Yz
+        {
+            get { return new Vec2(Y, Z); }
+            set { Y = value.X; Z = value.Y; }
+        }
+
+        /// <summary>
+        /// Get a vec2 with this vector's z and x or set them with a vec2
+        /// </summary>
+        [XmlIgnore]
+        public Vec2 Zx
+        {
+            get { return new Vec2(Z, X); }
+            set { Z = value.X; X = value.Y; }
+        }
+
+        /// <summary>
+        /// Get a vec2 with this vector's z and y or set them with a vec2
+        /// </summary>
+        [XmlIgnore]
+        public Vec2 Zy
+        {
+            get { return new Vec2(Z, Y); }
+            set { Z = value.X; Y = value.Y; }
+        }
+
+        //todo: vec3 permutations
+        #endregion
 
 #if OPENTK
         #region OpenTKCompat
