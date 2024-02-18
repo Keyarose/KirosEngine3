@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Matrix
 {
+    /// <summary>
+    /// Three by three matrix definition.
+    /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix3 : IEquatable<Matrix3>, IFormattable
@@ -18,8 +21,14 @@ namespace KirosEngine3.Math.Matrix
         public Vec3 Row1;
         public Vec3 Row2;
 
+        /// <summary>
+        /// The Identity matrix
+        /// </summary>
         public static readonly Matrix3 Identity = new Matrix3(Vec3.UnitX, Vec3.UnitY, Vec3.UnitZ);
 
+        /// <summary>
+        /// The zero matrix
+        /// </summary>
         public static readonly Matrix3 Zero = new Matrix3(Vec3.Zero, Vec3.Zero, Vec3.Zero);
 
         /// <summary>
@@ -44,60 +53,92 @@ namespace KirosEngine3.Math.Matrix
         {
             get
             {
-                return (Row0.X * Row1.Y * Row2.Z) + (Row0.Y * Row1.Z * Row2.X) + (Row0.Z * Row1.X * Row2.Y) 
-                    - (Row0.Z * Row1.Y * Row2.X) - (Row0.X * Row1.Z * Row2.Y) - (Row0.Y * Row1.X * Row2.Z);
+                float result = 0;
+
+                result += Row0.X * new Matrix2(M11, M12, M21, M22).Determinant;
+                result -= Row0.Y * new Matrix2(M10, M12, M20, M22).Determinant;
+                result += Row0.Z * new Matrix2(M10, M11, M20, M21).Determinant;
+
+                return result;
             }
         }
 
         #region Cell Accessors
+        /// <summary>
+        /// Accessor for row 0, column 0
+        /// </summary>
         public float M00
         {
             readonly get { return Row0.X; }
             set { Row0.X = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 0, column 1
+        /// </summary>
         public float M01
         {
             readonly get { return Row0.Y; }
             set { Row0.Y = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 0, column 2
+        /// </summary>
         public float M02
         {
             readonly get { return Row0.Z; }
             set { Row0.Z = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 1, column 0
+        /// </summary>
         public float M10
         {
             readonly get { return Row1.X; }
             set { Row1.X = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 1, column 1
+        /// </summary>
         public float M11
         {
             readonly get { return Row1.Y; }
             set { Row1.Y = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 1, column 2
+        /// </summary>
         public float M12
         {
             readonly get { return Row1.Z; }
             set { Row1.Z = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 2, column 0
+        /// </summary>
         public float M20
         {
             readonly get { return Row2.X; }
             set { Row2.X = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 2, column 1
+        /// </summary>
         public float M21
         {
             readonly get { return Row2.Y; }
             set { Row2.Y = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 2, column 2
+        /// </summary>
         public float M22
         {
             readonly get { return Row2.Z; }
@@ -139,11 +180,16 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="row">Row index</param>
         /// <param name="column">Column index</param>
         /// <returns>The value at the given indexes</returns>
-        /// <exception cref="IndexOutOfRangeException"></exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the index values are out of the allowed range</exception>
         public float this[int row, int column]
         {
             readonly get
             {
+                if (column < 0 && column > 2)
+                {
+                    throw new IndexOutOfRangeException(string.Format("Column index: {0} out of range for Matrix3.", column));
+                }
+
                 if (row == 0)
                 {
                     return Row0[column];
@@ -163,6 +209,11 @@ namespace KirosEngine3.Math.Matrix
             }
             set
             {
+                if (column < 0 && column > 2)
+                {
+                    throw new IndexOutOfRangeException(string.Format("Column index: {0} out of range for Matrix3.", column));
+                }
+
                 if (row == 0)
                 {
                     Row0[column] = value;
@@ -182,6 +233,12 @@ namespace KirosEngine3.Math.Matrix
             }
         }
 
+        /// <summary>
+        /// Basic constructor using Vec3s
+        /// </summary>
+        /// <param name="r0">First row of the matrix</param>
+        /// <param name="r1">Second row of the matrix</param>
+        /// <param name="r2">Third row of the matrix</param>
         public Matrix3(Vec3 r0, Vec3 r1, Vec3 r2)
         {
             Row0 = r0;
@@ -189,6 +246,18 @@ namespace KirosEngine3.Math.Matrix
             Row2 = r2;
         }
 
+        /// <summary>
+        /// Basic constructor using indvidual floats
+        /// </summary>
+        /// <param name="m00">Row 0, Column 0</param>
+        /// <param name="m01">Row 0, Column 1</param>
+        /// <param name="m02">Row 0, Column 2</param>
+        /// <param name="m10">Row 1, Column 0</param>
+        /// <param name="m11">Row 1, Column 1</param>
+        /// <param name="m12">Row 1, Column 2</param>
+        /// <param name="m20">Row 2, Column 0</param>
+        /// <param name="m21">Row 2, Column 1</param>
+        /// <param name="m22">Row 2, Column 2</param>
         public Matrix3(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22)
         {
             Row0 = new Vec3(m00, m01, m02);
@@ -205,6 +274,7 @@ namespace KirosEngine3.Math.Matrix
             Row0 /= determinant;
             Row1 /= determinant;
             Row2 /= determinant;
+            //todo: 0 division handling
         }
 
         /// <summary>
@@ -405,6 +475,7 @@ namespace KirosEngine3.Math.Matrix
         /// <returns>A new matrix containing the result</returns>
         public static Matrix3 Multiply(Matrix3 m1, Matrix3 m2)
         {
+            //todo: rework as a series of dot products
             var r = new Matrix3
             {
                 Row0 = new Vec3((m1[0, 0] * m2[0, 0]) + (m1[0, 1] * m2[1, 0]) + (m1[0, 2] * m2[2, 0]),
@@ -521,9 +592,9 @@ namespace KirosEngine3.Math.Matrix
         {
             var r = new Matrix3
             {
-                Row0 = new Vec3(m.Row0.X, m.Row1.X, m.Row2.X),
-                Row1 = new Vec3(m.Row0.Y, m.Row1.Y, m.Row2.Y),
-                Row2 = new Vec3(m.Row0.Z, m.Row1.Z, m.Row2.Z)
+                Row0 = m.Column0,
+                Row1 = m.Column1,
+                Row2 = m.Column2
             };
 
             return r;

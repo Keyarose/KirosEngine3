@@ -7,6 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);OPENTK</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove=".gitignore" />
   </ItemGroup>
