@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,6 +39,46 @@ namespace KirosEngine3.Math.Vector
                 return X*X + Y*Y + Z*Z + W*W;
             }
         }
+
+        /// <summary>
+        /// Predefined 4D vector 0,0,0,0
+        /// </summary>
+        public static readonly Vec4 Zero = new Vec4(0.0f);
+
+        /// <summary>
+        /// Predefined 4D vector 1,1,1,1
+        /// </summary>
+        public static readonly Vec4 One = new Vec4(1.0f);
+
+        /// <summary>
+        /// Predefined 4D vector -1,-1,-1,-1
+        /// </summary>
+        public static readonly Vec4 OneMinus = new Vec4(-1.0f);
+
+        /// <summary>
+        /// Predefined 4D vector 1,0,0,0
+        /// </summary>
+        public static readonly Vec4 UnitX = new Vec4(1.0f, 0.0f, 0.0f, 0.0f);
+
+        /// <summary>
+        /// Predefined 4D vector 0,1,0,0
+        /// </summary>
+        public static readonly Vec4 UnitY = new Vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
+        /// <summary>
+        /// Predefined 4D vector 0,0,1,0
+        /// </summary>
+        public static readonly Vec4 UnitZ = new Vec4(0.0f, 0.0f, 1.0f, 0.0f);
+
+        /// <summary>
+        /// Predefined 4D vector 0,0,0,1
+        /// </summary>
+        public static readonly Vec4 UnitW = new Vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+        /// <summary>
+        /// Size of the Vec4 struct in bytes
+        /// </summary>
+        public static readonly int SizeInBytesU = Unsafe.SizeOf<Vec4>();
 
         /// <summary>
         /// Index accessor for the vector
@@ -209,10 +250,10 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Check for a zero vector
         /// </summary>
-        /// <returns>True if all components are zero, false otherwise</returns>
+        /// <returns>True if LengthSqr and thus Length is zero, false otherwise</returns>
         public readonly bool IsZero()
         {
-            return X.IsZero() && Y.IsZero() && Z.IsZero() && W.IsZero();
+            return LengthSqr.IsZero();
         }
 
         /// <summary>
@@ -919,9 +960,295 @@ namespace KirosEngine3.Math.Vector
             set { W = value.X; Z = value.Y; }
         }
 
-        //todo: vec3 permutations
+        /// <summary>
+        /// Get a vec3 with this vector's values as X, Y, Z or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Xyz
+        {
+            get { return new Vec3(X, Y, Z); }
+            set { X = value.X; Y = value.Y; Z = value.Z; }
+        }
 
-        //todo: vec4 permutations
+        /// <summary>
+        /// Get a vec3 with this vector's values as X, Z, Y or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Xzy
+        {
+            get { return new Vec3(X, Z, Y); }
+            set { X = value.X; Z = value.Y; Y = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a vec3 with this vector's values as Y, X, Z or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Yxz
+        {
+            get { return new Vec3(Y, X, Z); }
+            set { Y = value.X; X = value.Y; Z = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a vec3 with this vector's values as Y, Z, X or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Yzx
+        {
+            get { return new Vec3(Y, Z, X); }
+            set { Y = value.X; Z = value.Y; X = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a vec3 with this vector's values as Z, X, Y or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Zxy
+        {
+            get { return new Vec3(Z, X, Y); }
+            set { Z = value.X; X = value.Y; Y = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a vec3 with this vector's values as Z, Y, X or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Zyx
+        {
+            get { return new Vec3(Z, Y, X); }
+            set { Z = value.X; Y = value.Y; X = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as X, Y, W, Z or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Xywz
+        {
+            get { return new Vec4(X, Y, W, Z); }
+            set { X = value.X; Y = value.Y; W = value.Z; Z = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as X, Z, Y, W or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Xzyw
+        {
+            get { return new Vec4(X, Z, Y, W); }
+            set { X = value.X; Z = value.Y; Y = value.Z; W = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as X, Z, W, Y or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Xzwy
+        {
+            get { return new Vec4(X, Z, W, Y); }
+            set { X = value.X; Z = value.Y; W = value.Z; Y = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as X, W, Y, Z or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Xwyz
+        {
+            get { return new Vec4(X, W, Y, Z); }
+            set { X = value.X; W = value.Y; Y = value.Z; Z = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as X, W, Z, Y or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Xwzy
+        {
+            get { return new Vec4(X, W, Z, Y); }
+            set { X = value.X; W = value.Y; Z = value.Z; Y = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Y, X, Z, W or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Yxzw
+        {
+            get { return new Vec4(Y, X, Z, W); }
+            set { Y = value.X; X = value.Y; Z = value.Z; W = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Y, X, W, Z or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Yxwz
+        {
+            get { return new Vec4(Y, X, W, Z); }
+            set { Y = value.X; X = value.Y; W = value.Z; Z = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Y, Z, X, W or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Yzxw
+        {
+            get { return new Vec4(Y, Z, X, W); }
+            set { Y = value.X; Z = value.Y; X = value.Z; W = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Y, Z, W, X or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Yzwx
+        {
+            get { return new Vec4(Y, Z, W, X); }
+            set { Y = value.X; Z = value.Y; W = value.Z; X = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Y, W, X, Z or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Ywxz
+        {
+            get { return new Vec4(Y, W, X, Z); }
+            set { Y = value.X; W = value.Y; X = value.Z; Z = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Y, W, Z, X or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Ywzx
+        {
+            get { return new Vec4(Y, W, Z, X); }
+            set { Y = value.X; W = value.Y; Z = value.Z; X = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Z, X, Y, W or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Zxyw
+        {
+            get { return new Vec4(Z, X, Y, W); }
+            set { Z = value.X; X = value.Y; Y = value.Z; W = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Z, X, W, Y or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Zxwy
+        {
+            get { return new Vec4(Z, X, W, Y); }
+            set { Z = value.X; X = value.Y; W = value.Z; Y = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Z, Y, X, W or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Zyxw
+        {
+            get { return new Vec4(Z, Y, X, W); }
+            set { Z = value.X; Y = value.Y; X = value.Z; W = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Z, Y, W, X or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Zywx
+        {
+            get { return new Vec4(Z, Y, W, X); }
+            set { Z = value.X; Y = value.Y; W = value.Z; X = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Z, W, X, Y or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Zwxy
+        {
+            get { return new Vec4(Z, W, X, Y); }
+            set { Z = value.X; W = value.Y; X = value.Z; Y = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as Z, W, Y, X or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Zwyx
+        {
+            get { return new Vec4(Z, W, Y, X); }
+            set { Z = value.X; W = value.Y; Y = value.Z; X = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as W, X, Y, Z or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Wxyz
+        {
+            get { return new Vec4(W, X, Y, Z); }
+            set { W = value.X; X = value.Y; Y = value.Z; Z = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as W, X, Z, Y or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Wxzy
+        {
+            get { return new Vec4(W, X, Z, Y); }
+            set { W = value.X; X = value.Y; Z = value.Z; Y = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as W, Y, X, Z or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Wyxz
+        {
+            get { return new Vec4(W, Y, X, Z); }
+            set { W = value.X; Y = value.Y; X = value.Z; Z = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as W, Y, Z, X or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Wyzx
+        {
+            get { return new Vec4(W, Y, Z, X); }
+            set { W = value.X; Y = value.Y; Z = value.Z; X = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as W, Z, X, Y or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Wzxy
+        {
+            get { return new Vec4(W, Z, X, Y); }
+            set { W = value.X; Z = value.Y; X = value.Z; Y = value.W; }
+        }
+
+        /// <summary>
+        /// Get a Vec4 with this vector's values as W, Z, Y, X or set them with a vec4
+        /// </summary>
+        [XmlIgnore]
+        public Vec4 Wzyx
+        {
+            get { return new Vec4(W, Z, Y, X); }
+            set { W = value.X; Z = value.Y; Y = value.Z; X = value.W; }
+        }
         #endregion
 
 #if OPENTK

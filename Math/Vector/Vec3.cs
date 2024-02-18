@@ -49,12 +49,12 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Predefined 3D vector 1,1,1
         /// </summary>
-        public static readonly Vec3 Unit = new Vec3(1.0f);
+        public static readonly Vec3 One = new Vec3(1.0f);
 
         /// <summary>
         /// Predefined 3D vector -1,-1,-1
         /// </summary>
-        public static readonly Vec3 UnitMinus = new Vec3(-1.0f);
+        public static readonly Vec3 OneMinus = new Vec3(-1.0f);
 
         /// <summary>
         /// Predefined 3D vector 1,0,0
@@ -231,10 +231,10 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Check for a zero vector
         /// </summary>
-        /// <returns>True if both X,Y and Z are 0, false otherwise</returns>
+        /// <returns>True if LengthSqr and thus Length is 0, false otherwise</returns>
         public readonly bool IsZero()
         {
-            return X.IsZero() && Y.IsZero() && Z.IsZero();
+            return LengthSqr.IsZero();
         }
 
         /// <summary>
@@ -1096,7 +1096,55 @@ namespace KirosEngine3.Math.Vector
             set { Z = value.X; Y = value.Y; }
         }
 
-        //todo: vec3 permutations
+        /// <summary>
+        /// Get a vec3 with this vector's values as X, Z, Y or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Xzy
+        {
+            get { return new Vec3(X, Z, Y); }
+            set { X = value.X; Z = value.Y; Y = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a vec3 with this vector's values as Y, X, Z or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Yxz
+        {
+            get { return new Vec3(Y, X, Z); }
+            set { Y = value.X; X = value.Y; Z = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a vec3 with this vector's values as Y, Z, X or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Yzx
+        {
+            get { return new Vec3(Y, Z, X); }
+            set { Y = value.X; Z = value.Y; X = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a vec3 with this vector's values as Z, X, Y or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Zxy
+        {
+            get { return new Vec3(Z, X, Y); }
+            set { Z = value.X; X = value.Y; Y = value.Z; }
+        }
+
+        /// <summary>
+        /// Get a vec3 with this vector's values as Z, Y, X or set them with a vec3
+        /// </summary>
+        [XmlIgnore]
+        public Vec3 Zyx
+        {
+            get { return new Vec3(Z, Y, X); }
+            set { Z = value.X; Y = value.Y; X = value.Z; }
+        }
         #endregion
 
 #if OPENTK

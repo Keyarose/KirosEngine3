@@ -47,12 +47,12 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Predefined 2D vector 1,1
         /// </summary>
-        public static readonly Vec2 Unit = new Vec2(1.0f);
+        public static readonly Vec2 One = new Vec2(1.0f);
 
         /// <summary>
         /// Predefined 2D vector -1,-1
         /// </summary>
-        public static readonly Vec2 UnitMinus = new Vec2(-1.0f);
+        public static readonly Vec2 OneMinus = new Vec2(-1.0f);
 
         /// <summary>
         /// Predefined 2D vector 1,0
@@ -68,6 +68,42 @@ namespace KirosEngine3.Math.Vector
         /// Size of the Vec2 struct in bytes
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<Vec2>();
+
+        /// <summary>
+        /// Index accessor for the vector
+        /// </summary>
+        /// <param name="index">Index that corresponds to the X, or Y component</param>
+        /// <returns>The value of X, or Z depending on the index value</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the index is not a value from 0-1 inclusive</exception>
+        public float this[int index]
+        {
+            readonly get
+            {
+                switch (index) 
+                {
+                    case 0: 
+                        return X;
+                    case 1:
+                        return Y;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Index: {0} out of range for Vec2.", index));
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0:
+                        X = value;
+                        break;
+                    case 1:
+                        Y = value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Index: {0} out of range for Vec2.", index));
+                }
+            }
+        }
 
         /// <summary>
         /// Construct a 2D vector with identical components
