@@ -1,6 +1,7 @@
 ﻿using KirosEngine3.Math.Vector;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -185,6 +186,211 @@ namespace KirosEngine3.Math.Matrix
             Row1 = new Vec2(m10, m11);
         }
 
-        //todo: more methods
+        #region Add
+        /// <summary>
+        /// Add two matrices together
+        /// </summary>
+        /// <param name="m1">First matrix to add</param>
+        /// <param name="m2">Second matrix to add</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 Add(Matrix2 m1, Matrix2 m2) 
+        {
+            var r = new Matrix2
+            {
+                Row0 = m1.Row0 + m2.Row0,
+                Row1 = m1.Row1 + m2.Row1,
+            };
+            return r;
+        }
+
+        /// <summary>
+        /// Add two matrices together
+        /// </summary>
+        /// <param name="m1">First matrix to add</param>
+        /// <param name="m2">Second matrix to add</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void Add(Matrix2 m1, Matrix2 m2, out Matrix2 result)
+        {
+            result = Add(m1, m2);
+        }
+
+        /// <summary>
+        /// Add two matrices together
+        /// </summary>
+        /// <param name="lhs">Left matrix</param>
+        /// <param name="rhs">Right matrix</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 operator +(Matrix2 lhs, Matrix2 rhs)
+        {
+            return Add(lhs, rhs);
+        }
+        #endregion
+
+        #region Multiply
+        /// <summary>
+        /// Multiply two matrices together
+        /// </summary>
+        /// <param name="m1">First matrix</param>
+        /// <param name="m2">Second matrix</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 Multiply(Matrix2 m1, Matrix2 m2)
+        {
+            var r = new Matrix2
+            {
+                Row0 = new Vec2(Vec2.Dot(m1.Row0, m2.Column0), Vec2.Dot(m1.Row0, m2.Column1)),
+                Row1 = new Vec2(Vec2.Dot(m1.Row1, m2.Column0), Vec2.Dot(m1.Row1, m2.Column1))
+            };
+            return r;
+        }
+
+        /// <summary>
+        /// Multiply two matrices together
+        /// </summary>
+        /// <param name="m1">First matrix</param>
+        /// <param name="m2">Second matrix</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void Multiply(Matrix2 m1, Matrix2 m2, out Matrix2 result)
+        {
+            result = Multiply(m1, m2);
+        }
+
+        /// <summary>
+        /// Multiply two matrices together
+        /// </summary>
+        /// <param name="lhs">Left matrix</param>
+        /// <param name="rhs">Right matrix</param>
+        /// <returns></returns>
+        public static Matrix2 operator *(Matrix2 lhs, Matrix2 rhs) 
+        {
+            return Multiply(lhs, rhs);
+        }
+        #endregion
+
+        //todo: invert
+
+        /// <summary>
+        /// Find the transpose of a matrix
+        /// </summary>
+        /// <param name="m">The matrix to transpose</param>
+        /// <returns>The transpose in a new instance</returns>
+        public static Matrix2 Transpose(Matrix2 m)
+        {
+            var r = new Matrix2
+            {
+                Row0 = m.Column0,
+                Row1 = m.Column1,
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Find the transpose of a matrix
+        /// </summary>
+        /// <param name="m">The matrix to transpose</param>
+        /// <param name="result">The transpose in a new instance</param>
+        public static void Transpose(Matrix2 m, out Matrix2 result)
+        {
+            result = Transpose(m);
+        }
+
+        /// <inheritdoc/>
+        public readonly bool Equals(Matrix2 other)
+        {
+            return Row0 == other.Row0 && Row1 == other.Row1;
+        }
+
+        /// <inheritdoc/>
+        public override readonly bool Equals([NotNullWhen(true)] object? obj)
+        {
+            return obj is Matrix2 other && Equals(other);
+        }
+
+        /// <summary>
+        /// Equivalence operator definition
+        /// </summary>
+        /// <param name="lhs">Left matrix</param>
+        /// <param name="rhs">Right matrix</param>
+        /// <returns>True if equal, false if not</returns>
+        public static bool operator ==(Matrix2 lhs, Matrix2 rhs) 
+        {
+            return lhs.Equals(rhs);
+        }
+
+        /// <summary>
+        /// Non-equivalence operator definition
+        /// </summary>
+        /// <param name="lhs">Left matrix</param>
+        /// <param name="rhs">Right matrix</param>
+        /// <returns>True if not equal, false if equal</returns>
+        public static bool operator !=(Matrix2 lhs, Matrix2 rhs) 
+        {
+            return ! lhs.Equals(rhs);
+        }
+
+        /// <inheritdoc/>
+        public override readonly int GetHashCode()
+        {
+            return HashCode.Combine(Row0, Row1);
+        }
+
+        #region ToString
+        /// <inheritdoc/>
+        public override readonly string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
+        public readonly string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            var r0 = Row0.ToString(format, formatProvider);
+            var r1 = Row1.ToString(format, formatProvider);
+
+            return string.Format("{0}\n{1}", r0, r1);
+        }
+        #endregion
+
+#if OPENTK
+        #region OpenTKCompat
+        /// <summary>
+        /// Handle conversion from OpenTK's Matrix2 to Matrix2
+        /// </summary>
+        /// <param name="m">The matrix to convert</param>
+        public static implicit operator Matrix2(OpenTK.Mathematics.Matrix2 m)
+        {
+            return new Matrix2
+            {
+                Row0 = m.Row0,
+                Row1 = m.Row1
+            };
+        }
+
+        /// <summary>
+        /// Handle conversion from Matrix2 to OpenTK's Matrix2
+        /// </summary>
+        /// <param name="m">The matrix to convert</param>
+        public static implicit operator OpenTK.Mathematics.Matrix2(Matrix2 m)
+        {
+            return new OpenTK.Mathematics.Matrix2
+            {
+                Row0 = m.Row0,
+                Row1 = m.Row1
+            };
+        }
+        #endregion
+#endif
     }
 }

@@ -598,6 +598,25 @@ namespace KirosEngine3.Math.Matrix
             return HashCode.Combine(Row0, Row1, Row2, Row3);
         }
 
+        #region ToString
+        /// <inheritdoc/>
+        public override readonly string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
         /// <inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
@@ -606,7 +625,42 @@ namespace KirosEngine3.Math.Matrix
             var r2 = Row2.ToString(format, formatProvider);
             var r3 = Row3.ToString(format, formatProvider);
 
-            return string.Format(@"{0}\n{1}\n{2}\n{3}", r0, r1, r2, r3);
+            return string.Format("{0}\n{1}\n{2}\n{3}", r0, r1, r2, r3);
         }
+        #endregion
+
+#if OPENTK
+        #region OpenTKCompat
+        /// <summary>
+        /// Handle conversion from OpenTK's Matrix4 to Matrix4
+        /// </summary>
+        /// <param name="m">The matrix to convert</param>
+        public static implicit operator Matrix4(OpenTK.Mathematics.Matrix4 m)
+        {
+            return new Matrix4
+            {
+                Row0 = m.Row0,
+                Row1 = m.Row1,
+                Row2 = m.Row2,
+                Row3 = m.Row3
+            };
+        }
+
+        /// <summary>
+        /// Handle conversion from Matrix4 to OpenTK's Matrix4
+        /// </summary>
+        /// <param name="m">The matrix to convert</param>
+        public static implicit operator OpenTK.Mathematics.Matrix4(Matrix4 m)
+        {
+            return new OpenTK.Mathematics.Matrix4
+            {
+                Row0 = m.Row0,
+                Row1 = m.Row1,
+                Row2 = m.Row2,
+                Row3 = m.Row3
+            };
+        }
+        #endregion
+#endif
     }
 }

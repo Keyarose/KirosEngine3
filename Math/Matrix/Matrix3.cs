@@ -508,12 +508,12 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// Multiply two matrices together
         /// </summary>
-        /// <param name="m1">Left matrix</param>
-        /// <param name="m2">Right matrix</param>
+        /// <param name="lhs">Left matrix</param>
+        /// <param name="rhs">Right matrix</param>
         /// <returns>A new matrix containing the result</returns>
-        public static Matrix3 operator *(Matrix3 m1, Matrix3 m2)
+        public static Matrix3 operator *(Matrix3 lhs, Matrix3 rhs)
         {
-            return Multiply(m1, m2);
+            return Multiply(lhs, rhs);
         }
         #endregion
 
@@ -650,6 +650,25 @@ namespace KirosEngine3.Math.Matrix
             return HashCode.Combine(Row0, Row1, Row2);
         }
 
+        #region ToString
+        /// <inheritdoc/>
+        public override readonly string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
         ///<inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
@@ -657,7 +676,40 @@ namespace KirosEngine3.Math.Matrix
             var r1 = Row1.ToString(format, formatProvider);
             var r2 = Row2.ToString(format, formatProvider);
 
-            return string.Format(@"{0}\n{1}\n{2}", r0, r1, r2);
+            return string.Format("{0}\n{1}\n{2}", r0, r1, r2);
         }
+        #endregion
+
+#if OPENTK
+        #region OpenTKCompat
+        /// <summary>
+        /// Handle conversion from OpenTK's Matrix3 to Matrix3
+        /// </summary>
+        /// <param name="m">The matrix to convert</param>
+        public static implicit operator Matrix3(OpenTK.Mathematics.Matrix3 m) 
+        {
+            return new Matrix3
+            {
+                Row0 = m.Row0,
+                Row1 = m.Row1,
+                Row2 = m.Row2
+            };
+        }
+
+        /// <summary>
+        /// Handle conversion from Matrix3 to OpenTK's Matrix3
+        /// </summary>
+        /// <param name="m">The matrix to convert</param>
+        public static implicit operator OpenTK.Mathematics.Matrix3(Matrix3 m)
+        {
+            return new OpenTK.Mathematics.Matrix3
+            {
+                Row0 = m.Row0,
+                Row1 = m.Row1,
+                Row2 = m.Row2
+            };
+        }
+        #endregion
+#endif
     }
 }
