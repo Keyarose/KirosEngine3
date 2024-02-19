@@ -1011,6 +1011,7 @@ namespace KirosEngine3.Math.Vector
             result = MathF.Acos(float.Clamp(dot / (v1.Length * v2.Length), -1.0f, 1.0f));
         }
 
+        #region ToString
         /// <inheritdoc/>
         public override readonly string ToString()
         {
@@ -1034,6 +1035,7 @@ namespace KirosEngine3.Math.Vector
         {
             return string.Format("({0},{1},{2})", X.ToString(format, formatProvider), Y.ToString(format, formatProvider), Z.ToString(format, formatProvider));
         }
+        #endregion
 
         #region ComponentAccessors
         /// <summary>

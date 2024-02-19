@@ -534,6 +534,12 @@ namespace KirosEngine3.Math.Vector
             result.Y = v1.Y / v2.Y;
         }
         
+        /// <summary>
+        /// Define the division of a vector by a scalar
+        /// </summary>
+        /// <param name="left">The vector to divide</param>
+        /// <param name="right">The scalar to divide by</param>
+        /// <returns>The resulting vector</returns>
         public static Vec2 operator /(Vec2 left, float right)
         {
             if (right.IsZero())
@@ -547,6 +553,12 @@ namespace KirosEngine3.Math.Vector
             return left;
         }
 
+        /// <summary>
+        /// Define the division of a vector component wise by another vector
+        /// </summary>
+        /// <param name="left">The vector to divide</param>
+        /// <param name="right">The vector to divide by</param>
+        /// <returns>The resulting vector</returns>
         public static Vec2 operator /(Vec2 left, Vec2 right)
         {
             if (right.X.IsZero() || right.Y.IsZero())
@@ -677,7 +689,34 @@ namespace KirosEngine3.Math.Vector
         }
         #endregion
 
-        #region OpenTkCompat
+        #region ToString
+        /// <inheritdoc/>
+        public override readonly string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
+        public readonly string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return string.Format("({0},{1})", X.ToString(format, formatProvider), Y.ToString(format, formatProvider));
+        }
+        #endregion
+
+#if OPENTK
+        #region OpenTKCompat
         /// <summary>
         /// Handle conversion from OpenTK's Vector2 to Vec2
         /// </summary>
@@ -696,5 +735,6 @@ namespace KirosEngine3.Math.Vector
             return new Vector2(v.X, v.Y);
         }
         #endregion
+#endif
     }
 }

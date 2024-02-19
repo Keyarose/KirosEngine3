@@ -810,7 +810,7 @@ namespace KirosEngine3.Math.Vector
         #endregion
 
         //todo: transform methods
-
+        #region ToString
         /// <inheritdoc/>
         public override readonly string ToString()
         {
@@ -832,12 +832,13 @@ namespace KirosEngine3.Math.Vector
         /// <inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
-            return string.Format("({0},{1},{2},{3}",
+            return string.Format("({0},{1},{2},{3})",
                 X.ToString(format, formatProvider),
                 Y.ToString(format, formatProvider),
                 Z.ToString(format, formatProvider),
                 W.ToString(format, formatProvider));
         }
+        #endregion
 
         #region ComponentAccessors
         /// <summary>
