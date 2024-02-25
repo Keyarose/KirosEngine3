@@ -186,6 +186,111 @@ namespace KirosEngine3.Math.Matrix
             Row1 = new Vec2(m10, m11);
         }
 
+        /// <summary>
+        /// Convert the matrix into it's transpose
+        /// </summary>
+        public void Transpose()
+        {
+            this = Transpose(this);
+        }
+
+        /// <summary>
+        /// Convert the matrix into it's inverse
+        /// </summary>
+        public void Invert()
+        {
+            this = Invert(this);
+        }
+
+        #region Scale
+        /// <summary>
+        /// Create a matrix with scale values
+        /// </summary>
+        /// <param name="scale">The scale factor to be used in both dimensions</param>
+        /// <returns>The matrix that represents the scale factors</returns>
+        public static Matrix2 CreateScale(float scale)
+        {
+            return CreateScale(scale, scale);
+        }
+
+        /// <summary>
+        /// Create a matrix with scale values
+        /// </summary>
+        /// <param name="scale">The scale factor to be used in both dimensions</param>
+        /// <param name="result">The matrix that represents the scale factors</param>
+        public static void CreateScale(float scale, out Matrix2 result)
+        {
+            result = CreateScale(scale, scale);
+        }
+
+        /// <summary>
+        /// Create a matrix with scale values
+        /// </summary>
+        /// <param name="x">The X dimension scale factor</param>
+        /// <param name="y">The Y dimension scale factor</param>
+        /// <returns>The matrix that represents the scale factors</returns>
+        public static Matrix2 CreateScale(float x, float y)
+        {
+            return new Matrix2(x, 0.0f, 0.0f, y);
+        }
+
+        /// <summary>
+        /// Create a matrix with scale values
+        /// </summary>
+        /// <param name="x">The X dimension scale factor</param>
+        /// <param name="y">The Y dimension scale factor</param>
+        /// <param name="result">The matrix that represents the scale factors</param>
+        public static void CreateScale(float x, float y, out Matrix2 result)
+        {
+            result = CreateScale(x, y);
+        }
+
+        /// <summary>
+        /// Create a matrix with scale values
+        /// </summary>
+        /// <param name="v">The scale factors for each dimension</param>
+        /// <returns>The matrix that represents the scale factors</returns>
+        public static Matrix2 CreateScale(Vec2 v)
+        {
+            return CreateScale(v.X, v.Y);
+        }
+
+        /// <summary>
+        /// Create a matrix with scale values
+        /// </summary>
+        /// <param name="v">The scale factors for each dimension</param>
+        /// <param name="result">The matrix that represents the scale factors</param>
+        public static void CreateScale(Vec2 v, out Matrix2 result)
+        {
+            result = CreateScale(v.X, v.Y);
+        }
+        #endregion
+
+        #region Rotate
+        /// <summary>
+        /// Create a matrix to represent the rotation
+        /// </summary>
+        /// <param name="angle">The angle to rotate by</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 CreateRotation(float angle)
+        {
+            var cos = MathF.Cos(angle);
+            var sin = MathF.Sin(angle);
+
+            return new Matrix2(cos, sin, -sin, cos);
+        }
+
+        /// <summary>
+        /// Create a matrix to represent the rotation
+        /// </summary>
+        /// <param name="angle">The angle to rotate by</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void CreateRotation(float angle, out Matrix2 result)
+        {
+            result = CreateRotation(angle);
+        }
+        #endregion
+
         #region Add
         /// <summary>
         /// Add two matrices together
@@ -226,6 +331,47 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        #region Subtract
+        /// <summary>
+        /// Subtract one matrix from another
+        /// </summary>
+        /// <param name="m1">The matrix to subtract from</param>
+        /// <param name="m2">The matrix to subtract</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 Subtract(Matrix2 m1, Matrix2 m2)
+        {
+            var r = new Matrix2
+            {
+                Row0 = m1.Row0 - m2.Row0,
+                Row1 = m1.Row1 - m2.Row1
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Subtract one matrix from another
+        /// </summary>
+        /// <param name="m1">The matrix to subtract from</param>
+        /// <param name="m2">The matrix to subtract</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void Subtract(Matrix2 m1, Matrix2 m2, out Matrix2 result)
+        {
+            result = Subtract(m1, m2);
+        }
+
+        /// <summary>
+        /// Define the subtraction operator between two matrices
+        /// </summary>
+        /// <param name="lhs">The left matrix</param>
+        /// <param name="rhs">The right matrix</param>
+        /// <returns></returns>
+        public static Matrix2 operator -(Matrix2 lhs, Matrix2 rhs)
+        {
+            return Subtract(lhs, rhs);
+        }
+        #endregion
+
         #region Multiply
         /// <summary>
         /// Multiply two matrices together
@@ -255,6 +401,34 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
+        /// Multiply the matrix by a scalar value
+        /// </summary>
+        /// <param name="m">The matrix to multiply</param>
+        /// <param name="scale">The scalar to multiply by</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 Multiply(Matrix2 m, float scale)
+        {
+            return new Matrix2
+            {
+                Row0 = m.Row0 * scale,
+                Row1 = m.Row1 * scale
+            };
+        }
+
+        /// <summary>
+        /// Multiply the matrix by a scalar value
+        /// </summary>
+        /// <param name="m">The matrix to multiply</param>
+        /// <param name="scale">The scalar to multiply by</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void Multiply(Matrix2 m, float scale, out Matrix2 result)
+        {
+            result = Multiply(m, scale);
+        }
+
+        //todo: multiply(mat2,mat2x3), multiply(mat2, mat2x4)
+
+        /// <summary>
         /// Multiply two matrices together
         /// </summary>
         /// <param name="lhs">Left matrix</param>
@@ -264,9 +438,65 @@ namespace KirosEngine3.Math.Matrix
         {
             return Multiply(lhs, rhs);
         }
+
+        /// <summary>
+        /// Multiply a matrix by a scalar
+        /// </summary>
+        /// <param name="lhs">The matrix</param>
+        /// <param name="rhs">The scalar</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 operator *(Matrix2 lhs, float rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Multiply a matrix by a scalar
+        /// </summary>
+        /// <param name="lhs">The scalar</param>
+        /// <param name="rhs">The matrix</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 operator *(float lhs, Matrix2 rhs)
+        {
+            return Multiply(rhs, lhs);
+        }
         #endregion
 
-        //todo: invert
+        /// <summary>
+        /// Invert the given matrix
+        /// </summary>
+        /// <param name="m">The matrix to invert</param>
+        /// <returns>The resulting matrix</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the matrix's determinant is 0, thus singular</exception>
+        public static Matrix2 Invert(Matrix2 m)
+        {
+            if (m.Determinant.IsZero())
+            {
+                throw new InvalidOperationException("Matrix cannot be inverted as it's singular.");
+            }
+
+            var invDet = 1f / m.Determinant;
+
+            return new Matrix2(m.Row1.Y * invDet, -m.Row0.Y * invDet, -m.Row1.X * invDet, m.Row0.X * invDet);
+        }
+
+        /// <summary>
+        /// Invert the given matrix
+        /// </summary>
+        /// <param name="m">The matrix to invert</param>
+        /// <param name="result">The resulting matrix</param>
+        /// /// <exception cref="InvalidOperationException">Thrown if the matrix's determinant is 0, thus singular</exception>
+        public static void Invert(Matrix2 m, out Matrix2 result)
+        {
+            try
+            {
+                result = Invert(m);
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
+        }
 
         /// <summary>
         /// Find the transpose of a matrix

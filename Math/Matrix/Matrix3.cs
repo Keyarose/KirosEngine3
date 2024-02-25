@@ -410,6 +410,7 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        #region Rotate
         /// <summary>
         /// Create a copy of the matrix with the rotation removed
         /// </summary>
@@ -424,6 +425,7 @@ namespace KirosEngine3.Math.Matrix
         }
 
         //todo: getRotation, createRotation
+        #endregion
 
         #region Add
         /// <summary>
@@ -457,14 +459,16 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// Add two matrices together
         /// </summary>
-        /// <param name="left">First matrix to add</param>
-        /// <param name="right">Second matrix to add</param>
+        /// <param name="lhs">First matrix to add</param>
+        /// <param name="rhs">Second matrix to add</param>
         /// <returns>The resulting matrix in a new instance</returns>
-        public static Matrix3 operator +(Matrix3 left, Matrix3 right)
+        public static Matrix3 operator +(Matrix3 lhs, Matrix3 rhs)
         {
-            return Add(left, right);
+            return Add(lhs, rhs);
         }
         #endregion
+
+        //todo: subtract
 
         #region Multiply
         /// <summary>
@@ -515,6 +519,8 @@ namespace KirosEngine3.Math.Matrix
         {
             return Multiply(lhs, rhs);
         }
+
+        //todo: other multiplication
         #endregion
 
         /// <summary>
@@ -539,7 +545,7 @@ namespace KirosEngine3.Math.Matrix
             float determ = (row0x * inRow0X) + (row0y * inRow1X) + (row0z * inRow2X);
 
             //check that the determinant isn't zero
-            if(determ == 0f)
+            if(determ.IsZero())
             {
                 throw new InvalidOperationException("Matrix cannot be inverted as it is singular.");
             }

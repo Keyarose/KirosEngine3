@@ -26,5 +26,7 @@ namespace KirosEngine3.Math.Matrix
 
             M = new T[rowCount, columnCount];
         }
+
+        //todo: methods
     }
 }
