@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Shaders\" />
     <Folder Include="Resources\" />
   </ItemGroup>
 

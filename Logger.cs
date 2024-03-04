@@ -14,6 +14,7 @@ namespace KirosEngine3
         private static Logger? _instance;
         protected bool _enabled = true;
 
+        //todo: configurable file path
         protected string _filePath = "log/"; //default file path
         protected FileInfo? _fileInfo;
         protected int _maxLogSizeMB = 512; //default log size in mb
