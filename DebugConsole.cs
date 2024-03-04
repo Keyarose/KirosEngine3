@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3
 {
-    internal class GameConsole
+    internal class DebugConsole
     {
         protected List<string> _lines = new List<string>();
 
@@ -33,7 +33,7 @@ namespace KirosEngine3
             set { _visible = value; }
         }
 
-        public GameConsole(int xPos,  int yPos, int width, int height)
+        public DebugConsole(int xPos,  int yPos, int width, int height)
         {
             _xPos = xPos;
             _yPos = yPos;
