@@ -7,33 +7,21 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Textures
 {
+    struct CharData
+    {
+        public float x, y;
+        public int width, height;
+    }
+
     internal class Font
     {
-        private int _charWidth;
-        private int _charHeight;
-
         private string _name;
         private string _filePath;
 
-        private Texture _fontText;
+        private Texture _fontTexture;
+        private int _size;
 
-        private readonly List<Vec2> _charCoords = new List<Vec2>();
-
-        /// <summary>
-        /// The width of chars for the font
-        /// </summary>
-        public int CharWidth
-        {
-            get { return _charWidth; } 
-        }
-
-        /// <summary>
-        /// The height of chars for the font
-        /// </summary>
-        public int CharHeight
-        {
-            get { return _charHeight; } 
-        }
+        private readonly List<CharData> _charCoords = new List<CharData>();
 
         /// <summary>
         /// The name of the font
@@ -43,7 +31,13 @@ namespace KirosEngine3.Textures
             get { return _name; } 
         }
 
-        public List<Vec2> CharCoords
+        /// <summary>
+        /// The font size
+        /// </summary>
+        public int Size
+        { get { return _size; } }
+
+        public List<CharData> CharCoords
         {
             get { return _charCoords; }
         }
@@ -52,7 +46,7 @@ namespace KirosEngine3.Textures
         {
             _name = name;
             _filePath = filePath;
-            _fontText = tex;
+            _fontTexture = tex;
             
             LoadFont();
             //todo: check that texture is loaded

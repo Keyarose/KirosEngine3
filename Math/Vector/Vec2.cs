@@ -241,7 +241,7 @@ namespace KirosEngine3.Math.Vector
         /// <inheritdoc/>
         public override readonly bool Equals([NotNullWhen(true)] object? obj)
         {
-            return obj is Vec2 && Equals((Vec2)obj);
+            return obj is Vec2 vec && Equals(vec);
         }
 
         /// <inheritdoc/>
