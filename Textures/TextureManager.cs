@@ -11,7 +11,7 @@ namespace KirosEngine3.Textures
     internal class TextureManager
     {
         private static TextureManager? _instance;
-
+        //todo: convert methods to static
         private Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
 
         private bool _autoLoadTextures = false;
@@ -180,15 +180,15 @@ namespace KirosEngine3.Textures
         /// Clean up the manager in preparation for closing the program
         /// </summary>
         /// <exception cref="CollectionNotEmptyException">Thrown when the texture dictionary is not properly emptied</exception>
-        public void OnUnload()
+        public static void OnUnload()
         {
-            foreach (var key in _textures.Keys)
+            foreach (var key in Instance._textures.Keys)
             {
-                _textures[key].Dispose();
+                Instance._textures[key].Dispose();
             }
-            _textures.Clear();
+            Instance._textures.Clear();
 
-            if (_textures.Count > 0 )
+            if (Instance._textures.Count > 0 )
             {
                 throw new CollectionNotEmptyException("The Texture Manager collection is not empty after running OnUnload, something is wrong.");
             }

@@ -14,7 +14,7 @@ namespace KirosEngine3.Scenes
     public sealed class SceneManager
     {
         private static SceneManager? _instance;
-
+        
         private readonly Dictionary<string, Scene> _scenes = new Dictionary<string, Scene>();
 
         /// <summary>
@@ -33,9 +33,9 @@ namespace KirosEngine3.Scenes
         /// </summary>
         /// <param name="scene">The scene to be added to the manager</param>
         /// <exception cref="ArgumentException">Thrown if the name for the scene is already in use</exception>
-        public void AddScene(Scene scene)
+        public static void AddScene(Scene scene)
         {
-            if (!_scenes.TryAdd(scene.Name, scene))
+            if (!Instance._scenes.TryAdd(scene.Name, scene))
             {
                 throw new ArgumentException(string.Format("Scene name: {0} is already in use.", scene.Name));
             }
@@ -47,9 +47,9 @@ namespace KirosEngine3.Scenes
         /// <param name="name">The name of the scene</param>
         /// <param name="scene">The xml document containing the scene data</param>
         /// <exception cref="ArgumentException">Thrown if the name for the scene is already in use</exception>
-        public void AddScene(string name, XDocument scene)
+        public static void AddScene(string name, XDocument scene)
         {
-            if (!_scenes.TryAdd(name, new Scene(name, scene)))
+            if (!Instance._scenes.TryAdd(name, new Scene(name, scene)))
             {
                 throw new ArgumentException(string.Format("Scene name: {0} is already in use.", name));
             }
@@ -61,9 +61,9 @@ namespace KirosEngine3.Scenes
         /// <param name="name">The name of the scene</param>
         /// <param name="file">The file containing the scene data</param>
         /// <exception cref="ArgumentException">Thrown if the name for the scene is already in use</exception>
-        public void AddScene(string name, string file)
+        public static void AddScene(string name, string file)
         {
-            if (!_scenes.TryAdd(name, new Scene(name, file)))
+            if (!Instance._scenes.TryAdd(name, new Scene(name, file)))
             {
                 throw new ArgumentException(string.Format("Scene name: {0} is already in use.", name));
             }
@@ -74,9 +74,9 @@ namespace KirosEngine3.Scenes
         /// </summary>
         /// <param name="scene">The scene to be added to the manager</param>
         /// <returns>True if the scene is successfully added to the manager, false otherwise</returns>
-        public bool TryAddScene(Scene scene)
+        public static bool TryAddScene(Scene scene)
         {
-            if (_scenes.TryAdd(scene.Name, scene))
+            if (Instance._scenes.TryAdd(scene.Name, scene))
             {
                 return true;
             }
@@ -92,9 +92,9 @@ namespace KirosEngine3.Scenes
         /// <param name="name">The name of the scene to be added</param>
         /// <param name="scene">The xml doc containing the scene data</param>
         /// <returns>True if the scene is successfully added to the manager, false otherwise</returns>
-        public bool TryAddScene(string name, XDocument scene)
+        public static bool TryAddScene(string name, XDocument scene)
         {
-            if (_scenes.TryAdd(name, new Scene(name, scene)))
+            if (Instance._scenes.TryAdd(name, new Scene(name, scene)))
             {
                 return true;
             }
@@ -110,9 +110,9 @@ namespace KirosEngine3.Scenes
         /// <param name="name">The name of the scene to be added</param>
         /// <param name="file">The file containing the scene data</param>
         /// <returns>True if the scene is successfully added to the manager, false otherwise</returns>
-        public bool TryAddScene(string name, string file)
+        public static bool TryAddScene(string name, string file)
         {
-            if (_scenes.TryAdd(name, new Scene(file)))
+            if (Instance._scenes.TryAdd(name, new Scene(file)))
             {
                 return true;
             }
@@ -127,13 +127,13 @@ namespace KirosEngine3.Scenes
         /// </summary>
         /// <param name="name">The name of the scene to be removed</param>
         /// <returns>True if the scene is removed, false if no scene is found for the name</returns>
-        public bool TryRemoveScene(string name)
+        public static bool TryRemoveScene(string name)
         {
             //if the scene exists clean up it's resources before removing it
-            if (_scenes.TryGetValue(name, out var scene))
+            if (Instance._scenes.TryGetValue(name, out var scene))
             {
                 scene.Unload();
-                return _scenes.Remove(name);
+                return Instance._scenes.Remove(name);
             }
 
             return false;
@@ -145,9 +145,9 @@ namespace KirosEngine3.Scenes
         /// <param name="name">The name of the scene to get</param>
         /// <param name="scene">The scene for the name if it exists</param>
         /// <returns>True if the scene is found, false otherwise</returns>
-        public bool TryGetScene(string name, out Scene? scene)
+        public static bool TryGetScene(string name, out Scene? scene)
         {
-            if (_scenes.TryGetValue(name, out var sce))
+            if (Instance._scenes.TryGetValue(name, out var sce))
             {
                 scene = sce;
                 return true;
@@ -161,15 +161,15 @@ namespace KirosEngine3.Scenes
         /// Clean up the scenes before unloading the program
         /// </summary>
         /// <exception cref="CollectionNotEmptyException">Thrown when the shader dictionary is not properly emptied</exception>
-        public void OnUnload()
+        public static void OnUnload()
         {
-            foreach (var key in _scenes.Keys)
+            foreach (var key in Instance._scenes.Keys)
             {
-                _scenes[key].Unload();
+                Instance._scenes[key].Unload();
             }
-            _scenes.Clear();
+            Instance._scenes.Clear();
 
-            if (_scenes.Count > 0) 
+            if (Instance._scenes.Count > 0) 
             {
                 throw new CollectionNotEmptyException("The Scene Manager collection is not empty after running OnUnload, something is wrong.");
             }
