@@ -101,7 +101,7 @@ namespace KirosEngine3.Textures
             if (!_loaded)
             {
                 Console.WriteLine("Attempting to use texture:" + _name + "without first loading it!"); //todo: exception handling
-                Logger.Instance.WriteToLog(string.Format("Attempt to use texture: {0} without first loading it.", _name));
+                Logger.WriteToLog(string.Format("Attempt to use texture: {0} without first loading it.", _name));
                 //todo: write to debug console
             }
             GL.ActiveTexture(unit);

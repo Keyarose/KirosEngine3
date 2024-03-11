@@ -579,7 +579,7 @@ namespace KirosEngine3.Math.Vector
             if(divisor.IsZero())
             {
                 Console.WriteLine("Division by zero in Vec3.Divide()");
-                Logger.Instance.WriteToLog("Division by zero in Vec3.Divide()");
+                Logger.WriteToLog("Division by zero in Vec3.Divide()");
             }
             return new Vec3(v.X / divisor, v.Y / divisor, v.Z / divisor);
         }
@@ -595,7 +595,7 @@ namespace KirosEngine3.Math.Vector
             if (divisor.IsZero())
             {
                 Console.WriteLine("Division by zero in Vec3.Divide()");
-                Logger.Instance.WriteToLog("Division by zero in Vec3.Divide()");
+                Logger.WriteToLog("Division by zero in Vec3.Divide()");
             }
             result.X = v.X / divisor;
             result.Y = v.Y / divisor;
@@ -613,7 +613,7 @@ namespace KirosEngine3.Math.Vector
             if (v2.X.IsZero() || v2.Y.IsZero() || v2.Z.IsZero())
             {
                 Console.WriteLine("Division by zero in Vec3.Divide()");
-                Logger.Instance.WriteToLog("Division by zero in Vec3.Divide()");
+                Logger.WriteToLog("Division by zero in Vec3.Divide()");
             }
             return new Vec3(v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z);
         }
@@ -629,7 +629,7 @@ namespace KirosEngine3.Math.Vector
             if (v2.X.IsZero() || v2.Y.IsZero() || v2.Z.IsZero())
             {
                 Console.WriteLine("Division by zero in Vec3.Divide()");
-                Logger.Instance.WriteToLog("Division by zero in Vec3.Divide()");
+                Logger.WriteToLog("Division by zero in Vec3.Divide()");
             }
             result.X = v1.X / v2.X;
             result.Y = v1.Y / v2.Y;
@@ -647,7 +647,7 @@ namespace KirosEngine3.Math.Vector
             if (right.IsZero())
             {
                 Console.WriteLine("Division by zero in Vec3.Divide()");
-                Logger.Instance.WriteToLog("Division by zero in Vec3.Divide()");
+                Logger.WriteToLog("Division by zero in Vec3.Divide()");
             }
             left.X /= right;
             left.Y /= right;
@@ -666,7 +666,7 @@ namespace KirosEngine3.Math.Vector
             if (right.X.IsZero() || right.Y.IsZero() || right.Z.IsZero())
             {
                 Console.WriteLine("Division by zero in Vec3.Divide()");
-                Logger.Instance.WriteToLog("Division by zero in Vec3.Divide()");
+                Logger.WriteToLog("Division by zero in Vec3.Divide()");
             }
             left.X /= right.X;
             left.Y /= right.Y;
@@ -859,7 +859,7 @@ namespace KirosEngine3.Math.Vector
         /// <returns>The straight line distance between two points</returns>
         public static float Distance(Vec3 v1, Vec3 v2)
         {
-            return MathF.Sqrt(((v2.X - v1.X) * (v2.X - v1.Y)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)) + ((v2.Z - v1.Z) * (v2.Z - v1.Z)));
+            return MathF.Sqrt(((v2.X - v1.X) * (v2.X - v1.X)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)) + ((v2.Z - v1.Z) * (v2.Z - v1.Z)));
         }
 
         /// <summary>
@@ -870,7 +870,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The straight line distance between two points</param>
         public static void Distance(Vec3 v1, Vec3 v2, out float result)
         {
-            result = MathF.Sqrt(((v2.X - v1.X) * (v2.X - v1.Y)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)) + ((v2.Z - v1.Z) * (v2.Z - v1.Z)));
+            result = MathF.Sqrt(((v2.X - v1.X) * (v2.X - v1.X)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)) + ((v2.Z - v1.Z) * (v2.Z - v1.Z)));
         }
 
         /// <summary>

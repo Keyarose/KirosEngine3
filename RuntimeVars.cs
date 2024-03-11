@@ -71,7 +71,7 @@ namespace KirosEngine3
                 return true;
             }
 
-            Logger.Instance.WriteToLog(string.Format("Variable already registered for the name: {0}", name));
+            Logger.WriteToLog(string.Format("Variable already registered for the name: {0}", name));
             //todo: write to debug console
             return false;
         }

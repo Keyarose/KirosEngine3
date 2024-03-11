@@ -507,7 +507,7 @@ namespace KirosEngine3.Math.Vector
             if(divisor.IsZero())
             {
                 Console.WriteLine("Division by zero in Vec4.Divide()");
-                Logger.Instance.WriteToLog("Division by zero in Vec4.Divide()");
+                Logger.WriteToLog("Division by zero in Vec4.Divide()");
             }
 
             return new Vec4(v.X / divisor, v.Y / divisor, v.Z / divisor, v.W / divisor);
@@ -535,7 +535,7 @@ namespace KirosEngine3.Math.Vector
             if (v2.X.IsZero() || v2.Y.IsZero() || v2.Z.IsZero() || v2.W.IsZero())
             {
                 Console.WriteLine("Division by zero in Vec4.Divide()");
-                Logger.Instance.WriteToLog("Division by zero in Vec4.Divide()");
+                Logger.WriteToLog("Division by zero in Vec4.Divide()");
             }
             return new Vec4(v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z, v1.W / v2.W);
         }

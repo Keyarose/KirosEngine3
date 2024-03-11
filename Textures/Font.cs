@@ -52,6 +52,9 @@ namespace KirosEngine3.Textures
             //todo: check that texture is loaded
         }
 
+        /// <summary>
+        /// Load the font data from its file
+        /// </summary>
         private void LoadFont() 
         {
             FileInfo fFile = new FileInfo(_filePath);

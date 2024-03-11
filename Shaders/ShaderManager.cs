@@ -70,7 +70,7 @@ namespace KirosEngine3.Shaders
             if (Instance._shaders.TryAdd(name, new Shader(name, vertPath, fragPath)))
             { return true; }
 
-            Logger.Instance.WriteToLog(string.Format("Shader name: {0} is already in use.", name));
+            Logger.WriteToLog(string.Format("Shader name: {0} is already in use.", name));
             //todo: write to debug console
             return false;
         }
@@ -86,7 +86,7 @@ namespace KirosEngine3.Shaders
             if (Instance._shaders.TryAdd(name, shader))
             { return true; }
 
-            Logger.Instance.WriteToLog(string.Format("Shader name: {0} is already in use.", name));
+            Logger.WriteToLog(string.Format("Shader name: {0} is already in use.", name));
             //todo: write to debug console
             return false;
         }

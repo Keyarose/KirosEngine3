@@ -12,7 +12,7 @@ namespace KirosEngine3.Math.Vector
     /// <summary>
     /// A 2D Vector struct that contains float values
     /// </summary>
-    public struct Vec2 : IEquatable<Vec2>
+    public struct Vec2 : IEquatable<Vec2>, IFormattable
     {
         public float X;
         public float Y;
@@ -476,7 +476,7 @@ namespace KirosEngine3.Math.Vector
             if (divisor.IsZero())
             {
                 Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
-                Logger.Instance.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
+                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
             }
             return new Vec2(v1.X / divisor, v1.Y / divisor);
         }
@@ -492,7 +492,7 @@ namespace KirosEngine3.Math.Vector
             if (divisor.IsZero())
             {
                 Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
-                Logger.Instance.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
+                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
             }
 
             result.X = v1.X / divisor;
@@ -510,7 +510,7 @@ namespace KirosEngine3.Math.Vector
             if (v2.X.IsZero() || v2.Y.IsZero())
             {
                 Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
-                Logger.Instance.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
+                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
             }
 
             return new Vec2(v1.X / v2.X, v1.Y / v2.Y);
@@ -527,7 +527,7 @@ namespace KirosEngine3.Math.Vector
             if (v2.X.IsZero() || v2.Y.IsZero())
             {
                 Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
-                Logger.Instance.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
+                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
             }
 
             result.X = v1.X / v2.X;
@@ -545,7 +545,7 @@ namespace KirosEngine3.Math.Vector
             if (right.IsZero())
             {
                 Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
-                Logger.Instance.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
+                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
             }
 
             left.X /= right;
@@ -564,7 +564,7 @@ namespace KirosEngine3.Math.Vector
             if (right.X.IsZero() || right.Y.IsZero())
             {
                 Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
-                Logger.Instance.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
+                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
             }
 
             left.X /= right.X;
@@ -593,6 +593,28 @@ namespace KirosEngine3.Math.Vector
         public static void Dot(Vec2 v1, Vec2 v2, out float result)
         {
             result = v1.X * v2.X + v1.Y * v2.Y;
+        }
+
+        /// <summary>
+        /// Calculate the distance between two points as represented by vectors
+        /// </summary>
+        /// <param name="v1">The first point</param>
+        /// <param name="v2">The second point</param>
+        /// <returns>The straight line distance between two points</returns>
+        public static float Distance(Vec2 v1, Vec2 v2)
+        {
+            return MathF.Sqrt(((v2.X - v1.X) * (v2.X - v1.X)) + ((v2.Y - v1.Y) * (v2.Y - v1.Y)));
+        }
+
+        /// <summary>
+        /// Calculate the distance between two points as represented by vectors
+        /// </summary>
+        /// <param name="v1">The first point</param>
+        /// <param name="v2">The second point</param>
+        /// <param name="result">The straight line distance between two points</param>
+        public static void Distance(Vec2 v1, Vec2 v2, out float result)
+        {
+            result = Distance(v1, v2);
         }
 
         #region MinMax

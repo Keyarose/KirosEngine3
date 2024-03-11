@@ -33,7 +33,7 @@ namespace KirosEngine3.Math.Data
         [XmlIgnore]
         public float X
         {
-            get { return Axis.X; }
+            readonly get { return Axis.X; }
             set { Axis.X = value; }
         }
 
@@ -43,7 +43,7 @@ namespace KirosEngine3.Math.Data
         [XmlIgnore]
         public float Y
         {
-            get { return Axis.Y; }
+            readonly get { return Axis.Y; }
             set { Axis.Y = value; }
         }
 
@@ -53,7 +53,7 @@ namespace KirosEngine3.Math.Data
         [XmlIgnore]
         public float Z
         {
-            get { return Axis.Z; }
+            readonly get { return Axis.Z; }
             set { Axis.Z = value; }
         }
 
@@ -128,7 +128,7 @@ namespace KirosEngine3.Math.Data
         /// Create a normalized copy of the Quaternion
         /// </summary>
         /// <returns>The resulting normalized quaternion</returns>
-        public Quaternion NormalizedCopy()
+        public readonly Quaternion NormalizedCopy()
         {
             var c = this;
             c.Normalize();
@@ -159,7 +159,7 @@ namespace KirosEngine3.Math.Data
         /// <summary>
         /// The magnitude of the quaternion
         /// </summary>
-        public float Magnitude
+        public readonly float Magnitude
         {
             get
             {
@@ -170,7 +170,7 @@ namespace KirosEngine3.Math.Data
         /// <summary>
         /// The Length of the quaternion, alias for Magnitude
         /// </summary>
-        public float Length
+        public readonly float Length
         {
             get { return Magnitude; }
         }
@@ -178,7 +178,7 @@ namespace KirosEngine3.Math.Data
         /// <summary>
         /// The magnitude of the quaternion squared
         /// </summary>
-        public float MagnitudeSquared
+        public readonly float MagnitudeSquared
         {
             get
             {
@@ -189,7 +189,7 @@ namespace KirosEngine3.Math.Data
         /// <summary>
         /// The length of the quaternion squared, alias for Magnitude
         /// </summary>
-        public float LengthSquared
+        public readonly float LengthSquared
         {
             get { return MagnitudeSquared; }
         }
@@ -426,10 +426,10 @@ namespace KirosEngine3.Math.Data
                 W = 2.0f * MathF.Acos(q.W) //calc angle
             };
 
-            var denom = MathF.Sqrt(1.0f - (q.W * q.W));
-            if(denom > 0.0001f)
+            var denominator = MathF.Sqrt(1.0f - (q.W * q.W));
+            if(denominator > 0.0001f)
             {
-                r.Xyz = q.Xyz / denom;
+                r.Xyz = q.Xyz / denominator;
             }
             else
             {
@@ -456,7 +456,7 @@ namespace KirosEngine3.Math.Data
         /// Convert the Quaternion to a set of Euler angles
         /// </summary>
         /// <returns>The resulting Euler angles</returns>
-        public Vec3 ToEulerAngles()
+        public readonly Vec3 ToEulerAngles()
         {
             var q = this;
 
@@ -546,44 +546,44 @@ namespace KirosEngine3.Math.Data
         }
 
         /// <inheritdoc/>
-        public override bool Equals([NotNullWhen(true)] object? obj)
+        public override readonly bool Equals([NotNullWhen(true)] object? obj)
         {
-            return obj is Quaternion q && Equals(obj);
+            return obj is Quaternion q && Equals(q);
         }
 
         /// <inheritdoc/>
-        public bool Equals(Quaternion other)
+        public readonly bool Equals(Quaternion other)
         {
             return Axis == other.Axis && W == other.W;
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine(W, Axis);
         }
 
         #region ToString
         /// <inheritdoc/>
-        public override string ToString()
+        public override readonly string ToString()
         {
             return ToString(null, null);
         }
 
         /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
-        public string ToString(string? format)
+        public readonly string ToString(string? format)
         {
             return ToString(format, null);
         }
 
         /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
-        public string ToString(IFormatProvider? formatProvider)
+        public readonly string ToString(IFormatProvider? formatProvider)
         {
             return ToString(null, formatProvider);
         }
 
         /// <inheritdoc/>
-        public string ToString(string? format, IFormatProvider? formatProvider)
+        public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
             return string.Format("(({0}), ({1}, {2}, {3}))", W.ToString(format, formatProvider), Axis.X.ToString(format, formatProvider), Axis.Y.ToString(format, formatProvider), Axis.Z.ToString(format, formatProvider));
         }
@@ -596,7 +596,7 @@ namespace KirosEngine3.Math.Data
         [XmlIgnore]
         public Vec3 Xyz
         {
-            get { return Axis; }
+            readonly get { return Axis; }
             set { Axis = value; }
         }
         #endregion

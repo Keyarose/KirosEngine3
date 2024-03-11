@@ -72,7 +72,7 @@ namespace KirosEngine3.Shaders
             }
             catch (Exception ex)
             {
-                Logger.Instance.WriteToLog(ex.Message);
+                Logger.WriteToLog(ex.Message);
                 Console.WriteLine(ex.Message);
                 return;
             }
@@ -94,7 +94,7 @@ namespace KirosEngine3.Shaders
             {
                 string info = GL.GetShaderInfoLog(vertexShader);
                 Console.WriteLine(info);
-                Logger.Instance.WriteToLog(info);
+                Logger.WriteToLog(info);
             }
 
             //compile the fragment shader
@@ -106,7 +106,7 @@ namespace KirosEngine3.Shaders
             {
                 string info = GL.GetShaderInfoLog(fragmentShader);
                 Console.WriteLine(info);
-                Logger.Instance.WriteToLog(info);
+                Logger.WriteToLog(info);
             }
 
             //create the shader program handle
@@ -123,7 +123,7 @@ namespace KirosEngine3.Shaders
             {
                 string info = GL.GetProgramInfoLog(_handle);
                 Console.WriteLine(info);
-                Logger.Instance.WriteToLog(info);
+                Logger.WriteToLog(info);
             }
 
             //cleanup
@@ -190,7 +190,7 @@ namespace KirosEngine3.Shaders
             if (_disposed == false)
             {
                 Console.WriteLine("Shader named: " + _name + ", not properly disposed of.");
-                Logger.Instance.WriteToLog("Shader named: " + _name + ", not properly disposed of.");
+                Logger.WriteToLog("Shader named: " + _name + ", not properly disposed of.");
             }
         }
     }

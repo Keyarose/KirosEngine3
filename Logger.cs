@@ -123,18 +123,18 @@ namespace KirosEngine3
         /// Write a string to the log file
         /// </summary>
         /// <param name="message">The string to write</param>
-        public void WriteToLog(string message)
+        public static void WriteToLog(string message)
         {
-            if(_enabled && (_fileInfo != null))
+            if(Instance._enabled && (Instance._fileInfo != null))
             {
-                if(!IsLogFull())
+                if(!Instance.IsLogFull())
                 {
                     try
                     {
                         //append the message to the log prefixed by the datetime to millisecond
-                        using StreamWriter sw = _fileInfo.AppendText();
+                        using StreamWriter sw = Instance._fileInfo.AppendText();
                         sw.WriteLine(string.Format("{0} : {1}", DateTime.Now.ToString("MM/dd/yy-HH:mm:ss.fff"), message));
-                        _currentLineCount++;
+                        Instance._currentLineCount++;
                     }
                     catch (IOException ex) 
                     {
@@ -144,14 +144,14 @@ namespace KirosEngine3
                 }
                 else
                 {
-                    BeginNewLog();
+                    Instance.BeginNewLog();
 
                     try
                     {
                         //append the message to the log prefixed by the datetime to millisecond
-                        using StreamWriter sw = _fileInfo.AppendText();
+                        using StreamWriter sw = Instance._fileInfo.AppendText();
                         sw.WriteLine(string.Format("{0} : {1}", DateTime.Now.ToString("MM/dd/yy-HH:mm:ss.fff"), message));
-                        _currentLineCount++;
+                        Instance._currentLineCount++;
                     }
                     catch (IOException ex)
                     {
@@ -162,17 +162,17 @@ namespace KirosEngine3
             }
         }
 
-        public void WriteToLog(int i)
+        public static void WriteToLog(int i)
         {
             WriteToLog(i.ToString());
         }
 
-        public void WriteToLog(float f)
+        public static void WriteToLog(float f)
         {
             WriteToLog(f.ToString());
         }
 
-        public void WriteToLog(Exception ex)
+        public static void WriteToLog(Exception ex)
         {
             WriteToLog(ex.ToString());
         }

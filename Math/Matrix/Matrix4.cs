@@ -338,7 +338,7 @@ namespace KirosEngine3.Math.Matrix
         /// Create a copy of the matrix without translation
         /// </summary>
         /// <returns>The matrix without translation</returns>
-        public Matrix4 ClearTranslation()
+        public readonly Matrix4 ClearTranslation()
         {
             var c = this;
             c.Row3.Xyz = Vec3.Zero;

@@ -9,7 +9,7 @@ namespace KirosEngine3
 {
     internal class DebugConsole
     {
-        protected List<string> _lines = new List<string>();
+        protected List<string> _lines = [];
 
         protected int _xPos;
         protected int _yPos;
