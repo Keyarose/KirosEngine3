@@ -247,6 +247,18 @@ namespace KirosEngine3.Math.Vector
                 !(float.IsNaN(X) || float.IsNaN(Y) || float.IsNaN(Z));
         }
 
+        /// <summary>
+        /// Check if the vector is parallel to the given vector
+        /// </summary>
+        /// <param name="v">The given vector</param>
+        /// <returns>True if they are parallel, false otherwise</returns>
+        public readonly bool IsParallel(Vec3 v)
+        {
+            if (Cross(this, v).IsZero()) { return true; }
+
+            return false;
+        }
+
         /// <inheritdoc/>
         public override readonly bool Equals([NotNullWhen(true)] object? obj)
         {
@@ -1044,7 +1056,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Xy
         {
-            get { return new Vec2(X, Y); }
+            readonly get { return new Vec2(X, Y); }
             set { X = value.X; Y = value.Y; }
         }
 
@@ -1054,7 +1066,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Xz
         {
-            get { return new Vec2(X, Z); }
+            readonly get { return new Vec2(X, Z); }
             set { X = value.X; Z = value.Y; }
         }
 
@@ -1064,7 +1076,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Yx
         {
-            get { return new Vec2(Y, X); }
+            readonly get { return new Vec2(Y, X); }
             set { Y = value.X; X = value.Y; }
         }
 
@@ -1074,7 +1086,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Yz
         {
-            get { return new Vec2(Y, Z); }
+            readonly get { return new Vec2(Y, Z); }
             set { Y = value.X; Z = value.Y; }
         }
 
@@ -1084,7 +1096,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Zx
         {
-            get { return new Vec2(Z, X); }
+            readonly get { return new Vec2(Z, X); }
             set { Z = value.X; X = value.Y; }
         }
 
@@ -1094,7 +1106,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Zy
         {
-            get { return new Vec2(Z, Y); }
+            readonly get { return new Vec2(Z, Y); }
             set { Z = value.X; Y = value.Y; }
         }
 
@@ -1104,7 +1116,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Xzy
         {
-            get { return new Vec3(X, Z, Y); }
+            readonly get { return new Vec3(X, Z, Y); }
             set { X = value.X; Z = value.Y; Y = value.Z; }
         }
 
@@ -1114,7 +1126,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Yxz
         {
-            get { return new Vec3(Y, X, Z); }
+            readonly get { return new Vec3(Y, X, Z); }
             set { Y = value.X; X = value.Y; Z = value.Z; }
         }
 
@@ -1124,7 +1136,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Yzx
         {
-            get { return new Vec3(Y, Z, X); }
+            readonly get { return new Vec3(Y, Z, X); }
             set { Y = value.X; Z = value.Y; X = value.Z; }
         }
 
@@ -1134,7 +1146,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Zxy
         {
-            get { return new Vec3(Z, X, Y); }
+            readonly get { return new Vec3(Z, X, Y); }
             set { Z = value.X; X = value.Y; Y = value.Z; }
         }
 
@@ -1144,7 +1156,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Zyx
         {
-            get { return new Vec3(Z, Y, X); }
+            readonly get { return new Vec3(Z, Y, X); }
             set { Z = value.X; Y = value.Y; X = value.Z; }
         }
         #endregion
