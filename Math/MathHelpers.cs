@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,6 +51,28 @@ namespace KirosEngine3.Math
         public static float Clamp(this float a, float min, float max)
         {
             return a < min ? min : (a > max ? max : a);
+        }
+
+        /// <summary>
+        /// Compare one float to another to see if they are within the given margin of difference
+        /// </summary>
+        /// <param name="a">The first float to compare</param>
+        /// <param name="b">The second float</param>
+        /// <param name="margin">The margin of difference to look for, defaults to Epsilon</param>
+        /// <returns>True if the difference is less than the margin, false otherwise</returns>
+        public static bool CloseTo(this float a, float b, float margin = float.Epsilon)
+        {
+            return (a - b) <= margin;
+        }
+
+        /// <summary>
+        /// Shortcut method for getting the absolute value of a float
+        /// </summary>
+        /// <param name="a">The float to get the absolute value</param>
+        /// <returns>The absolute value</returns>
+        public static float Abs(this float a)
+        {
+            return MathF.Abs(a);
         }
     }
 }

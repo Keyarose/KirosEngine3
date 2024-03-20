@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace KirosEngine3.Math.Geometry
         /// <summary>
         /// One of two points that define the circle's plane in conjunction with the center
         /// </summary>
-        Vec3 Plane1, Plane2;
+        public Plane CirPlane;
 
         /// <summary>
         /// The Diameter of the circle
@@ -36,9 +37,7 @@ namespace KirosEngine3.Math.Geometry
         /// The Circumference of the circle
         /// </summary>
         public readonly float Circumference { get { return Diameter * MathF.PI; } }
-
-        //todo: public Plane CirPlane { get { return new Plane(Center, Plane1, Plane2); } }
-
+                
         /// <summary>
         /// Basic constructor for a circle
         /// </summary>
@@ -50,8 +49,7 @@ namespace KirosEngine3.Math.Geometry
         {
             Radius = rad;
             Center = cen;
-            Plane1 = p1;
-            Plane2 = p2;
+            CirPlane = new Plane(cen, p1, p2);
         }
 
         /// <summary>
@@ -64,8 +62,20 @@ namespace KirosEngine3.Math.Geometry
         {
             Radius = cir.Radius;
             Center = new Vec3(cir.Center, 0);
-            Plane1 = p1;
-            Plane2 = p2;
+            CirPlane = new Plane(Center, p1, p2);
+        }
+        
+        /// <summary>
+        /// Construct a 3D circle using a plane
+        /// </summary>
+        /// <param name="rad">The radius of the circle</param>
+        /// <param name="cen">The center of the circle, must be a point on the provided plane.</param>
+        /// <param name="p">The plane the circle is on</param>
+        public Circle3D(float rad, Vec3 cen, Plane p)
+        {
+            Radius = rad;
+            Center = cen; //todo: check that center is on CirPlane
+            CirPlane = p;
         }
 
         /// <summary>
@@ -75,12 +85,11 @@ namespace KirosEngine3.Math.Geometry
         /// <returns>True if the point is inside the circle, false otherwise</returns>
         public readonly bool IsPointInside(Vec3 point)
         {
-            if (point == Center) { return true; }
+            if (point == Center) { return true; } //if the point is the center then it's true
 
+            //if the point is on the same plane as the circle and closer than the radius to the center then it's true
             var dist = Vec3.Distance(Center, point);
-            //if (CirPlane.IsOnPlane(point) && MathF.Abs(dist) < Radius) { return true; }
-
-            return false;
+            return CirPlane.IsOnPlane(point) && MathF.Abs(dist) < Radius;
         }
 
         /// <inheritdoc/>
@@ -92,13 +101,13 @@ namespace KirosEngine3.Math.Geometry
         /// <inheritdoc/>
         public readonly bool Equals(Circle3D other)
         {
-            return Radius == other.Radius && Center == other.Center; //todo: && CirPlane == other.CirPlane;
+            return Radius == other.Radius && Center == other.Center && CirPlane == other.CirPlane;
         }
 
         /// <inheritdoc/>
         public override readonly int GetHashCode()
         {
-            return HashCode.Combine(HashCode.Combine(Radius, Center.GetHashCode()), HashCode.Combine(Plane1, Plane2));
+            return HashCode.Combine(HashCode.Combine(Radius, Center), CirPlane);
         }
 
         /// <summary>
@@ -144,11 +153,10 @@ namespace KirosEngine3.Math.Geometry
         /// <inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
-            return string.Format("Center: {0} Radius: {1} Plane Point 1: {2} Plane Point 2: {3}",
+            return string.Format("Circle3D \n\t Center: {0}\n\t Radius: {1}\n\t Plane: {2}",
                 Center.ToString(format, formatProvider),
                 Radius.ToString(format, formatProvider),
-                Plane1.ToString(format, formatProvider),
-                Plane2.ToString(format, formatProvider));
+                CirPlane.ToString(format, formatProvider));
         }
     }
 }

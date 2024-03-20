@@ -20,8 +20,7 @@ namespace KirosEngine3.Math.Geometry
         {
             Vertices = verts;
 
-            Vec3 norm = Vec3.Cross(Edge3, Edge1);
-            Normal = norm.NormalizedCopy();
+            Normal = Vec3.Cross(Edge3, Edge1).NormalizedCopy();
 
 #if DEBUG
             if (!Normal.IsFinite()) //unsure if it's needed so its debug only for now
@@ -86,6 +85,11 @@ namespace KirosEngine3.Math.Geometry
         /// The area of the triangle
         /// </summary>
         public readonly float Area { get { return Vec3.Cross(Edge1, Edge2).Length / 2; } }
+
+        /// <summary>
+        /// The Plane the triangle exists in
+        /// </summary>
+        public readonly Plane TriPlane { get { return new Plane(Vertices); } }
 
         /// <inheritdoc/>
         public override readonly string ToString()

@@ -73,7 +73,7 @@ namespace KirosEngine3.Math.Geometry
         /// <inheritdoc/>
         public override readonly int GetHashCode()
         {
-            return HashCode.Combine(Radius, Center.GetHashCode());
+            return HashCode.Combine(Radius, Center);
         }
 
         /// <summary>
