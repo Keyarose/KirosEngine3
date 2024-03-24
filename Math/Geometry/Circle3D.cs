@@ -12,7 +12,7 @@ namespace KirosEngine3.Math.Geometry
     /// <summary>
     /// Defines a circle in 3D space
     /// </summary>
-    public struct Circle3D : IEquatable<Circle3D>, IFormattable
+    public struct Circle3D : IEquatable<Circle3D>, IFormattable, IGeometrical
     {
         /// <summary>
         /// The Radius of the circle
@@ -74,7 +74,7 @@ namespace KirosEngine3.Math.Geometry
         public Circle3D(float rad, Vec3 cen, Plane p)
         {
             Radius = rad;
-            Center = cen; //todo: check that center is on CirPlane
+            Center = cen;
             CirPlane = p;
         }
 
@@ -133,6 +133,20 @@ namespace KirosEngine3.Math.Geometry
         }
 
         /// <inheritdoc/>
+        public bool IsGeometricallyCorrect(out string? message)
+        {
+            if (CirPlane.IsOnPlane(Center)) 
+            {
+                message = null;
+                return true; 
+            }
+
+            message = string.Format("Circle is not geometrically correct as it's center point is not on it's defining plane.");
+            return false;
+        }
+
+        #region ToString
+        /// <inheritdoc/>
         public override readonly string ToString()
         {
             return ToString(null, null);
@@ -158,5 +172,6 @@ namespace KirosEngine3.Math.Geometry
                 Radius.ToString(format, formatProvider),
                 CirPlane.ToString(format, formatProvider));
         }
+        #endregion
     }
 }

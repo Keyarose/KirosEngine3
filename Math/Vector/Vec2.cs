@@ -617,6 +617,15 @@ namespace KirosEngine3.Math.Vector
             result = Distance(v1, v2);
         }
 
+        /// <summary>
+        /// Returns the 2D vector as a 3D vector with a zero in the Z component
+        /// </summary>
+        /// <returns>The 2D vector as a 3D vector</returns>
+        public readonly Vec3 AsVec3()
+        {
+            return new Vec3(X, Y, 0.0f);
+        }
+
         #region MinMax
         /// <summary>
         /// Create a vector from the smallest corresponding vector components

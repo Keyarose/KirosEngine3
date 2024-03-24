@@ -38,7 +38,7 @@ namespace KirosEngine3.Math.Geometry
                 Vec3 yParallel = new Vec3(1, 0, 0) - PointForXZ(1, 0);
                 Vec3 xParallel = PointForYZ(0, 0) - new Vec3(1, 0, 0);
 
-                return MathF.Atan2(yParallel.Length, xParallel.Length);//todo: signs?, ask bryn
+                return MathF.Atan2(yParallel.Length, xParallel.Length);//todo: rework based on normal crosses
             } 
         }
 

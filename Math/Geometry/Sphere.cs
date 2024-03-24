@@ -21,6 +21,21 @@ namespace KirosEngine3.Math.Geometry
         public float Radius;
 
         /// <summary>
+        /// The sphere's diameter
+        /// </summary>
+        public readonly float Diameter { get { return Radius * 2; } }
+
+        /// <summary>
+        /// The sphere's surface area
+        /// </summary>
+        public readonly float SurfaceArea { get { return MathF.PI * Radius * Radius * 4; } }
+
+        /// <summary>
+        /// The sphere's volume
+        /// </summary>
+        public readonly float Volume { get { return SurfaceArea * Radius / 3; } }
+
+        /// <summary>
         /// Basic constructor for a Sphere
         /// </summary>
         /// <param name="center">The center of the sphere</param>

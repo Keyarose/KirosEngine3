@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Geometry
 {
+    /// <summary>
+    /// Define a 2D triangle
+    /// </summary>
     public struct Triangle2D
     {
         public Vec2[] Vertices = new Vec2[3];
@@ -42,5 +45,10 @@ namespace KirosEngine3.Math.Geometry
         /// The area of the triangle
         /// </summary>
         public readonly float Area { get { return Vec3.Cross(new Vec3(Edge1, 0.0f), new Vec3(Edge2, 0.0f)).Length / 2; } }
+
+        public readonly bool ContainsPoint(Vec2 point)
+        {
+            throw new NotImplementedException();//TODO:implement
+        }
     }
 }
