@@ -72,6 +72,11 @@ namespace KirosEngine3.Math.Vector
         public static readonly Vec3 UnitZ = new Vec3(0.0f, 0.0f, 1.0f);
 
         /// <summary>
+        /// Predefined 3D vector float.MaxVal, float.MaxVal, float.MaxVal
+        /// </summary>
+        public static readonly Vec3 MaxVal = new Vec3(float.MaxValue, float.MaxValue, float.MaxValue);
+
+        /// <summary>
         /// Size of the Vec3 struct in bytes
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<Vec3>();
@@ -255,6 +260,18 @@ namespace KirosEngine3.Math.Vector
         public readonly bool IsParallel(Vec3 v)
         {
             if (Cross(this, v).IsZero()) { return true; }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Check if the vector is perpendicular to the given vector
+        /// </summary>
+        /// <param name="v">The given vector</param>
+        /// <returns>True if they are perpendicular, false otherwise</returns>
+        public readonly bool IsPerpendicular(Vec3 v)
+        {
+            if (Dot(this, v).IsZero()) { return true; }
 
             return false;
         }

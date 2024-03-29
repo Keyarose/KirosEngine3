@@ -20,7 +20,7 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// The Length of the vector
         /// </summary>
-        public float Length
+        public readonly float Length
         {
             get
             {
@@ -31,9 +31,9 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// The length of the vector squared, slightly faster than getting the length itself
         /// </summary>
-        public float LengthSqr
+        public readonly float LengthSqr
         {
-            get 
+            get
             {
                 return X * X + Y * Y;
             }
@@ -236,6 +236,30 @@ namespace KirosEngine3.Math.Vector
         public readonly bool IsFinite()
         {
             return float.IsFinite(X) && float.IsFinite(Y) && !(float.IsNaN(X) || float.IsNaN(Y));
+        }
+
+        /// <summary>
+        /// Check if the vector is parallel to the given vector
+        /// </summary>
+        /// <param name="v">The given vector</param>
+        /// <returns>True if they are parallel, false otherwise</returns>
+        public readonly bool IsParallel(Vec2 v)
+        {
+            if (Dot(this, v).Abs() == 1) { return true; }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Check if the vector is perpendicular to the given vector
+        /// </summary>
+        /// <param name="v">The given vector</param>
+        /// <returns>True if they are perpendicular, false otherwise</returns>
+        public readonly bool IsPerpendicular(Vec2 v)
+        {
+            if (Dot(this, v).IsZero()) { return true; }
+
+            return false;
         }
 
         /// <inheritdoc/>
