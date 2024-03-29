@@ -110,21 +110,23 @@ namespace KirosEngine3.Math.Data
             return new Measurement(lhs.Value - rhs.Value, lhs.Units);
         }
 
+        //todo: multiplication and division
+
         /// <summary>
         /// Converts the measurement to use the given units
         /// </summary>
         /// <param name="targetUnits">The units to convert to</param>
         /// <returns>The measurement using the given units</returns>
         /// <exception cref="ConversionNotDefinedException">Thrown if conversion from the starting units to the target units is not defined</exception>
-        public Measurement ConvertUnits(Unit targetUnits)
+        public readonly Measurement ConvertUnits(Unit targetUnits)
         {
             if (Units.Equals(targetUnits))
                 return this;
 
-            if (!Units.Conversions.ContainsKey(targetUnits.Symbol))
+            if (!Units.Conversions.TryGetValue(targetUnits.Symbol, out Func<Measurement, Measurement>? value))
                 throw new ConversionNotDefinedException(string.Format("Conversion of Measurements between Unit type {0}, and {1} is not defined.", Units, targetUnits));
 
-            return Units.Conversions[targetUnits.Symbol].Invoke(this);
+            return value.Invoke(this);
         }
     }
 }

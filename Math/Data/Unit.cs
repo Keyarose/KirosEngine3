@@ -17,10 +17,12 @@ namespace KirosEngine3.Math.Data
         public Prefix Prefix;
         public Dictionary<string, Func<Measurement, Measurement>> Conversions;
 
+        //todo: singleton index for defined units
+
         /// <summary>
         /// Define the Meter unit of measurement
         /// </summary>
-        public static Unit Meter = new Unit
+        public static readonly Unit Meter = new Unit
         {
             Name = "Meter",
             Symbol = "m",
@@ -35,7 +37,7 @@ namespace KirosEngine3.Math.Data
         /// <summary>
         /// Define the Foot unit of measurement
         /// </summary>
-        public static Unit Foot = new Unit
+        public static readonly Unit Foot = new Unit
         {
             Name = "Foot",
             Symbol = "ft",
@@ -65,7 +67,7 @@ namespace KirosEngine3.Math.Data
         /// </summary>
         /// <param name="targetSymbol">The symbol of the target unit type</param>
         /// <param name="converter">The conversion function from the start type to the target type</param>
-        public void AddConversion(string targetSymbol, Func<Measurement, Measurement> converter)
+        public readonly void AddConversion(string targetSymbol, Func<Measurement, Measurement> converter)
         {
             Conversions.Add(targetSymbol, converter);//todo: handle existing keys
         }
@@ -196,24 +198,47 @@ namespace KirosEngine3.Math.Data
         }
 
         /// <inheritdoc/>
-        public bool Equals(Unit other)
+        public readonly bool Equals(Unit other)
         {
             return Name.Equals(other.Name) && Symbol.Equals(other.Symbol);
         }
 
         /// <inheritdoc/>
-        public override bool Equals([NotNullWhen(true)] object? obj)
+        public override readonly bool Equals([NotNullWhen(true)] object? obj)
         {
             return obj is Unit u && Equals(u);
         }
 
+        /// <summary>
+        /// Define the equivalence operator between two units
+        /// </summary>
+        /// <param name="lhs">The left value</param>
+        /// <param name="rhs">The right value</param>
+        /// <returns>True if the name and symbol are the same</returns>
+        public static bool operator ==(Unit lhs, Unit rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        /// <summary>
+        /// Define the non-equivalence operator between two units
+        /// </summary>
+        /// <param name="lhs">The left value</param>
+        /// <param name="rhs">The right value</param>
+        /// <returns>False if the name and symbol are the same</returns>
+        public static bool operator !=(Unit lhs, Unit rhs)
+        {
+            return !lhs.Equals(rhs);
+        }
+
         /// <inheritdoc/>
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine(Name, HashCode.Combine(Symbol, Prefix));
         }
 
-        public override string ToString()
+        //todo: implement iformattable
+        public override readonly string ToString()
         {
             return string.Format("Unit Name: {1}{0}\n\t Symbol: {1}{2}", Name, Prefix, Symbol);
         }

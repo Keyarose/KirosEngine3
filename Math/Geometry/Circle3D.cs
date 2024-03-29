@@ -133,7 +133,7 @@ namespace KirosEngine3.Math.Geometry
         }
 
         /// <inheritdoc/>
-        public bool IsGeometricallyCorrect(out string? message)
+        public readonly bool IsGeometricallyCorrect(out string? message)
         {
             if (CirPlane.IsOnPlane(Center)) 
             {

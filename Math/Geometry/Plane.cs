@@ -29,44 +29,35 @@ namespace KirosEngine3.Math.Geometry
         public float DVal;
 
         /// <summary>
-        /// The plane's angle from the X axis in radians
+        /// The plane's angle from the normal to the X axis in radians
         /// </summary>
         public readonly float AngleFromXAxis 
         { 
             get 
             {
-                Vec3 yParallel = new Vec3(1, 0, 0) - PointForXZ(1, 0);
-                Vec3 xParallel = PointForYZ(0, 0) - new Vec3(1, 0, 0);
-
-                return MathF.Atan2(yParallel.Length, xParallel.Length);//todo: rework based on normal crosses
+                return MathF.Acos(Vec3.Dot(Normal, Vec3.UnitX));
             } 
         }
 
         /// <summary>
-        /// The plane's angle from the Y axis in radians
+        /// The plane's angle from the normal to the Y axis in radians
         /// </summary>
         public readonly float AngleFromYAxis
         {
             get
             {
-                Vec3 yParallel = new Vec3(0, 1, 0) - PointForXZ(0, 0);
-                Vec3 xParallel = PointForYZ(1, 0) - new Vec3(0, 1, 0);
-
-                return MathF.Atan2(xParallel.Length, yParallel.Length);
+                return MathF.Acos(Vec3.Dot(Normal, Vec3.UnitY));
             }
         }
 
         /// <summary>
-        /// The plane's angle from the Z axis in radians
+        /// The plane's angle from the normal to the Z axis in radians
         /// </summary>
         public readonly float AngleFromZAxis
         {
             get
             {
-                Vec3 yParallel = new Vec3(0, 0, 1) - PointForXZ(0, 0);
-                Vec3 zParallel = PointForXY(0, 1) - new Vec3(0, 0, 1);
-
-                return MathF.Atan2(yParallel.Length, zParallel.Length);
+                return MathF.Acos(Vec3.Dot(Normal, Vec3.UnitZ));
             }
         }
 

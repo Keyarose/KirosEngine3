@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Math\Geometry\" />
     <Folder Include="Resources\" />
   </ItemGroup>
 
