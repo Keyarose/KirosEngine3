@@ -300,6 +300,99 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
+        /// Construct a world space to a camera space matrix
+        /// </summary>
+        /// <param name="pos">The camera's position</param>
+        /// <param name="target">The target to look at</param>
+        /// <param name="up">The up direction of the camera space</param>
+        /// <returns>A conversion matrix between world space and camera space</returns>
+        public static Matrix4 LookAt(Vec3 pos, Vec3 target, Vec3 up)
+        {
+            Vec3 zAxis = Vec3.Normalize(pos - target);
+            Vec3 xAxis = Vec3.Normalize(Vec3.Cross(zAxis, up));
+            Vec3 yAxis = Vec3.Normalize(Vec3.Cross(zAxis, xAxis));
+            Matrix4 result = new Matrix4();
+
+            result.Row0 = new Vec4(xAxis.X, yAxis.X, zAxis.X, 0.0f);
+            result.Row1 = new Vec4(xAxis.Y, yAxis.Y, zAxis.Y, 0.0f);
+            result.Row2 = new Vec4(xAxis.Z, yAxis.Z, zAxis.Z, 0.0f);
+            result.Row3 = new Vec4(-Vec3.Dot(xAxis, pos), -Vec3.Dot(yAxis, pos), -Vec3.Dot(zAxis, pos), 1.0f);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Construct a perspective projection matrix
+        /// </summary>
+        /// <param name="fovy">Angle of the field of view in y axis</param>
+        /// <param name="aspect">The ratio of the view width/height</param>
+        /// <param name="depthNear">Distance to the near clip plane</param>
+        /// <param name="depthFar">Distance to the far clip plane</param>
+        /// <returns>A perspective projection matrix</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if depthNear, depthFar, or aspect are zero or less, or if fovy is negative or greater than PI</exception>
+        public static Matrix4 CreatePerspectiveFOV(float fovy, float aspect, float depthNear, float depthFar)
+        {
+            if (fovy <= 0.0f || fovy > MathF.PI)
+            {
+                throw new ArgumentOutOfRangeException(nameof(fovy));
+            }
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(aspect, 0.0f);
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(depthNear, 0.0f);
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(depthFar, 0.0f);
+
+            Matrix4 result = new Matrix4();
+            float top = depthNear * MathF.Tan(0.5f * fovy);
+            float bottom = 0.0f - top;
+            float left = bottom * aspect;
+            float right = top * aspect;
+
+            float x = 2.0f * depthNear / (right - left);
+            float y = 2.0f * depthNear / (top - bottom);
+            float x2 = (right + left) / (right - left);
+            float y2 = (top + bottom) / (top - bottom);
+            float z = (0.0f - (depthFar + depthNear)) / (depthFar - depthNear);
+            float z2 = (0.0f - (2.0f * depthFar * depthNear)) / (depthFar - depthNear);
+
+            result.Row0 = new Vec4(x, 0.0f, 0.0f, 0.0f);
+            result.Row1 = new Vec4(0.0f, y, 0.0f, 0.0f);
+            result.Row2 = new Vec4(x2, y2, z, -1.0f);
+            result.Row3 = new Vec4(0.0f, 0.0f, z2, 0.0f);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Construct an orthographic projection matrix
+        /// </summary>
+        /// <param name="width">The width of the projection volume</param>
+        /// <param name="height">The height of the projection volume</param>
+        /// <param name="depthNear">The near clip plane distance</param>
+        /// <param name="depthFar">The far clip plane distance</param>
+        /// <returns>An orthographic projection matrix</returns>
+        public static Matrix4 CreateOrthographic(float width, float height, float depthNear, float depthFar)
+        {
+            float left = (0.0f - width) / 2.0f;
+            float right = width / 2.0f;
+            float bottom = (0.0f - height) / 2.0f;
+            float top = height / 2.0f;
+
+            Matrix4 result = Identity;
+            float x = 1.0f / (right - left);
+            float y = 1.0f / (top - bottom);
+            float z = 1.0f / (depthFar - depthNear);
+
+            result.Row0.X = 2.0f * x;
+            result.Row1.Y = 2.0f * y;
+            result.Row2.Z = -2.0f * z;
+
+            result.Row3.X = (0.0f - (right + left)) * x;
+            result.Row3.Y = (0.0f - (top + bottom)) * y;
+            result.Row3.Z = (0.0f - (depthFar + depthNear)) * z;
+
+            return result;
+        }
+
+        /// <summary>
         /// Normalize the matrix by dividing by the determinant, should be checked for nan and infinites
         /// </summary>
         public void Normalize()
@@ -625,7 +718,7 @@ namespace KirosEngine3.Math.Matrix
             var r2 = Row2.ToString(format, formatProvider);
             var r3 = Row3.ToString(format, formatProvider);
 
-            return string.Format("{0}\n{1}\n{2}\n{3}", r0, r1, r2, r3);
+            return string.Format("Matrix4: \n\t({0}\n\t{1}\n\t{2}\n\t{3})", r0, r1, r2, r3);
         }
         #endregion
 

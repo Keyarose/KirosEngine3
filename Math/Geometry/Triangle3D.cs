@@ -91,6 +91,7 @@ namespace KirosEngine3.Math.Geometry
         /// </summary>
         public readonly Plane TriPlane { get { return new Plane(Vertices); } }
 
+        #region ToString
         /// <inheritdoc/>
         public override readonly string ToString()
         {
@@ -112,9 +113,10 @@ namespace KirosEngine3.Math.Geometry
         /// <inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
-            return string.Format("{0}, {1}, {2}", Vertices[0].ToString(format, formatProvider),
+            return string.Format("Triangle3D \n\tVertices: {0}, \n\t\t{1}, \n\t\t{2}", Vertices[0].ToString(format, formatProvider),
                 Vertices[1].ToString(format, formatProvider),
                 Vertices[2].ToString(format, formatProvider));
         }
+        #endregion
     }
 }
