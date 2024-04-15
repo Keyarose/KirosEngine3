@@ -23,6 +23,7 @@ namespace KirosEngine3
     {
         Text? testText;
         Point? testPoint;
+        Line? testLine;
         BaseCamera? camera;
 
         public TestClient(int width, int height) : base (width, height, "Test Client")
@@ -45,7 +46,8 @@ namespace KirosEngine3
             Font df = new Font("df", "Resources/Fonts/latin_sas_math_16pt.xml", "Resources/Fonts/latin_sas_math_16pt_0.png");
 
             testText = new Text(new Vec2(0.0f), df, "t");
-            testPoint = new Point(Vec3.Zero, new Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), new Vec4(1.0f, 1.0f, 0.0f, 1.0f));
+            testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), new Vec4(1.0f, 0.0f, 0.0f, 1.0f));
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -55,6 +57,8 @@ namespace KirosEngine3
             if(!IsFocused) { return; }
             
             if(KeyboardState.IsKeyDown(Keys.Escape)) { Close(); }
+
+            if(KeyboardState.IsKeyDown(Keys.Up)) { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); }
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -71,10 +75,8 @@ namespace KirosEngine3
                 Orthographic = (camera != null) ? camera.Orthographic : Matrix4.Identity
             };
 
-            //testing point draw
-            testPoint?.Draw("color");
-            
-            //end testing point draw
+            testPoint?.DrawGL();
+            testLine?.DrawGL();
 
             //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
 
