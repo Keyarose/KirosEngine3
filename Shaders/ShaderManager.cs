@@ -30,6 +30,30 @@ namespace KirosEngine3.Shaders
         }
 
         /// <summary>
+        /// Accessor for the Shader collection
+        /// </summary>
+        /// <param name="name">The name of the shader to be accessed</param>
+        /// <returns>The shader for the given name</returns>
+        public Shader this[string name]
+        {
+            get
+            {
+                return _shaders[name];
+            }
+
+            set
+            {
+                _shaders[name] = value;
+            }
+        }
+
+        /// <inheritdoc cref="AddShader(string, string, string)"/>
+        public static void CreateShader(string shaderName, string vertPath, string fragPath)
+        {
+            AddShader(shaderName, vertPath, fragPath);
+        }
+
+        /// <summary>
         /// Add a shader to the manager
         /// </summary>
         /// <param name="name">The name of the shader</param>

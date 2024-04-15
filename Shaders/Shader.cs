@@ -1,4 +1,6 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using KirosEngine3.Math.Matrix;
+using KirosEngine3.Math.Vector;
+using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Shaders
 {
-    public class Shader
+    public class Shader : IDisposable
     {
         protected int _handle;
         protected bool _disposed;
@@ -60,7 +62,7 @@ namespace KirosEngine3.Shaders
         {
             int vertexShader;
             int fragmentShader;
-
+            //todo: cache all uniform see opentk shader
             string vertShaderSource;
             string fragShaderSource;
 
@@ -112,18 +114,19 @@ namespace KirosEngine3.Shaders
             //create the shader program handle
             _handle = GL.CreateProgram();
 
-            GL.AttachShader(vertexShader, _handle);
-            GL.AttachShader(fragmentShader, _handle);
+            GL.AttachShader(_handle, vertexShader);
+            GL.AttachShader(_handle, fragmentShader);
 
             GL.LinkProgram(_handle);
+            GL.ValidateProgram(_handle);
 
             //check for program errors
             GL.GetProgram(_handle, GetProgramParameterName.LinkStatus, out int checkP);
             if (checkP == 0)
             {
                 string info = GL.GetProgramInfoLog(_handle);
-                Console.WriteLine(info);
-                Logger.WriteToLog(info);
+                Console.WriteLine("Shader program failed to link: {0}", info);
+                Logger.WriteToLog("Shader program failed to link: {0}", info);
             }
 
             //cleanup
@@ -132,6 +135,8 @@ namespace KirosEngine3.Shaders
             GL.DeleteShader(vertexShader);
             GL.DeleteShader(fragmentShader);
         }
+
+        //todo: setup and attrib handling making use of GL.GetActiveAttrib
 
         /// <summary>
         /// Provide access to the shader attribute locations (OpenGL)
@@ -151,6 +156,8 @@ namespace KirosEngine3.Shaders
             GL.UseProgram(_handle);
         }
 
+        #region SetUniformsGL
+        //todo: more uniform types
         /// <summary>
         /// Set a uniform in the shader program to the given integer value (OpenGL)
         /// </summary>
@@ -159,9 +166,46 @@ namespace KirosEngine3.Shaders
         public void SetUniformIntGL(string name, int value)
         {
             int location = GL.GetUniformLocation(Handle, name);
-
+            GL.UseProgram(Handle);
             GL.Uniform1(location, value);
         }
+
+        public void SetUniformVec3GL(string name, Vec3 value)
+        {
+            int location = GL.GetUniformLocation(Handle, name);
+            GL.UseProgram(Handle);
+            GL.Uniform3(location, value);
+        }
+
+        public void SetUniformVec4GL(string name, Vec4 value)
+        {
+            int loc = GL.GetUniformLocation(Handle, name);
+            GL.UseProgram(Handle);
+            GL.Uniform4(loc, value);
+        }
+
+        /// <summary>
+        /// Set a uniform in the shader program to the given Matrix4 (OpenGL)
+        /// </summary>
+        /// <param name="name">The name of the uniform</param>
+        /// <param name="value">The matrix4 to set it to</param>
+        public void SetUniformMat4GL(string name, Matrix4 value)
+        {
+            OpenTK.Mathematics.Matrix4 v2 = value;//convert to openTK format
+            int loc = GL.GetUniformLocation(Handle, name);
+            GL.UseProgram(Handle);
+            GL.UniformMatrix4(loc, true, ref v2);
+        }
+        #endregion
+
+        #region ProgramUniformsGL
+        //todo: more uniform types
+        public void ProgramUniformVec4GL(string name, Vec4 value)
+        {
+            int loc = GL.GetUniformLocation(Handle, name);
+            GL.ProgramUniform4(Handle, loc, value);
+        }
+        #endregion
 
         /// <summary>
         /// Disposes of the shader program and marks the shader as disposed (OpenGL)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,17 +23,17 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// Allow the manager to automatically load textures as they are added to it
         /// </summary>
-        public void EnableAutoLoadTextures()
+        public static void EnableAutoLoadTextures()
         {
-            _autoLoadTextures = true;
+            Instance._autoLoadTextures = true;
         }
 
         /// <summary>
         /// Disallow the manager to automatically load textures
         /// </summary>
-        public void DisableAutoLoadTextures() 
+        public static void DisableAutoLoadTextures() 
         {
-            _autoLoadTextures = false;
+            Instance._autoLoadTextures = false;
         }
 
         /// <summary>
@@ -41,14 +42,14 @@ namespace KirosEngine3.Textures
         /// <param name="name">The name of the texture</param>
         /// <param name="texture">The texture to be added</param>
         /// <exception cref="ArgumentException">Thrown when the name for the texture is already in use</exception>
-        public void AddTexture(string name, Texture texture)
+        public static void AddTexture(string name, Texture texture)
         {
-            if (!_textures.TryAdd(name, texture))
+            if (!Instance._textures.TryAdd(name, texture))
             {
                 throw new ArgumentException(string.Format("Texture name: {0} is already in use.", name));
             }
 
-            if (_autoLoadTextures)
+            if (Instance._autoLoadTextures)
             { texture.Load(); }
         }
 
@@ -58,15 +59,15 @@ namespace KirosEngine3.Textures
         /// <param name="name">The name of the texture</param>
         /// <param name="textureFile">The file the texture is stored in</param>
         /// <exception cref="ArgumentException">Thrown when the name for the texture is already in use</exception>
-        public void AddTexture(string name, string textureFile)
+        public static void AddTexture(string name, string textureFile)
         {
-            if (!_textures.TryAdd(name, new Texture(name, textureFile)))
+            if (!Instance._textures.TryAdd(name, new Texture(name, textureFile)))
             {
                 throw new ArgumentException(string.Format("Texture name: {0} is already in use.", name));
             }
 
-            if (_autoLoadTextures)
-            { _textures[name].Load(); }
+            if (Instance._autoLoadTextures)
+            { Instance._textures[name].Load(); }
         }
 
         /// <summary>
@@ -75,11 +76,11 @@ namespace KirosEngine3.Textures
         /// <param name="name">The name of the texture</param>
         /// <param name="texture">The texture to add</param>
         /// <returns>True if the texture is added to the manager, false otherwise</returns>
-        public bool TryAddTexture(string name, Texture texture)
+        public static bool TryAddTexture(string name, Texture texture)
         {
-            if (_textures.TryAdd(name, texture))
+            if (Instance._textures.TryAdd(name, texture))
             {
-                if (_autoLoadTextures)
+                if (Instance._autoLoadTextures)
                 { texture.Load(); }
                 return true;
             }
@@ -95,12 +96,12 @@ namespace KirosEngine3.Textures
         /// <param name="name">The name of the texture</param>
         /// <param name="textureFile">The file that contains the texture</param>
         /// <returns>True if the texture is added to the manager, false otherwise</returns>
-        public bool TryAddTexture(string name, string textureFile)
+        public static bool TryAddTexture(string name, string textureFile)
         {
-            if (_textures.TryAdd(name, new Texture(name, textureFile)))
+            if (Instance._textures.TryAdd(name, new Texture(name, textureFile)))
             {
-                if (_autoLoadTextures)
-                { _textures[name].Load(); }
+                if (Instance._autoLoadTextures)
+                { Instance._textures[name].Load(); }
                 return true;
             }
 
@@ -114,13 +115,13 @@ namespace KirosEngine3.Textures
         /// </summary>
         /// <param name="name">The name of the texture to remove</param>
         /// <returns>True if successful, false otherwise</returns>
-        public bool TryRemoveTexture(string name) 
+        public static bool TryRemoveTexture(string name) 
         {
             //if the texture exists clean it up before removing it to prevent memory leaks
-            if (_textures.TryGetValue(name, out var texture))
+            if (Instance._textures.TryGetValue(name, out var texture))
             {
                 texture.Dispose();
-                return _textures.Remove(name);
+                return Instance._textures.Remove(name);
             }
 
             return false;
@@ -132,9 +133,9 @@ namespace KirosEngine3.Textures
         /// <param name="name">The name of the texture</param>
         /// <param name="texture">The texture for the name or null</param>
         /// <returns>True if the texture is found, false otherwise</returns>
-        public bool TryGetTexture(string name, out Texture? texture)
+        public static bool TryGetTexture(string name,[NotNullWhen(true)] out Texture? texture)
         {
-            if (_textures.TryGetValue(name, out texture))
+            if (Instance._textures.TryGetValue(name, out texture))
             { return true; }
 
             texture = null;
@@ -146,9 +147,9 @@ namespace KirosEngine3.Textures
         /// </summary>
         /// <param name="name">The name of the texture</param>
         /// <returns>The handle for the texture or -1 if not found</returns>
-        public int GetTextureHandle(string name)
+        public static int GetTextureHandle(string name)
         {
-            if (_textures.TryGetValue(name, out var tex))
+            if (Instance._textures.TryGetValue(name, out var tex))
             {
                 return tex.Handle;
             }
@@ -162,17 +163,17 @@ namespace KirosEngine3.Textures
         /// <param name="name">The name of the texture to be used</param>
         /// <param name="tu">The texture unit the texture is to be assigned to</param>
         /// <returns>True if successful, false otherwise</returns>
-        public bool UseTextureGL(string name, TextureUnit tu)
+        public static bool UseTextureGL(string name, TextureUnit tu)
         {
-            if (_textures.TryGetValue(name, out var tex))
+            if (Instance._textures.TryGetValue(name, out var tex))
             {
                 if (!tex.IsLoaded)
-                { tex.LoadGL(); }
-
+                {
+                    tex.LoadGL();
+                }
                 tex.UseGL(tu);
                 return true;
             }
-
             return false;
         }
 

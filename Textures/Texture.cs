@@ -11,9 +11,9 @@ namespace KirosEngine3.Textures
 {
     public class Texture : IDisposable
     {
-        private int _handle;
-        private string _name;
-        private string _path;
+        private readonly int _handle;
+        private readonly string _name;
+        private readonly string _path;
 
         private bool _loaded = false;
         private bool _disposed = false;
