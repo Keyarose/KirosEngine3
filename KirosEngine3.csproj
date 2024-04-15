@@ -16,12 +16,34 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <Folder Include="XML\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="opentk" Version="4.8.2" />
+    <PackageReference Include="SharpDX" Version="4.2.0" />
     <PackageReference Include="stbimagesharp" Version="2.27.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\Fonts\latin_sas_math_16pt.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Fonts\latin_sas_math_16pt_0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\FontShader_default.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\FontShader_default.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -270,20 +270,20 @@ namespace KirosEngine3.Math.Geometry
         /// <param name="intersect">The line defining the intersection</param>
         /// <returns>True if there is an intersection, false otherwise</returns>
         /// <remarks>based on Graphics gems 1 pg 305</remarks>
-        public readonly bool Intersection(Plane other, out Line intersect)
+        public readonly bool Intersection(Plane other, out Line3D intersect)
         {
             Vec3 p3n = Vec3.Cross(Normal, other.Normal);
             float det = p3n.LengthSqr;
 
             if (det.IsZero())//the planes are parallel and don't intersect
             { 
-                intersect = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+                intersect = new Line3D(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
                 return false;
             }
 
             Vec3 point = ((Vec3.Cross(p3n, other.Normal) * DVal) + (Vec3.Cross(p3n, Normal) * other.DVal)) / det; //a point on the line of intersection
 
-            intersect = new Line(point, p3n);
+            intersect = new Line3D(point, p3n);
             return true;
         }
 

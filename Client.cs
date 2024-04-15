@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using KirosEngine3.Math.Matrix;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System;
@@ -78,5 +79,13 @@ namespace KirosEngine3
         {
             base.OnUnload();
         }
+    }
+
+    public struct ViewMatrixes
+    {
+        public Matrix4 Model { get; set; }
+        public Matrix4 View { get; set; }
+        public Matrix4 Projection { get; set; }
+        public Matrix4 Orthographic { get; set; }
     }
 }

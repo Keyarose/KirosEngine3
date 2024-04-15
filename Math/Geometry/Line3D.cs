@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace KirosEngine3.Math.Geometry
 {
-    public struct Line : IEquatable<Line>, IFormattable
+    public struct Line3D : IEquatable<Line3D>, IFormattable
     {
         /// <summary>
         /// Start point of the line
@@ -40,7 +40,7 @@ namespace KirosEngine3.Math.Geometry
         /// <param name="start">A starting point on the line</param>
         /// <param name="dir">A directional vector to define the line's direction</param>
         /// <remarks>Line formula: [x, y, z] = [x0, y0, z0] + t[a, b, c]</remarks>
-        public Line(Vec3 start, Vec3 dir)
+        public Line3D(Vec3 start, Vec3 dir)
         {
             Start = start;
             Direction = dir;
@@ -53,7 +53,7 @@ namespace KirosEngine3.Math.Geometry
         /// <param name="start">A starting point on the line</param>
         /// <param name="dir">A directional vector or end point</param>
         /// <param name="finite">True marks the line as finite, false an infinite line</param>
-        public Line(Vec3 start, Vec3 dir, bool finite)
+        public Line3D(Vec3 start, Vec3 dir, bool finite)
         {
             Start = start;
             Direction = dir;
@@ -64,42 +64,57 @@ namespace KirosEngine3.Math.Geometry
         /// The point on the line where the X value is the given value
         /// </summary>
         /// <param name="x">The X value of the point to find</param>
-        /// <returns>The point on the line that has the given X value</returns>
+        /// <returns>The point on the line that has the given X value, or Start if it doesn't exist</returns>
         public readonly Vec3 PointForX(float x)
         {
-            float t = (x - Start.X) / Direction.X; //x = x0 + ta
-            float y = Start.Y + t * Direction.Y;
-            float z = Start.Z + t * Direction.Z;
+            if (!Direction.X.IsZero())
+            {
+                float t = (x - Start.X) / Direction.X; //x = x0 + ta
+                float y = Start.Y + t * Direction.Y;
+                float z = Start.Z + t * Direction.Z;
 
-            return new Vec3(x, y, z);
+                return new Vec3(x, y, z);
+            }
+
+            return Start;
         }
 
         /// <summary>
         /// The point on the line where the Y value is the given value
         /// </summary>
         /// <param name="y">The Y value of the point to find</param>
-        /// <returns>The point on the line that has the given Y value</returns>
+        /// <returns>The point on the line that has the given Y value, or Start if it doesn't exist</returns>
         public readonly Vec3 PointForY(float y) 
         {
-            float t = (y - Start.Y) / Direction.Y;
-            float x = Start.X + t * Direction.X;
-            float z = Start.Z + t * Direction.Z;
+            if (!Direction.Y.IsZero()) 
+            {
+                float t = (y - Start.Y) / Direction.Y;
+                float x = Start.X + t * Direction.X;
+                float z = Start.Z + t * Direction.Z;
 
-            return new Vec3(x, y, z);
+                return new Vec3(x, y, z);
+            }
+
+            return Start;
         }
 
         /// <summary>
         /// The point on the line where the Z value is the given value
         /// </summary>
         /// <param name="z">The Z value of the point to find</param>
-        /// <returns>The point on the line that has the given Z value</returns>
+        /// <returns>The point on the line that has the given Z value, or Start if it doesn't exist</returns>
         public readonly Vec3 PointForZ(float z) 
         {
-            float t = (z - Start.Z) / Direction.Z;
-            float x = Start.X + t * Direction.X;
-            float y = Start.Y + t * Direction.Y;
+            if (!Direction.Z.IsZero())
+            {
+                float t = (z - Start.Z) / Direction.Z;
+                float x = Start.X + t * Direction.X;
+                float y = Start.Y + t * Direction.Y;
 
-            return new Vec3(x, y, z);
+                return new Vec3(x, y, z);
+            }
+
+            return Start;
         }
 
         /// <summary>
@@ -116,8 +131,21 @@ namespace KirosEngine3.Math.Geometry
             return tx.CloseTo(ty) && tx.CloseTo(tz);
         }
 
+
+        /// <summary>
+        /// Checks which side of the line the given point is on
+        /// </summary>
+        /// <param name="point">The point to check</param>
+        /// <param name="pos">If true returns true if the point is on the positive value side, if false returns true if the point is on the negative value side</param>
+        /// <returns>True if the point is on the side with the value sign indicated by pos, false otherwise</returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public readonly bool IsToSide(Vec3 point, bool pos)
+        {
+            throw new NotImplementedException();//todo:implement
+        }
+
         /// <inheritdoc/>
-        public readonly bool Equals(Line other)
+        public readonly bool Equals(Line3D other)
         {
             if (Finite != other.Finite) { return false; } //if one line is finite and the other isn't then they are not equal
 
@@ -132,7 +160,7 @@ namespace KirosEngine3.Math.Geometry
         /// <inheritdoc/>
         public readonly override bool Equals([NotNullWhen(true)] object? obj)
         {
-            return obj is Line l && Equals(l);
+            return obj is Line3D l && Equals(l);
         }
 
         /// <summary>
@@ -141,7 +169,7 @@ namespace KirosEngine3.Math.Geometry
         /// <param name="lhs">The left value</param>
         /// <param name="rhs">The right value</param>
         /// <returns>True if the lines are equivalent, false otherwise</returns>
-        public static bool operator ==(Line lhs, Line rhs)
+        public static bool operator ==(Line3D lhs, Line3D rhs)
         {
             return lhs.Equals(rhs);
         }
@@ -152,7 +180,7 @@ namespace KirosEngine3.Math.Geometry
         /// <param name="lhs">The left value</param>
         /// <param name="rhs">The right value</param>
         /// <returns>True if the lines are not equivalent, false otherwise</returns>
-        public static bool operator !=(Line lhs, Line rhs)
+        public static bool operator !=(Line3D lhs, Line3D rhs)
         {
             return !lhs.Equals(rhs);
         }

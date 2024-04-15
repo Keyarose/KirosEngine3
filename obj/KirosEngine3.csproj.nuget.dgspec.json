@@ -50,6 +50,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "SharpDX": {
+              "target": "Package",
+              "version": "[4.2.0, )"
+            },
             "opentk": {
               "target": "Package",
               "version": "[4.8.2, )"

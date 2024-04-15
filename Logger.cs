@@ -162,6 +162,26 @@ namespace KirosEngine3
             }
         }
 
+        /// <summary>
+        /// Write a formatted string to the log file
+        /// </summary>
+        /// <param name="message">The string format to write</param>
+        /// <param name="arg0">The data to be inserted into the format</param>
+        public static void WriteToLog(string message, object? arg0)
+        {
+            WriteToLog(string.Format(message, arg0));
+        }
+
+        /// <summary>
+        /// Write a formatted string to the log file
+        /// </summary>
+        /// <param name="message">The string format to write</param>
+        /// <param name="args">Data to be inserted into the format</param>
+        public static void WriteToLog(string message, params object?[] args)
+        {
+            WriteToLog(string.Format(message, args));
+        }
+
         public static void WriteToLog(int i)
         {
             WriteToLog(i.ToString());
