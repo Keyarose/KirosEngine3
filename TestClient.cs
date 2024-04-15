@@ -1,12 +1,18 @@
 ﻿using KirosEngine3.Scenes;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
+using KirosEngine3.Math.Vector;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using KirosEngine3.Math.Matrix;
+using KirosEngine3.Camera;
+using KirosEngine3.Mesh;
 
 namespace KirosEngine3
 {
@@ -15,6 +21,10 @@ namespace KirosEngine3
     /// </summary>
     internal class TestClient : Client
     {
+        Text? testText;
+        Point? testPoint;
+        BaseCamera? camera;
+
         public TestClient(int width, int height) : base (width, height, "Test Client")
         {
             RuntimeVars.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);
@@ -23,25 +33,63 @@ namespace KirosEngine3
         protected override void OnLoad()
         {
             base.OnLoad();
+
+            GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);
+
+            camera = new BaseCamera(-Vec3.UnitZ, ClientSize.X, ClientSize.Y);
+
+            ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag");
+
+            ShaderManager.CreateShader("text", "Resources/Shaders/FontShader_default.vert", "Resources/Shaders/FontShader_default.frag");
+
+            Font df = new Font("df", "Resources/Fonts/latin_sas_math_16pt.xml", "Resources/Fonts/latin_sas_math_16pt_0.png");
+
+            testText = new Text(new Vec2(0.0f), df, "t");
+            testPoint = new Point(Vec3.Zero, new Vec4(1.0f, 0.0f, 0.0f, 1.0f));
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             base.OnUpdateFrame(args);
+
+            if(!IsFocused) { return; }
+            
+            if(KeyboardState.IsKeyDown(Keys.Escape)) { Close(); }
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             base.OnRenderFrame(args);
+
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            ViewMatrixes viewMatrixes = new ViewMatrixes
+            {
+                Model = Matrix4.Identity,
+                Projection = (camera != null) ? camera.Projection : Matrix4.Identity,
+                View = (camera != null) ? camera.View : Matrix4.Identity,
+                Orthographic = (camera != null) ? camera.Orthographic : Matrix4.Identity
+            };
+
+            //testing point draw
+            testPoint?.Draw("color");
+            
+            //end testing point draw
+
+            //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
+
+            SwapBuffers();
         }
 
         protected override void OnUnload()
         {
-            base.OnUnload();
+            testPoint?.Dispose();
 
             ShaderManager.OnUnload();
             TextureManager.OnUnload();
             SceneManager.OnUnload();
+
+            base.OnUnload();
         }
     }
 }
