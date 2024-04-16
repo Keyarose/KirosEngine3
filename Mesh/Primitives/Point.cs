@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace KirosEngine3.Mesh
+namespace KirosEngine3.Mesh.Primitives
 {
     /// <summary>
     /// Defines a drawable point with color
@@ -50,7 +50,7 @@ namespace KirosEngine3.Mesh
         /// <param name="position">The point's position</param>
         /// <param name="color">The color of the point</param>
         /// <param name="shaderName">The name of the shader to use in drawing</param>
-        public Point(Vec3 position, Vec4 color, string shaderName = "color") 
+        public Point(Vec3 position, Vec4 color, string shaderName = "color")
         {
             _point[0].Position = position;
             _point[0].Color = color;
@@ -107,7 +107,7 @@ namespace KirosEngine3.Mesh
         /// <param name="disposing">If true the user code is calling, false means the GC system is</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!_disposed) 
+            if (!_disposed)
             {
                 if (disposing)
                 {

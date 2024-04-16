@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using KirosEngine3.Math.Matrix;
 using KirosEngine3.Camera;
-using KirosEngine3.Mesh;
+using KirosEngine3.Mesh.Primitives;
 
 namespace KirosEngine3
 {
@@ -24,6 +24,7 @@ namespace KirosEngine3
         Text? testText;
         Point? testPoint;
         Line? testLine;
+        Triangle? testTriangle;
         BaseCamera? camera;
 
         public TestClient(int width, int height) : base (width, height, "Test Client")
@@ -48,6 +49,7 @@ namespace KirosEngine3
             testText = new Text(new Vec2(0.0f), df, "t");
             testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), new Vec4(1.0f, 1.0f, 0.0f, 1.0f));
             testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), new Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+            testTriangle = new Triangle([new Vec3(0.0f, 0.3f, 0.0f), new Vec3(0.2f, -0.2f, 0.0f), new Vec3(-0.2f, -0.2f, 0.0f)], new Vec4(0.0f, 1.0f, 1.0f, 1.0f));
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -75,8 +77,10 @@ namespace KirosEngine3
                 Orthographic = (camera != null) ? camera.Orthographic : Matrix4.Identity
             };
 
+            testTriangle?.DrawGL();
             testPoint?.DrawGL();
             testLine?.DrawGL();
+            
 
             //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
 

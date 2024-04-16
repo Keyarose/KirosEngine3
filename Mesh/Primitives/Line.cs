@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KirosEngine3.Mesh
+namespace KirosEngine3.Mesh.Primitives
 {
     /// <summary>
     /// Defines a drawable line with color
@@ -17,7 +17,7 @@ namespace KirosEngine3.Mesh
     public class Line : IDisposable, IRenderable
     {
         //mathematical representation of the line in 3D
-        protected Line3D _line;
+        protected Line3D _line;//todo: change so that the math rep doesn't need to be stored and is created from vertex data as needed
         //the color of the line
         protected Vec4 _color;
         //the vertex data
@@ -34,14 +34,14 @@ namespace KirosEngine3.Mesh
         /// <summary>
         /// The line's starting point
         /// </summary>
-        public Vec3 Start 
-        { 
-            get { return _line.Start; } 
-            set 
-            { 
+        public Vec3 Start
+        {
+            get { return _line.Start; }
+            set
+            {
                 _line.Start = value;
                 RecalculateVerts();
-            } 
+            }
         }
 
         /// <summary>
@@ -102,6 +102,8 @@ namespace KirosEngine3.Mesh
 
             ColorVertex.SetVertexPositionAttrib(sh, "aPosition");//todo: get the shader attrib names from the shader object
             ColorVertex.SetVertexColorAttrib(sh, "aColor");
+
+            GL.BindVertexArray(0);
         }
 
         /// <summary>
@@ -110,8 +112,9 @@ namespace KirosEngine3.Mesh
         /// <param name="line">A mathematical representation of the line</param>
         /// <param name="color">The color of the line</param>
         /// <param name="shaderName">The name of the shader to use in drawing</param>
-        public Line(Line3D line, Vec4 color, string shaderName = "color") : 
-            this(line.Start, line.Direction, color, shaderName){ }
+        public Line(Line3D line, Vec4 color, string shaderName = "color") :
+            this(line.Start, line.Direction, color, shaderName)
+        { }
 
         /// <summary>
         /// Draws the point on the screen using the named shader (OpenGL)
@@ -126,8 +129,7 @@ namespace KirosEngine3.Mesh
                 return;
             }
 
-            Shader sh = ShaderManager.Instance[_shaderName];
-            sh.UseGL();
+            ShaderManager.TryUseShader(_shaderName);
 
             GL.BindVertexArray(_VAO);
 
@@ -149,7 +151,7 @@ namespace KirosEngine3.Mesh
         /// </summary>
         public void UpdateGL()
         {
-            
+
         }
 
         /// <summary>
@@ -173,7 +175,7 @@ namespace KirosEngine3.Mesh
         {
             if (!_disposed)
             {
-                if (disposing) 
+                if (disposing)
                 {
                     //clear managed items
                 }
