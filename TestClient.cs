@@ -33,6 +33,10 @@ namespace KirosEngine3
             ConfigVars.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);
             ConfigVars.AddVar(DEFAULT_FONT_NAME_KEY, "default");
             ConfigVars.AddVar(DEFAULT_FONT_FILE_KEY, "Resources/Fonts/latin_sas_math_16pt");
+
+            FontManager.AddFont((string)ConfigVars.Instance[DEFAULT_FONT_NAME_KEY], new Font((string)ConfigVars.Instance[DEFAULT_FONT_NAME_KEY],
+            (string)ConfigVars.Instance[DEFAULT_FONT_FILE_KEY] + ".xml",
+            (string)ConfigVars.Instance[DEFAULT_FONT_FILE_KEY] + "_0.png"));//todo: cleanup call once config system is implemented
         }
 
         protected override void OnLoad()
@@ -47,9 +51,9 @@ namespace KirosEngine3
 
             ShaderManager.CreateShader("text", "Resources/Shaders/FontShader_default.vert", "Resources/Shaders/FontShader_default.frag");
 
-            Font df = Font.Default;
+            _ = FontManager.TryGetFont(DEFAULT_FONT_NAME_KEY, out Font? df);
 
-            testText = new Text(new Vec2(0.0f), df, "t");
+            testText = new Text(new Vec2(0.0f), df!, "t");
             testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
 
             testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), Color4.Red);

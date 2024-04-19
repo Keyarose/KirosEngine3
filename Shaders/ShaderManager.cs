@@ -14,7 +14,7 @@ namespace KirosEngine3.Shaders
     {
         private static ShaderManager? _instance;
         
-        private readonly Dictionary<string, Shader> _shaders = new Dictionary<string, Shader>();
+        private readonly Dictionary<string, Shader> _shaders = [];
 
         /// <summary>
         /// Singleton constructor

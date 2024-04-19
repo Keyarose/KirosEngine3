@@ -13,18 +13,22 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Textures
 {
-    public class Text
+    public class Text : IDisposable
     {
-        protected Font _font;
+        protected Font? _font;
         protected string _shader;//todo: set as default text shader
         protected string _text;
         protected Vec2 _pos;
         protected SentenceData _sentence;
+        protected int _VAO;
+        protected int _VBO;
+        protected int _EBO;
+        protected bool _disposed = false;
 
         /// <summary>
         /// The font to draw the text with
         /// </summary>
-        public Font Font { get { return _font; } set { _font = value; } }
+        public Font? Font { get { return _font; } set { _font = value; } }
 
         /// <summary>
         /// The shader to be used
@@ -34,7 +38,7 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The text itself
         /// </summary>
-        public string Verse { get { return _text; } set { _text = value; UpdateSentence(); } }
+        public string Sentence { get { return _text; } set { _text = value; UpdateSentence(); } }
 
         /// <summary>
         /// The position of the text
@@ -52,15 +56,19 @@ namespace KirosEngine3.Textures
         /// <param name="pos">The screen origin position of the text</param>
         public Text(Vec2 pos)
         {
-            _font = Font.Default;
+            if (!FontManager.TryGetFont(Client.DEFAULT_FONT_NAME_KEY, out _font))
+            {
+                Console.WriteLine("Warning: Default font is not configured.");
+                Logger.WriteToLog("Warning: Default font is not configured.");
+            }
             _shader = "text"; //todo: define environment var for default text shader
             _text = string.Empty;
             _pos = pos;
 
             _sentence = new SentenceData
             {
-                VertexBuffer = [],
-                IndexBuffer = [],
+                Vertexes = [],
+                Indexes = [],
                 Color = new Vec4(0.0f, 0.0f, 0.0f, 1.0f) //default to black
             };
         }
@@ -81,11 +89,16 @@ namespace KirosEngine3.Textures
         /// </summary>
         private void UpdateSentence()
         {
-            //todo: check for text or position change, if only position just apply vector addition
-            SentenceData ns = _font.TextForString(_text, _pos.AsVec3());
+            if (_font != null) 
+            {
+                //todo: check for text or position change, if only position just apply vector addition
+                SentenceData ns = _font.TextForString(_text, _pos.AsVec3());
 
-            _sentence.VertexBuffer = ns.VertexBuffer;
-            _sentence.IndexBuffer = ns.IndexBuffer;
+                _sentence.Vertexes = ns.Vertexes;
+                _sentence.Indexes = ns.Indexes;
+
+                //todo: update buffers
+            }
         }
 
         /// <summary>
@@ -94,33 +107,33 @@ namespace KirosEngine3.Textures
         /// <param name="text">The string to set the text to</param>
         public void SetText(string text)
         {
-            Verse = text;
+            Sentence = text;
         }
 
         public void Draw(ViewMatrixes vm, TextureUnit tu)
         {
-            _font.UseFont(tu);
+            _font?.UseFont(tu);
 
             Shader sh = ShaderManager.Instance[_shader];
             sh.UseGL();
             sh.SetUniformIntGL("texture0", (int)tu);
 
             //setup vertex array
-            int vertexArray = GL.GenVertexArray(); //todo: move array stuff to load
-            GL.BindVertexArray(vertexArray);
+            _VAO = GL.GenVertexArray(); //todo: move array stuff to load
+            GL.BindVertexArray(_VAO);
 
             //vertex and index buffers
-            int vertexBuffer = GL.GenBuffer();
-            int indexBuffer = GL.GenBuffer();
+            _VBO = GL.GenBuffer();
+            _EBO = GL.GenBuffer();
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, _sentence.VertexBuffer.Length * TexturedVertex.SizeInBytesU, _sentence.VertexBuffer, BufferUsageHint.DynamicDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, _sentence.Vertexes.Length * TexturedVertex.SizeInBytesU, _sentence.Vertexes, BufferUsageHint.DynamicDraw);
 
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, _sentence.IndexBuffer.Length * sizeof(int), _sentence.IndexBuffer, BufferUsageHint.DynamicDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, _sentence.Indexes.Length * sizeof(int), _sentence.Indexes, BufferUsageHint.DynamicDraw);
 
             //debug
-            foreach (var v in _sentence.VertexBuffer)
+            foreach (var v in _sentence.Vertexes)
             {
                 Console.WriteLine(v.ToString());
             }
@@ -136,7 +149,7 @@ namespace KirosEngine3.Textures
 
             sh.SetUniformVec4GL("aTextColor", _sentence.Color);
             
-            GL.DrawElements(PrimitiveType.Triangles, _sentence.IndexBuffer.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, _sentence.Indexes.Length, DrawElementsType.UnsignedInt, 0);
         }
 
         public void Update()
@@ -144,16 +157,41 @@ namespace KirosEngine3.Textures
 
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    //clear managed items
+                }
+
+                GL.DeleteBuffer(_VBO);
+                GL.DeleteBuffer(_EBO);
+                GL.DeleteVertexArray(_VAO);
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Release the text's resources for unloading
+        /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
+        ~Text()
+        {
+            Dispose(false);
         }
     }
 
     public struct SentenceData
     {
-        public TexturedVertex[] VertexBuffer;
-        public uint[] IndexBuffer;
+        public TexturedVertex[] Vertexes;
+        public uint[] Indexes;
         public Vec4 Color;
     }
 }

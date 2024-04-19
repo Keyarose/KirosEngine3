@@ -847,7 +847,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Xy
         {
-            get { return new Vec2(X, Y); }
+            readonly get { return new Vec2(X, Y); }
             set { X = value.X; Y = value.Y; }
         }
 
@@ -857,7 +857,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Xz
         {
-            get { return new Vec2(X, Z); }
+            readonly get { return new Vec2(X, Z); }
             set { X = value.X; Z = value.Y; }
         }
 
@@ -867,7 +867,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Xw
         {
-            get { return new Vec2(X, W); }
+            readonly get { return new Vec2(X, W); }
             set { X = value.X; W = value.Y; }
         }
 
@@ -877,7 +877,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Yx
         {
-            get { return new Vec2(Y, X); }
+            readonly get { return new Vec2(Y, X); }
             set { Y = value.X; X = value.Y; }
         }
 
@@ -887,7 +887,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Yz
         {
-            get { return new Vec2(Y, Z); }
+            readonly get { return new Vec2(Y, Z); }
             set { Y = value.X; Z = value.Y; }
         }
 
@@ -897,7 +897,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Yw
         {
-            get { return new Vec2(Y, W); }
+            readonly get { return new Vec2(Y, W); }
             set { Y = value.X; W = value.Y; }
         }
 
@@ -907,7 +907,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Zx
         {
-            get { return new Vec2(Z, X); }
+            readonly get { return new Vec2(Z, X); }
             set { Z = value.X; X = value.Y; }
         }
 
@@ -917,7 +917,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Zy
         {
-            get { return new Vec2(Z, Y); }
+            readonly get { return new Vec2(Z, Y); }
             set { Z = value.X; Y = value.Y; }
         }
 
@@ -927,7 +927,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Zw
         {
-            get { return new Vec2(Z, W); }
+            readonly get { return new Vec2(Z, W); }
             set { Z = value.X; W = value.Y; }
         }
 
@@ -937,7 +937,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Wx
         {
-            get { return new Vec2(W, X); }
+            readonly get { return new Vec2(W, X); }
             set { W = value.X; X = value.Y; }
         }
 
@@ -947,7 +947,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Wy
         {
-            get { return new Vec2(W, Y); }
+            readonly get { return new Vec2(W, Y); }
             set { W = value.X; Y = value.Y; }
         }
 
@@ -957,7 +957,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec2 Wz
         {
-            get { return new Vec2(W, Z); }
+            readonly get { return new Vec2(W, Z); }
             set { W = value.X; Z = value.Y; }
         }
 
@@ -967,7 +967,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Xyz
         {
-            get { return new Vec3(X, Y, Z); }
+            readonly get { return new Vec3(X, Y, Z); }
             set { X = value.X; Y = value.Y; Z = value.Z; }
         }
 
@@ -977,7 +977,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Xzy
         {
-            get { return new Vec3(X, Z, Y); }
+            readonly get { return new Vec3(X, Z, Y); }
             set { X = value.X; Z = value.Y; Y = value.Z; }
         }
 
@@ -987,7 +987,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Yxz
         {
-            get { return new Vec3(Y, X, Z); }
+            readonly get { return new Vec3(Y, X, Z); }
             set { Y = value.X; X = value.Y; Z = value.Z; }
         }
 
@@ -997,7 +997,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Yzx
         {
-            get { return new Vec3(Y, Z, X); }
+            readonly get { return new Vec3(Y, Z, X); }
             set { Y = value.X; Z = value.Y; X = value.Z; }
         }
 
@@ -1007,7 +1007,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Zxy
         {
-            get { return new Vec3(Z, X, Y); }
+            readonly get { return new Vec3(Z, X, Y); }
             set { Z = value.X; X = value.Y; Y = value.Z; }
         }
 
@@ -1017,7 +1017,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec3 Zyx
         {
-            get { return new Vec3(Z, Y, X); }
+            readonly get { return new Vec3(Z, Y, X); }
             set { Z = value.X; Y = value.Y; X = value.Z; }
         }
 
@@ -1027,7 +1027,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Xywz
         {
-            get { return new Vec4(X, Y, W, Z); }
+            readonly get { return new Vec4(X, Y, W, Z); }
             set { X = value.X; Y = value.Y; W = value.Z; Z = value.W; }
         }
 
@@ -1037,7 +1037,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Xzyw
         {
-            get { return new Vec4(X, Z, Y, W); }
+            readonly get { return new Vec4(X, Z, Y, W); }
             set { X = value.X; Z = value.Y; Y = value.Z; W = value.W; }
         }
 
@@ -1047,7 +1047,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Xzwy
         {
-            get { return new Vec4(X, Z, W, Y); }
+            readonly get { return new Vec4(X, Z, W, Y); }
             set { X = value.X; Z = value.Y; W = value.Z; Y = value.W; }
         }
 
@@ -1057,7 +1057,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Xwyz
         {
-            get { return new Vec4(X, W, Y, Z); }
+            readonly get { return new Vec4(X, W, Y, Z); }
             set { X = value.X; W = value.Y; Y = value.Z; Z = value.W; }
         }
 
@@ -1067,7 +1067,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Xwzy
         {
-            get { return new Vec4(X, W, Z, Y); }
+            readonly get { return new Vec4(X, W, Z, Y); }
             set { X = value.X; W = value.Y; Z = value.Z; Y = value.W; }
         }
 
@@ -1077,7 +1077,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Yxzw
         {
-            get { return new Vec4(Y, X, Z, W); }
+            readonly get { return new Vec4(Y, X, Z, W); }
             set { Y = value.X; X = value.Y; Z = value.Z; W = value.W; }
         }
 
@@ -1087,7 +1087,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Yxwz
         {
-            get { return new Vec4(Y, X, W, Z); }
+            readonly get { return new Vec4(Y, X, W, Z); }
             set { Y = value.X; X = value.Y; W = value.Z; Z = value.W; }
         }
 
@@ -1097,7 +1097,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Yzxw
         {
-            get { return new Vec4(Y, Z, X, W); }
+            readonly get { return new Vec4(Y, Z, X, W); }
             set { Y = value.X; Z = value.Y; X = value.Z; W = value.W; }
         }
 
@@ -1107,7 +1107,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Yzwx
         {
-            get { return new Vec4(Y, Z, W, X); }
+            readonly get { return new Vec4(Y, Z, W, X); }
             set { Y = value.X; Z = value.Y; W = value.Z; X = value.W; }
         }
 
@@ -1117,7 +1117,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Ywxz
         {
-            get { return new Vec4(Y, W, X, Z); }
+            readonly get { return new Vec4(Y, W, X, Z); }
             set { Y = value.X; W = value.Y; X = value.Z; Z = value.W; }
         }
 
@@ -1127,7 +1127,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Ywzx
         {
-            get { return new Vec4(Y, W, Z, X); }
+            readonly get { return new Vec4(Y, W, Z, X); }
             set { Y = value.X; W = value.Y; Z = value.Z; X = value.W; }
         }
 
@@ -1137,7 +1137,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Zxyw
         {
-            get { return new Vec4(Z, X, Y, W); }
+            readonly get { return new Vec4(Z, X, Y, W); }
             set { Z = value.X; X = value.Y; Y = value.Z; W = value.W; }
         }
 
@@ -1147,7 +1147,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Zxwy
         {
-            get { return new Vec4(Z, X, W, Y); }
+            readonly get { return new Vec4(Z, X, W, Y); }
             set { Z = value.X; X = value.Y; W = value.Z; Y = value.W; }
         }
 
@@ -1157,7 +1157,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Zyxw
         {
-            get { return new Vec4(Z, Y, X, W); }
+            readonly get { return new Vec4(Z, Y, X, W); }
             set { Z = value.X; Y = value.Y; X = value.Z; W = value.W; }
         }
 
@@ -1167,7 +1167,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Zywx
         {
-            get { return new Vec4(Z, Y, W, X); }
+            readonly get { return new Vec4(Z, Y, W, X); }
             set { Z = value.X; Y = value.Y; W = value.Z; X = value.W; }
         }
 
@@ -1177,7 +1177,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Zwxy
         {
-            get { return new Vec4(Z, W, X, Y); }
+            readonly get { return new Vec4(Z, W, X, Y); }
             set { Z = value.X; W = value.Y; X = value.Z; Y = value.W; }
         }
 
@@ -1187,7 +1187,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Zwyx
         {
-            get { return new Vec4(Z, W, Y, X); }
+            readonly get { return new Vec4(Z, W, Y, X); }
             set { Z = value.X; W = value.Y; Y = value.Z; X = value.W; }
         }
 
@@ -1197,7 +1197,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Wxyz
         {
-            get { return new Vec4(W, X, Y, Z); }
+            readonly get { return new Vec4(W, X, Y, Z); }
             set { W = value.X; X = value.Y; Y = value.Z; Z = value.W; }
         }
 
@@ -1207,7 +1207,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Wxzy
         {
-            get { return new Vec4(W, X, Z, Y); }
+            readonly get { return new Vec4(W, X, Z, Y); }
             set { W = value.X; X = value.Y; Z = value.Z; Y = value.W; }
         }
 
@@ -1217,7 +1217,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Wyxz
         {
-            get { return new Vec4(W, Y, X, Z); }
+            readonly get { return new Vec4(W, Y, X, Z); }
             set { W = value.X; Y = value.Y; X = value.Z; Z = value.W; }
         }
 
@@ -1227,7 +1227,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Wyzx
         {
-            get { return new Vec4(W, Y, Z, X); }
+            readonly get { return new Vec4(W, Y, Z, X); }
             set { W = value.X; Y = value.Y; Z = value.Z; X = value.W; }
         }
 
@@ -1237,7 +1237,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Wzxy
         {
-            get { return new Vec4(W, Z, X, Y); }
+            readonly get { return new Vec4(W, Z, X, Y); }
             set { W = value.X; Z = value.Y; X = value.Z; Y = value.W; }
         }
 
@@ -1247,7 +1247,7 @@ namespace KirosEngine3.Math.Vector
         [XmlIgnore]
         public Vec4 Wzyx
         {
-            get { return new Vec4(W, Z, Y, X); }
+            readonly get { return new Vec4(W, Z, Y, X); }
             set { W = value.X; Z = value.Y; Y = value.Z; X = value.W; }
         }
         #endregion

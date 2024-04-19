@@ -13,7 +13,7 @@ namespace KirosEngine3.Textures
     {
         private static TextureManager? _instance;
 
-        private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
+        private readonly Dictionary<string, Texture> _textures = [];
 
         private bool _autoLoadTextures = false;
 

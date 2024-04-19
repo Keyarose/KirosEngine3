@@ -311,12 +311,13 @@ namespace KirosEngine3.Math.Matrix
             Vec3 zAxis = Vec3.Normalize(pos - target);
             Vec3 xAxis = Vec3.Normalize(Vec3.Cross(zAxis, up));
             Vec3 yAxis = Vec3.Normalize(Vec3.Cross(zAxis, xAxis));
-            Matrix4 result = new Matrix4();
-
-            result.Row0 = new Vec4(xAxis.X, yAxis.X, zAxis.X, 0.0f);
-            result.Row1 = new Vec4(xAxis.Y, yAxis.Y, zAxis.Y, 0.0f);
-            result.Row2 = new Vec4(xAxis.Z, yAxis.Z, zAxis.Z, 0.0f);
-            result.Row3 = new Vec4(-Vec3.Dot(xAxis, pos), -Vec3.Dot(yAxis, pos), -Vec3.Dot(zAxis, pos), 1.0f);
+            Matrix4 result = new Matrix4
+            {
+                Row0 = new Vec4(xAxis.X, yAxis.X, zAxis.X, 0.0f),
+                Row1 = new Vec4(xAxis.Y, yAxis.Y, zAxis.Y, 0.0f),
+                Row2 = new Vec4(xAxis.Z, yAxis.Z, zAxis.Z, 0.0f),
+                Row3 = new Vec4(-Vec3.Dot(xAxis, pos), -Vec3.Dot(yAxis, pos), -Vec3.Dot(zAxis, pos), 1.0f)
+            };
 
             return result;
         }

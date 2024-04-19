@@ -11,9 +11,9 @@ namespace KirosEngine3.Textures
     {
         private static FontManager? _instance;
 
-        private readonly Dictionary<string, Font> _fonts = new Dictionary<string, Font>();
+        private readonly Dictionary<string, Font> _fonts = [];
 
-        private static FontManager Instance
+        public static FontManager Instance
         { get { return _instance ??= new FontManager(); } }
 
         /// <summary>

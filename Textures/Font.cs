@@ -36,8 +36,8 @@ namespace KirosEngine3.Textures
 
         private readonly string _fontTexture;
         private int _size;
-        private readonly float _spaceSize = 3.0f;//todo: accessors
-        private float _charSpaceSize = 1.0f;
+        private float _spaceSize = 3.0f;
+        private float _charPaddingSize = 1.0f;
         
         private readonly Dictionary<char, CharInfo> _charData = [];
         private Vec2 _bitmapScale;
@@ -57,19 +57,26 @@ namespace KirosEngine3.Textures
         { get { return _size; } }
 
         /// <summary>
+        /// The width to use for a space in the text.
+        /// </summary>
+        /// <remarks>Default value of 3.0</remarks>
+        public float SpaceSize
+        { get { return _spaceSize; } set { _spaceSize = value; } }
+
+        /// <summary>
+        /// The amount of padding between each character in a text.
+        /// </summary>
+        /// <remarks>Default value of 1.0</remarks>
+        public float CharPaddingSize
+        { get { return _charPaddingSize; } set { _charPaddingSize = value; } }
+
+        /// <summary>
         /// The font data
         /// </summary>
         public Dictionary<char, CharInfo> CharData
         {
             get { return _charData; }
         }
-
-        /// <summary>
-        /// The default font
-        /// </summary>
-        public static Font Default = new Font((string)ConfigVars.Instance[Client.DEFAULT_FONT_NAME_KEY], 
-            (string)ConfigVars.Instance[Client.DEFAULT_FONT_FILE_KEY] + ".xml",
-            (string)ConfigVars.Instance[Client.DEFAULT_FONT_FILE_KEY] + "_0.png");
 
         /// <summary>
         /// Basic constructor for a font object
@@ -184,7 +191,7 @@ namespace KirosEngine3.Textures
                 else
                 {
                     CharInfo ci = _charData[c];
-                    //opengl uv 0,0 is bottom left
+                    //OpenGL uv 0,0 is bottom left
                     //tri 1
                     //top left -4
                     textVerts[counterV].Position = pos;
@@ -223,12 +230,12 @@ namespace KirosEngine3.Textures
                     counterI += 6; //increment for the next char
 
                     //shift start pos for next letter
-                    pos.X += ci.Width + _charSpaceSize;
+                    pos.X += ci.Width + _charPaddingSize;
                 }
             }
 
-            result.VertexBuffer = textVerts;
-            result.IndexBuffer = textIndices;
+            result.Vertexes = textVerts;
+            result.Indexes = textIndices;
 
             return result;
         }
