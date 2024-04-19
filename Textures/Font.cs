@@ -67,7 +67,9 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The default font
         /// </summary>
-        public static Font Default = new Font("", "", "");//todo: define environment vars for default font and textures
+        public static Font Default = new Font((string)ConfigVars.Instance[Client.DEFAULT_FONT_NAME_KEY], 
+            (string)ConfigVars.Instance[Client.DEFAULT_FONT_FILE_KEY] + ".xml",
+            (string)ConfigVars.Instance[Client.DEFAULT_FONT_FILE_KEY] + "_0.png");
 
         /// <summary>
         /// Basic constructor for a font object

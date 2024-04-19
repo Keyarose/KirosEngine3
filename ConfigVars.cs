@@ -9,22 +9,22 @@ namespace KirosEngine3
     /// <summary>
     /// Define a collection for application wide accessible variables
     /// </summary>
-    internal class RuntimeVars
+    internal class ConfigVars
     {
-        private static RuntimeVars? _instance;
+        private static ConfigVars? _instance;
 
-        private Dictionary<string, object> _vars = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _vars = [];
 
         /// <summary>
         /// Singleton constructor
         /// </summary>
-        private RuntimeVars() { }
+        private ConfigVars() { }
 
         /// <summary>
         /// Singleton accessor
         /// </summary>
-        public static RuntimeVars Instance
-        { get { return _instance ??= new RuntimeVars(); } }
+        public static ConfigVars Instance
+        { get { return _instance ??= new ConfigVars(); } }
 
         /// <summary>
         /// Accessor for the variables collection
