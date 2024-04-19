@@ -20,7 +20,7 @@ namespace KirosEngine3
         protected int _charWidth;
         protected int _linesHeight;//how many lines fit in the space
 
-        protected Font _defaultFont;
+        protected string _defaultFontName = "";
 
         protected bool _visible;
 
@@ -39,8 +39,16 @@ namespace KirosEngine3
             _yPos = yPos;
             _width = width;
             _height = height;
-
-            //todo: load the default font based on config
+            
+            if (ConfigVars.TryGetVar(Client.DEFAULT_FONT_NAME_KEY, out object? fontName))
+            {
+                _defaultFontName = (string)fontName!;
+            }
+            else
+            {
+                Console.WriteLine("Warning: Default font is not configured.");
+                Logger.WriteToLog("Warning: Default font is not configured.");
+            }
 
             _visible = false; //default to not visible
         }

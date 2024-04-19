@@ -18,6 +18,9 @@ namespace KirosEngine3.Shaders
         protected string _vertPath;
         protected string _fragPath;
 
+        protected readonly Dictionary<string, int> _uniformLocations = [];
+        protected ShaderSignature _signature;
+
         public int Handle
         { get { return _handle; } }
 
@@ -62,7 +65,7 @@ namespace KirosEngine3.Shaders
         {
             int vertexShader;
             int fragmentShader;
-            //todo: cache all uniform see opentk shader
+            
             string vertShaderSource;
             string fragShaderSource;
 
@@ -134,9 +137,28 @@ namespace KirosEngine3.Shaders
             GL.DetachShader(_handle, fragmentShader);
             GL.DeleteShader(vertexShader);
             GL.DeleteShader(fragmentShader);
-        }
 
-        //todo: setup and attrib handling making use of GL.GetActiveAttrib
+            //uniform caching
+            GL.GetProgram(_handle, GetProgramParameterName.ActiveUniforms, out var uniformCount);
+            for (int i = 0; i < uniformCount; i++) 
+            {
+                string key = GL.GetActiveUniform(_handle, i, out _, out _);
+                int location = GL.GetUniformLocation(_handle, key);
+
+                _uniformLocations.Add(key, location);
+            }
+
+            //form shader signature from attributes
+            GL.GetProgram(_handle, GetProgramParameterName.ActiveAttributes, out var attributesCount);
+            _signature.Attributes = new Tuple<int, string, ActiveAttribType>[attributesCount];
+            for (int i = 0; i < attributesCount; i++)
+            {
+                string key = GL.GetActiveAttrib(_handle, i, out _, out ActiveAttribType type);
+                int location = GL.GetAttribLocation(_handle, key);
+
+                _signature.Attributes[i] = new Tuple<int, string, ActiveAttribType>(location, key, type);
+            }
+        }
 
         /// <summary>
         /// Provide access to the shader attribute locations (OpenGL)
@@ -145,7 +167,8 @@ namespace KirosEngine3.Shaders
         /// <returns>The location integer of the attribute named</returns>
         public int GetAttribLocationGL(string name)
         {
-            return GL.GetAttribLocation(_handle, name);
+            return _signature.Attributes.Where(attrib => attrib.Item2 == name)
+                .Select(attrib => attrib.Item1).First();
         }
 
         /// <summary>
@@ -165,23 +188,29 @@ namespace KirosEngine3.Shaders
         /// <param name="value">The value to set it to</param>
         public void SetUniformIntGL(string name, int value)
         {
-            int location = GL.GetUniformLocation(Handle, name);
-            GL.UseProgram(Handle);
-            GL.Uniform1(location, value);
+            if (_uniformLocations.TryGetValue(name, out int loc))
+            {
+                GL.UseProgram(Handle);
+                GL.Uniform1(loc, value);
+            }
         }
 
         public void SetUniformVec3GL(string name, Vec3 value)
         {
-            int location = GL.GetUniformLocation(Handle, name);
-            GL.UseProgram(Handle);
-            GL.Uniform3(location, value);
+            if (_uniformLocations.TryGetValue(name, out int loc))
+            {
+                GL.UseProgram(Handle);
+                GL.Uniform3(loc, value);
+            }
         }
 
         public void SetUniformVec4GL(string name, Vec4 value)
         {
-            int loc = GL.GetUniformLocation(Handle, name);
-            GL.UseProgram(Handle);
-            GL.Uniform4(loc, value);
+            if (_uniformLocations.TryGetValue(name, out int loc))
+            {
+                GL.UseProgram(Handle);
+                GL.Uniform4(loc, value);
+            }
         }
 
         /// <summary>
@@ -192,9 +221,11 @@ namespace KirosEngine3.Shaders
         public void SetUniformMat4GL(string name, Matrix4 value)
         {
             OpenTK.Mathematics.Matrix4 v2 = value;//convert to openTK format
-            int loc = GL.GetUniformLocation(Handle, name);
-            GL.UseProgram(Handle);
-            GL.UniformMatrix4(loc, true, ref v2);
+            if (_uniformLocations.TryGetValue(name, out int loc))
+            {
+                GL.UseProgram(Handle);
+                GL.UniformMatrix4(loc, true, ref v2);
+            }
         }
         #endregion
 
@@ -202,8 +233,10 @@ namespace KirosEngine3.Shaders
         //todo: more uniform types
         public void ProgramUniformVec4GL(string name, Vec4 value)
         {
-            int loc = GL.GetUniformLocation(Handle, name);
-            GL.ProgramUniform4(Handle, loc, value);
+            if (_uniformLocations.TryGetValue(name, out int loc))
+            {
+                GL.ProgramUniform4(Handle, loc, value);
+            }
         }
         #endregion
 
@@ -237,5 +270,10 @@ namespace KirosEngine3.Shaders
                 Logger.WriteToLog("Shader named: " + _name + ", not properly disposed of.");
             }
         }
+    }
+
+    public struct ShaderSignature
+    {
+        public Tuple<int, string, ActiveAttribType>[] Attributes;
     }
 }

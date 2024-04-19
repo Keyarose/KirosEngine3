@@ -13,6 +13,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using KirosEngine3.Math.Matrix;
 using KirosEngine3.Camera;
 using KirosEngine3.Mesh.Primitives;
+using KirosEngine3.Math.Data;
 
 namespace KirosEngine3
 {
@@ -29,7 +30,9 @@ namespace KirosEngine3
 
         public TestClient(int width, int height) : base (width, height, "Test Client")
         {
-            RuntimeVars.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);
+            ConfigVars.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);
+            ConfigVars.AddVar(DEFAULT_FONT_NAME_KEY, "default");
+            ConfigVars.AddVar(DEFAULT_FONT_FILE_KEY, "Resources/Fonts/latin_sas_math_16pt");
         }
 
         protected override void OnLoad()
@@ -44,12 +47,15 @@ namespace KirosEngine3
 
             ShaderManager.CreateShader("text", "Resources/Shaders/FontShader_default.vert", "Resources/Shaders/FontShader_default.frag");
 
-            Font df = new Font("df", "Resources/Fonts/latin_sas_math_16pt.xml", "Resources/Fonts/latin_sas_math_16pt_0.png");
+            Font df = Font.Default;
 
             testText = new Text(new Vec2(0.0f), df, "t");
-            testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), new Vec4(1.0f, 1.0f, 0.0f, 1.0f));
-            testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), new Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-            testTriangle = new Triangle([new Vec3(0.0f, 0.3f, 0.0f), new Vec3(0.2f, -0.2f, 0.0f), new Vec3(-0.2f, -0.2f, 0.0f)], new Vec4(0.0f, 1.0f, 1.0f, 1.0f));
+            testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
+
+            testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), Color4.Red);
+            testLine.Init();
+
+            testTriangle = new Triangle([new Vec3(0.0f, 0.3f, 0.0f), new Vec3(0.2f, -0.2f, 0.0f), new Vec3(-0.2f, -0.2f, 0.0f)], Color4.Aqua);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)

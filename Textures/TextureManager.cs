@@ -12,8 +12,8 @@ namespace KirosEngine3.Textures
     internal class TextureManager
     {
         private static TextureManager? _instance;
-        //todo: convert methods to static
-        private Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
+
+        private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
 
         private bool _autoLoadTextures = false;
 
@@ -86,6 +86,7 @@ namespace KirosEngine3.Textures
             }
 
             Logger.WriteToLog(string.Format("Texture name: {0} is already in use.", name));
+            Console.WriteLine(string.Format("Texture name: {0} is already in use.", name));
             //todo: write to debug console
             return false;
         }
@@ -106,6 +107,8 @@ namespace KirosEngine3.Textures
             }
 
             Logger.WriteToLog(string.Format("Texture name: {0} is already in use.", name));
+            Console.WriteLine(string.Format("Texture name: {0} is already in use.", name));
+
             //todo: write to debug console
             return false;
         }
