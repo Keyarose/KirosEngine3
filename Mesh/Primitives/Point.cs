@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Math.Vector;
+﻿using KirosEngine3.Math.Data;
+using KirosEngine3.Math.Vector;
 using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
 using System;
@@ -37,7 +38,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// The color of the point
         /// </summary>
-        public Vec4 Color { get { return _point[0].Color; } set { _point[0].Color = value; } }
+        public Color4 Color { get { return _point[0].Color; } set { _point[0].Color = value; } }
 
         /// <summary>
         /// The name of the shader used to render the line
@@ -50,7 +51,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <param name="position">The point's position</param>
         /// <param name="color">The color of the point</param>
         /// <param name="shaderName">The name of the shader to use in drawing</param>
-        public Point(Vec3 position, Vec4 color, string shaderName = "color")
+        public Point(Vec3 position, Color4 color, string shaderName = "color")
         {
             _point[0].Position = position;
             _point[0].Color = color;

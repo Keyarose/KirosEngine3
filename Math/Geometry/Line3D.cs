@@ -60,6 +60,18 @@ namespace KirosEngine3.Math.Geometry
             Finite = finite;
         }
 
+        public Line3D(Vec3[] verts, bool finite)
+        {
+            if (verts.Length < 2)
+            {
+                throw new ArgumentException("Line3D requires two points.");
+            }
+
+            Start = verts[0];
+            Direction = verts[1];
+            Finite = finite;
+        }
+
         /// <summary>
         /// The point on the line where the X value is the given value
         /// </summary>

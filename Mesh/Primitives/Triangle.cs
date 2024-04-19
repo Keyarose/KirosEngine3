@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Math.Geometry;
+﻿using KirosEngine3.Math.Data;
+using KirosEngine3.Math.Geometry;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
@@ -14,7 +15,7 @@ namespace KirosEngine3.Mesh.Primitives
     {
         //protected Triangle3D _tri;
 
-        protected Vec4 _color;
+        protected Color4 _color;
 
         protected ColorVertex[] _verts = new ColorVertex[3];
 
@@ -37,7 +38,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// The color of the triangle
         /// </summary>
-        public Vec4 Color { get { return _color; } set { _color = value; } }
+        public Color4 Color { get { return _color; } set { _color = value; } }
 
         /// <summary>
         /// The mathematical representation of the triangle
@@ -49,7 +50,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public string ShaderName { get { return _shaderName; } set { _shaderName = value; } }
 
-        public Triangle(Vec3[] points, Vec4 color, string shaderName = "color")
+        public Triangle(Vec3[] points, Color4 color, string shaderName = "color")
         {
             if (points.Length < 3)
             {

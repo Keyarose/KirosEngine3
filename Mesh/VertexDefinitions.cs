@@ -3,15 +3,23 @@ using KirosEngine3.Shaders;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
+using KirosEngine3.Math.Data;
 
 namespace KirosEngine3.Mesh
 {
+    public interface IVertex
+    {
+        public Vec3 Position { get; set; }
+
+        public static readonly int SizeInBytesU;
+    }
+    //todo: vertex type checking against shader signature
     /// <summary>
     /// Defines a Vertex with position and color with alpha
     /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct ColorVertex
+    public struct ColorVertex : IVertex
     {
         /// <summary>
         /// The vertex's position
@@ -21,7 +29,7 @@ namespace KirosEngine3.Mesh
         /// <summary>
         /// The vertex's color with alpha
         /// </summary>
-        public Vec4 Color { get; set; }
+        public Color4 Color { get; set; }
 
         /// <summary>
         /// The size of the vertex in bytes (Unsafe)
@@ -201,7 +209,7 @@ namespace KirosEngine3.Mesh
         /// <summary>
         /// The vertex's color
         /// </summary>
-        public Vec4 Color { get; set; }
+        public Color4 Color { get; set; }
 
         /// <summary>
         /// The vertex's texture coordinates

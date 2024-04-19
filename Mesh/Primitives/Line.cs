@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Math.Geometry;
+﻿using KirosEngine3.Math.Data;
+using KirosEngine3.Math.Geometry;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
@@ -16,10 +17,6 @@ namespace KirosEngine3.Mesh.Primitives
     /// </summary>
     public class Line : IDisposable, IRenderable
     {
-        //mathematical representation of the line in 3D
-        protected Line3D _line;//todo: change so that the math rep doesn't need to be stored and is created from vertex data as needed
-        //the color of the line
-        protected Vec4 _color;
         //the vertex data
         protected ColorVertex[] _verts = new ColorVertex[2];
         //vertex array object
@@ -36,11 +33,11 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public Vec3 Start
         {
-            get { return _line.Start; }
+            get { return _verts[0].Position; }
             set
             {
-                _line.Start = value;
-                RecalculateVerts();
+                _verts[0].Position = value;
+                ReloadVerts();
             }
         }
 
@@ -49,48 +46,77 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public Vec3 End
         {
-            get { return _line.Direction; }
+            get { return _verts[1].Position; }
             set
             {
-                _line.Direction = value;
-                RecalculateVerts();
+                _verts[1].Position = value;
+                ReloadVerts();
             }
         }
 
         /// <summary>
         /// The line's color
         /// </summary>
-        public Vec4 Color { get { return _color; } set { _color = value; } }
+        public Color4[] Colors
+        { 
+            get { return [_verts[0].Color, _verts[1].Color]; }
+        }
 
         /// <summary>
         /// The mathematical representation of the line
         /// </summary>
-        public Line3D MathLine { get { return _line; } }
+        public Line3D MathLine { get { return new Line3D([_verts[0].Position, _verts[1].Position], false); } }
 
         /// <summary>
         /// The name of the shader used to render the line
         /// </summary>
         public string ShaderName { get { return _shaderName; } set { _shaderName = value; } }
 
+        #region Loading
         /// <summary>
         /// Basic constructor for a renderable line object
         /// </summary>
         /// <param name="start">The line's start point</param>
         /// <param name="end">The line's end point</param>
-        /// <param name="color">The color of the line</param>
+        /// <param name="colors">The colors of the line</param>
         /// <param name="shaderName">The name of the shader to use in drawing</param>
-        public Line(Vec3 start, Vec3 end, Vec4 color, string shaderName = "color")
+        public Line(Vec3 start, Vec3 end, Color4[] colors, string shaderName = "color")
         {
-            _line = new Line3D(start, end, true);
-            _color = color;
             _shaderName = shaderName;
 
-            _verts[0].Position = _line.Start;
-            _verts[0].Color = _color;
+            _verts[0].Position = start;
+            _verts[0].Color = colors[0];
 
-            _verts[1].Position = _line.Direction;
-            _verts[1].Color = _color;
+            _verts[1].Position = end;
+            _verts[1].Color = colors[1];
+        }
 
+        /// <summary>
+        /// Constructor for a renderable line object
+        /// </summary>
+        /// <param name="line">A mathematical representation of the line</param>
+        /// <param name="colors">The colors of the line</param>
+        /// <param name="shaderName">The name of the shader to use in drawing</param>
+        public Line(Line3D line, Color4[] colors, string shaderName = "color") :
+            this(line.Start, line.Direction, colors, shaderName)
+        { }
+
+        /// <summary>
+        /// Constructor for a renderable line object
+        /// </summary>
+        /// <param name="start">The line's start point</param>
+        /// <param name="end">The line's end point</param>
+        /// <param name="color">The color for the whole line</param>
+        /// <param name="shaderName">The name of the shader to use in drawing</param>
+        public Line(Vec3 start, Vec3 end, Color4 color, string shaderName = "color") :
+            this(start, end, [color, color], shaderName)
+        { }
+
+        /// <summary>
+        /// Called to initialize the renderable object if it is not being drawn as part of a group
+        /// </summary>
+        public void Init()
+        {
             _VAO = GL.GenVertexArray();
             GL.BindVertexArray(_VAO);
 
@@ -98,7 +124,7 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _verts.Length, _verts, BufferUsageHint.DynamicDraw);
 
-            Shader sh = ShaderManager.Instance[shaderName];
+            Shader sh = ShaderManager.Instance[_shaderName];
 
             ColorVertex.SetVertexPositionAttrib(sh, "aPosition");//todo: get the shader attrib names from the shader object
             ColorVertex.SetVertexColorAttrib(sh, "aColor");
@@ -107,15 +133,22 @@ namespace KirosEngine3.Mesh.Primitives
         }
 
         /// <summary>
-        /// Constructor for a renderable line object
+        /// Called to initialize the renderable object for drawing as a part of similar objects
         /// </summary>
-        /// <param name="line">A mathematical representation of the line</param>
-        /// <param name="color">The color of the line</param>
-        /// <param name="shaderName">The name of the shader to use in drawing</param>
-        public Line(Line3D line, Vec4 color, string shaderName = "color") :
-            this(line.Start, line.Direction, color, shaderName)
-        { }
+        public void BindToGroup()
+        {
+            _VBO = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _verts.Length, _verts, BufferUsageHint.DynamicDraw);
 
+            Shader sh = ShaderManager.Instance[_shaderName];
+
+            ColorVertex.SetVertexPositionAttrib(sh, "aPosition");//todo: get the shader attrib names from the shader object
+            ColorVertex.SetVertexColorAttrib(sh, "aColor");
+        }
+        #endregion
+
+        #region Draw
         /// <summary>
         /// Draws the point on the screen using the named shader (OpenGL)
         /// </summary>
@@ -138,6 +171,24 @@ namespace KirosEngine3.Mesh.Primitives
         }
 
         /// <summary>
+        /// Draws the point as part of a group of similar objects (OpenGL)
+        /// </summary>
+        public void DrawInGroupGL()
+        {
+            if (_disposed)
+            {
+                Logger.WriteToLog("Attempt to draw unloaded line object: {0}", this);
+                Console.WriteLine("Attempt to draw unloaded line object: {0}", this);
+                //todo: write to debug console
+                return;
+            }
+
+            //shader and vertex array should be set in the calling method
+
+            GL.DrawArrays(PrimitiveType.Lines, 0, _verts.Length);
+        }
+
+        /// <summary>
         /// Draws the point on the screen using the named shader (DirectX)
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
@@ -145,7 +196,9 @@ namespace KirosEngine3.Mesh.Primitives
         {
             throw new NotImplementedException();
         }
+        #endregion
 
+        #region Update
         /// <summary>
         /// Updates to the line called each frame
         /// </summary>
@@ -155,17 +208,30 @@ namespace KirosEngine3.Mesh.Primitives
         }
 
         /// <summary>
+        /// Set the color of the specified vertex, 0 for the start vertex, 1 for the end vertex
+        /// </summary>
+        /// <param name="vIndex">The index of the vertex</param>
+        /// <param name="color">The color to set the vertex to</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the vertex index is outside the allowed range</exception>
+        public void SetVertexColor(int vIndex, Color4 color)
+        {
+            if (vIndex > 1 || vIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(vIndex));
+            }
+
+            _verts[vIndex].Color = color;
+        }
+
+        /// <summary>
         /// Update the vertices based on changes to the line data
         /// </summary>
-        protected void RecalculateVerts()
+        protected void ReloadVerts()
         {
-            _verts[0].Position = _line.Start;
-
-            _verts[1].Position = _line.Direction;
-
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _verts.Length, _verts, BufferUsageHint.DynamicDraw);
         }
+        #endregion
 
         /// <summary>
         /// Disposal of unmanaged objects

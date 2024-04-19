@@ -267,13 +267,13 @@ namespace KirosEngine3.Math.Vector
         }
 
         /// <inheritdoc/>
-        public override bool Equals([NotNullWhen(true)] object? obj)
+        public override readonly bool Equals([NotNullWhen(true)] object? obj)
         {
             return obj is Vec4 vec && Equals(vec);
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode() 
+        public override readonly int GetHashCode() 
         {
             return HashCode.Combine(X, Y, Z, W);
         }
@@ -312,7 +312,7 @@ namespace KirosEngine3.Math.Vector
         /// </summary>
         /// <param name="lhs">The left vector</param>
         /// <param name="rhs">The right vector</param>
-        /// <returns></returns>
+        /// <returns>False if equivalent, true otherwise</returns>
         public static bool operator !=(Vec4 lhs, Vec4 rhs) 
         {
             return !lhs.Equals(rhs);
@@ -832,7 +832,7 @@ namespace KirosEngine3.Math.Vector
         /// <inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
-            return string.Format("({0},{1},{2},{3})",
+            return string.Format("Vector 4D: ({0},{1},{2},{3})",
                 X.ToString(format, formatProvider),
                 Y.ToString(format, formatProvider),
                 Z.ToString(format, formatProvider),
@@ -1257,7 +1257,7 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Handle conversion from OpenTK's Vector4 to Vec4
         /// </summary>
-        /// <param name="v"></param>
+        /// <param name="v">The vector to be converted</param>
         public static implicit operator Vec4(Vector4 v)
         {
             return new Vec4(v.X, v.Y, v.Z, v.W);
@@ -1266,7 +1266,7 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Handle conversion from Vec4 to OpenTK's Vector4
         /// </summary>
-        /// <param name="v"></param>
+        /// <param name="v">The vector to be converted</param>
         public static implicit operator Vector4(Vec4 v)
         {
             return new Vector4(v.X, v.Y, v.Z, v.W);
