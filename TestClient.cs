@@ -14,6 +14,7 @@ using KirosEngine3.Math.Matrix;
 using KirosEngine3.Camera;
 using KirosEngine3.Mesh.Primitives;
 using KirosEngine3.Math.Data;
+using KirosEngine3.Input;
 
 namespace KirosEngine3
 {
@@ -36,7 +37,7 @@ namespace KirosEngine3
 
             FontManager.AddFont((string)ConfigVars.Instance[DEFAULT_FONT_NAME_KEY], new Font((string)ConfigVars.Instance[DEFAULT_FONT_NAME_KEY],
             (string)ConfigVars.Instance[DEFAULT_FONT_FILE_KEY] + ".xml",
-            (string)ConfigVars.Instance[DEFAULT_FONT_FILE_KEY] + "_0.png"));//todo: cleanup call once config system is implemented
+            (string)ConfigVars.Instance[DEFAULT_FONT_FILE_KEY] + "_0.png"));//todo: cleanup method call once config system is implemented
         }
 
         protected override void OnLoad()
@@ -51,7 +52,7 @@ namespace KirosEngine3
 
             ShaderManager.CreateShader("text", "Resources/Shaders/FontShader_default.vert", "Resources/Shaders/FontShader_default.frag");
 
-            _ = FontManager.TryGetFont(DEFAULT_FONT_NAME_KEY, out Font? df);
+            _ = FontManager.TryGetFont((string)ConfigVars.Instance[DEFAULT_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
 
             testText = new Text(new Vec2(0.0f), df!, "t");
             testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
@@ -60,6 +61,13 @@ namespace KirosEngine3
             testLine.Init();
 
             testTriangle = new Triangle([new Vec3(0.0f, 0.3f, 0.0f), new Vec3(0.2f, -0.2f, 0.0f), new Vec3(-0.2f, -0.2f, 0.0f)], Color4.Aqua);
+
+            //kem testing
+            KeyboardEventManager.SubscribeKeyboardEvent("test", Keys.B,
+                KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { });
+            KeyboardEventManager.SubscribeKeyboardEvent("test", Keys.B,
+                KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { });
+            Console.WriteLine(KeyboardEventManager.ListDelegates("test"));
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
