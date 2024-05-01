@@ -1,6 +1,8 @@
 ﻿using KirosEngine3.Math;
 using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +38,7 @@ namespace KirosEngine3.Camera
 
         //mouse control variables
         private bool _firstMove = true;
-        private Vec2 _lastMove;
+        private Vec2 _lastPos;
         private float _sensitivity;
 
         //view matrices
@@ -345,6 +347,11 @@ namespace KirosEngine3.Camera
             _up = Vec3.Normalize(Vec3.Cross(_right, _forward));
 
             UpdateViewMatrix();
+        }
+
+        public void OnUpdateFrame(FrameEventArgs e, MouseState mouse)
+        {
+            //todo: camera update method
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Textures;
+﻿using KirosEngine3.Config;
+using KirosEngine3.Textures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,9 +41,9 @@ namespace KirosEngine3
             _width = width;
             _height = height;
             
-            if (ConfigVars.TryGetVar(Client.DEFAULT_FONT_NAME_KEY, out object? fontName))
+            if (ConfigVars.TryGetVar(ConfigKeys.D_FONT_NAME_KEY, out string? fontName))
             {
-                _defaultFontName = (string)fontName!;
+                _defaultFontName = fontName!;
             }
             else
             {

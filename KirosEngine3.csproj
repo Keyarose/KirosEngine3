@@ -13,10 +13,7 @@
 
   <ItemGroup>
     <None Remove=".gitignore" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="XML\" />
+    <None Remove="Resources\Config\generalConfig.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +41,10 @@
     <Content Include="Resources\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="XML\" />
   </ItemGroup>
 
 </Project>

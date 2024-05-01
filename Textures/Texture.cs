@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Exceptions;
+﻿using KirosEngine3.Config;
+using KirosEngine3.Exceptions;
 using OpenTK.Graphics.OpenGL4;
 using StbImageSharp;
 using System;
@@ -81,7 +82,7 @@ namespace KirosEngine3.Textures
 
                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Data);
 
-                //todo: allow greater flexibility in setting text params
+                //todo: allow greater flexibility in setting text params, including mipmaps
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
@@ -150,6 +151,8 @@ namespace KirosEngine3.Textures
             if (_disposed == false)
             {
                 Console.WriteLine("Texture named: " + _name + " not properly disposed of."); //todo: exception and handling
+                Logger.WriteToLog("Texture named: " + _name + " not properly disposed of.");
+                //todo:write to debug
             }
         }
     }

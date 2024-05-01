@@ -15,6 +15,7 @@ using KirosEngine3.Camera;
 using KirosEngine3.Mesh.Primitives;
 using KirosEngine3.Math.Data;
 using KirosEngine3.Input;
+using KirosEngine3.Config;
 
 namespace KirosEngine3
 {
@@ -32,12 +33,15 @@ namespace KirosEngine3
         public TestClient(int width, int height) : base (width, height, "Test Client")
         {
             ConfigVars.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);
-            ConfigVars.AddVar(DEFAULT_FONT_NAME_KEY, "default");
-            ConfigVars.AddVar(DEFAULT_FONT_FILE_KEY, "Resources/Fonts/latin_sas_math_16pt");
+            if (!ConfigVars.LoadFromXML("Resources/Config/generalConfig.xml"))
+            {
+                //failed to load general config perform fallback
+            }
+            
 
-            FontManager.AddFont((string)ConfigVars.Instance[DEFAULT_FONT_NAME_KEY], new Font((string)ConfigVars.Instance[DEFAULT_FONT_NAME_KEY],
-            (string)ConfigVars.Instance[DEFAULT_FONT_FILE_KEY] + ".xml",
-            (string)ConfigVars.Instance[DEFAULT_FONT_FILE_KEY] + "_0.png"));//todo: cleanup method call once config system is implemented
+            FontManager.AddFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], new Font(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY],
+            ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + ".xml",
+            ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + "_0.png"));//todo: cleanup method call once config system is implemented
         }
 
         protected override void OnLoad()
@@ -46,13 +50,18 @@ namespace KirosEngine3
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);
 
+            //system control setup
+            KeyboardEventManager.CurrentContext = "system";
+            KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
+                KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { Close(); });
+
             camera = new BaseCamera(-Vec3.UnitZ, ClientSize.X, ClientSize.Y);
 
             ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag");
 
             ShaderManager.CreateShader("text", "Resources/Shaders/FontShader_default.vert", "Resources/Shaders/FontShader_default.frag");
 
-            _ = FontManager.TryGetFont((string)ConfigVars.Instance[DEFAULT_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
+            _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
 
             testText = new Text(new Vec2(0.0f), df!, "t");
             testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
@@ -63,11 +72,11 @@ namespace KirosEngine3
             testTriangle = new Triangle([new Vec3(0.0f, 0.3f, 0.0f), new Vec3(0.2f, -0.2f, 0.0f), new Vec3(-0.2f, -0.2f, 0.0f)], Color4.Aqua);
 
             //kem testing
-            KeyboardEventManager.SubscribeKeyboardEvent("test", Keys.B,
-                KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { });
-            KeyboardEventManager.SubscribeKeyboardEvent("test", Keys.B,
-                KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { });
+            KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B,
+                KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
+            
             Console.WriteLine(KeyboardEventManager.ListDelegates("test"));
+            Console.WriteLine(KeyboardEventManager.ListDelegates("system"));
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -75,10 +84,10 @@ namespace KirosEngine3
             base.OnUpdateFrame(args);
 
             if(!IsFocused) { return; }
-            
-            if(KeyboardState.IsKeyDown(Keys.Escape)) { Close(); }
+            //check keyboard state and notify subscribers
+            KeyboardEventManager.Update(KeyboardState);
 
-            if(KeyboardState.IsKeyDown(Keys.Up)) { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); }
+
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -103,6 +112,22 @@ namespace KirosEngine3
             //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
 
             SwapBuffers();
+        }
+
+        /// <summary>
+        /// Handle window resize events
+        /// </summary>
+        /// <param name="e">The resize event args</param>
+        protected override void OnResize(ResizeEventArgs e)
+        {
+            base.OnResize(e);
+
+            GL.Viewport(0, 0, e.Width, e.Height);
+        }
+
+        protected override void OnTextInput(TextInputEventArgs e)
+        {
+            base.OnTextInput(e);//todo: explore usages, or ignore in favor of an agnostic method?
         }
 
         protected override void OnUnload()

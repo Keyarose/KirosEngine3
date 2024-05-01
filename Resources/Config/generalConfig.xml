@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+  <defaults>
+    <directories>
+      <directory name="Fonts">Resources/Fonts</directory>
+      <directory name="Textures">Resources/Textures</directory>
+      <directory name="Shaders">Resources/Shaders</directory>
+    </directories>
+    <font name="default" file="Resources/Fonts/latin_sas_math_16pt" fType=".xml"/>
+  </defaults>
+</config>

@@ -268,6 +268,7 @@ namespace KirosEngine3.Shaders
             {
                 Console.WriteLine("Shader named: " + _name + ", not properly disposed of.");
                 Logger.WriteToLog("Shader named: " + _name + ", not properly disposed of.");
+                //todo: write to debug
             }
         }
     }

@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using KirosEngine3.Config;
 
 namespace KirosEngine3.Textures
 {
@@ -56,7 +57,7 @@ namespace KirosEngine3.Textures
         /// <param name="pos">The screen origin position of the text</param>
         public Text(Vec2 pos)
         {
-            if (!FontManager.TryGetFont(Client.DEFAULT_FONT_NAME_KEY, out _font))
+            if (!FontManager.TryGetFont(ConfigKeys.D_FONT_NAME_KEY, out _font))
             {
                 Console.WriteLine("Warning: Default font is not configured.");
                 Logger.WriteToLog("Warning: Default font is not configured.");
