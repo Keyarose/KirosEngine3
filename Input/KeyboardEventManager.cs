@@ -8,12 +8,26 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Input
 {
+    /// <summary>
+    /// Manages keyboard input and notifies subscribed objects of input events.
+    /// Intended to be tied to the frame update cycle of the client.
+    /// </summary>
     public class KeyboardEventManager
     {
         private static KeyboardEventManager? _instance;
 
         private static KeyboardEventManager Instance
         { get { return _instance ??= new KeyboardEventManager(); } }
+
+        private string _context = "";
+        private static KeyboardState? _lastState;
+        private static bool _capsLockState = false;
+        private static bool _numLockState = false;
+
+        public static string CurrentContext
+        { get { return Instance._context; } set { Instance._context = value; } }
+
+        public const string GLOBAL_CONTEXT = "global";
 
         /// <summary>
         /// Method signature for keyboard event handlers
@@ -23,6 +37,7 @@ namespace KirosEngine3.Input
         public delegate void KeyboardEventHandler(object sender, KeyboardEventArgs e);
         private Dictionary<string, Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>> _eventRegistry = [];
 
+        #region Add/Remove
         /// <summary>
         /// Subscribe to the keyboard event manager in the given context for the given key and event type
         /// </summary>
@@ -76,7 +91,7 @@ namespace KirosEngine3.Input
             throw new ArgumentException("The context string for a keyboard event cannot be empty.", nameof(context));
         }
 
-        ///<inheritdoc cref="SubscribeKeyboardEvent(string, Keys, KeyboardEventType, KeyboardEventHandler)"/>
+        /// <inheritdoc cref="SubscribeKeyboardEvent(string, Keys, KeyboardEventType, KeyboardEventHandler)"/>
         public static bool SubscribeKeyboardEvent(string context, Tuple<Keys, KeyboardEventType> keyMode, KeyboardEventHandler callback)
         {
             return SubscribeKeyboardEvent(context, keyMode.Item1, keyMode.Item2, callback);
@@ -104,6 +119,136 @@ namespace KirosEngine3.Input
             }
 
             return false;
+        }
+
+        /// <inheritdoc cref="UnSubscribeKeyboardEvent(string, Keys, KeyboardEventType, KeyboardEventHandler)"/>
+        public static bool UnSubscribeKeyboardEvent(string context, Tuple<Keys, KeyboardEventType> keyMode, KeyboardEventHandler callback)
+        {
+            return UnSubscribeKeyboardEvent(context, keyMode.Item1, keyMode.Item2, callback);
+        }
+        #endregion
+
+        /// <summary>
+        /// On each frame update check the keyboard state and send callbacks to all registered watchers
+        /// who's events have happened.
+        /// Intended to be called from Client.OnUpdateFrame
+        /// </summary>
+        /// <param name="keyState">The current keyboard state</param>
+        /// <exception cref="InvalidOperationException">Thrown when the KeyboardEventType for an unpacked
+        /// event handler is an invalid value</exception>
+        public static void Update(KeyboardState keyState)
+        {
+            //check special key states like caps-lock
+            if (keyState.IsKeyPressed(Keys.CapsLock)) { _capsLockState = !_capsLockState; }
+            if (keyState.IsKeyPressed(Keys.NumLock)) { _numLockState = !_numLockState; }
+
+            Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>? contextList;
+            //global context check
+            if (Instance._eventRegistry.TryGetValue(GLOBAL_CONTEXT, out contextList))
+            {
+                try
+                {
+                    ProcessContextList(keyState, contextList);
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+
+            //current context check
+            if (Instance._eventRegistry.TryGetValue(Instance._context, out contextList))
+            {
+                try
+                {
+                    ProcessContextList(keyState, contextList);
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+            //else there are no keys being watched in the current context
+
+            //last save the state for comparison against next frame
+            _lastState = keyState.GetSnapshot();
+        }
+
+        /// <summary>
+        /// Process the given list of watchers
+        /// </summary>
+        /// <param name="keyState">The current key state</param>
+        /// <param name="contextList">The list of watchers to process</param>
+        /// <exception cref="InvalidOperationException">Thrown when the KeyboardEventType for an unpacked 
+        /// event handler is an invalid value</exception>
+        private static void ProcessContextList(KeyboardState keyState, Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>? contextList)
+        {
+            if (contextList != null)
+            {
+                //for each registered watcher check the key state
+                foreach (var kE in contextList)
+                {
+                    //check modifier keys
+                    ActiveModifierKeys amk = ActiveModifierKeys.None;
+                    if (_capsLockState) { amk |= ActiveModifierKeys.CapsLock; }
+
+                    if (_numLockState) { amk |= ActiveModifierKeys.NumLock; }
+
+                    if (keyState.IsKeyDown(Keys.LeftShift) || keyState.IsKeyDown(Keys.RightShift)) { amk |= ActiveModifierKeys.Shift; }
+
+                    if (keyState.IsKeyDown(Keys.LeftControl) || keyState.IsKeyDown(Keys.RightControl)) { amk |= ActiveModifierKeys.Ctrl; }
+
+                    if (keyState.IsKeyDown(Keys.LeftAlt) || keyState.IsKeyDown(Keys.RightAlt)) { amk |= ActiveModifierKeys.Alt; }
+
+                    //decide which check to perform based on event type
+                    switch (kE.Key.Item2)
+                    {
+                        case KeyboardEventType.KeyPressed:
+                            {
+                                //check the relevant key and invoke the callback if true
+                                if (keyState.IsKeyPressed(kE.Key.Item1))
+                                {
+                                    KeyboardEventHandler temp = kE.Value;
+                                    if (temp != null)
+                                    {
+                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk);
+                                        temp.Invoke(Instance, args);
+                                    }
+                                }
+                                break;
+                            }
+                        case KeyboardEventType.KeyReleased:
+                            {
+                                if (keyState.IsKeyReleased(kE.Key.Item1))
+                                {
+                                    KeyboardEventHandler temp = kE.Value;
+                                    if (temp != null)
+                                    {
+                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk);
+                                        temp.Invoke(Instance, args);
+                                    }
+                                }
+                                break;
+                            }
+                        case KeyboardEventType.KeyHeld:
+                            {
+                                //if the key is down now and was down last check, if there was no last check then it's false
+                                if ((_lastState?.IsKeyDown(kE.Key.Item1) ?? false) && keyState.IsKeyDown(kE.Key.Item1))
+                                {
+                                    KeyboardEventHandler temp = kE.Value;
+                                    if (temp != null)
+                                    {
+                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk);
+                                        temp.Invoke(Instance, args);
+                                    }
+                                }
+                                break;
+                            }
+                        default:
+                            throw new InvalidOperationException(string.Format("Invalid value for KeyboardEventType: {0}", kE.Key.Item2));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -137,6 +282,29 @@ namespace KirosEngine3.Input
     {
         public Keys Key { get; private set; }
         public KeyboardEventType Type { get; private set; }
+
+        public ActiveModifierKeys ModifierKeys { get; private set; }
+
+        public KeyboardEventArgs(Keys key, KeyboardEventType type, ActiveModifierKeys modKeys)
+        {
+            Key = key;
+            Type = type;
+            ModifierKeys = modKeys;
+        }
+    }
+
+    /// <summary>
+    /// Flags that show which modifier keys are active
+    /// </summary>
+    [Flags]
+    public enum ActiveModifierKeys
+    {
+        None = 0,
+        Ctrl = 1,
+        Shift = 2,
+        Alt = 4,
+        CapsLock = 8,
+        NumLock = 16,
     }
 
     /// <summary>
