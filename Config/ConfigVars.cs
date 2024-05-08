@@ -198,6 +198,9 @@ namespace KirosEngine3.Config
         }
     }
 
+    /// <summary>
+    /// Container struct for config key constants.
+    /// </summary>
     public struct ConfigKeys
     {
         public const string D_DIR_FONT_KEY = "ddirfont";

@@ -1,9 +1,11 @@
-﻿using System;
+﻿using KirosEngine3.Mesh;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using OpenTK.Graphics.OpenGL4;
 
 namespace KirosEngine3.Scenes
 {
@@ -13,6 +15,8 @@ namespace KirosEngine3.Scenes
     public class Scene
     {
         protected string _name = string.Empty;
+
+        protected List<SceneObject> _objects = new List<SceneObject>();
 
         public string Name { get { return _name; } set { _name = value; } }
         //todo: fill stub

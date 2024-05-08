@@ -2,6 +2,7 @@
 using KirosEngine3.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -139,13 +140,17 @@ namespace KirosEngine3.Shaders
         /// <param name="name">The name of the shader to get</param>
         /// <param name="shader">The Shader for the name if it exists</param>
         /// <returns>True if the shader is found, false otherwise</returns>
-        public static bool TryGetShader(string name, out Shader? shader)
+        public static bool TryGetShader(string name, [NotNullWhen(true)] out Shader? shader)
         {
             if (Instance._shaders.TryGetValue(name, out var sha))
             {
                 shader = sha;
                 return true;
             }
+
+            Logger.WriteToLog("Failed to set shader named: {0} for use", name);
+            Console.WriteLine("Failed to set shader named: {0} for use", name);
+            //todo: write to debug console
 
             shader = null;
             return false;

@@ -27,6 +27,8 @@ namespace KirosEngine3.Shaders
         public string Name
         { get { return _name; } }
 
+        //todo: attrib pointers for position, color, texture, ect.
+
         /// <summary>
         /// Construct a shader from a vertex shader and a fragment shader
         /// </summary>
@@ -160,6 +162,12 @@ namespace KirosEngine3.Shaders
             }
         }
 
+        //todo: get signature attribute for ActiveAttribType
+
+        //todo: get signature attribute for index
+
+        //todo: get signature attribute for name
+
         /// <summary>
         /// Provide access to the shader attribute locations (OpenGL)
         /// </summary>
@@ -193,6 +201,12 @@ namespace KirosEngine3.Shaders
                 GL.UseProgram(Handle);
                 GL.Uniform1(loc, value);
             }
+            else
+            {
+                Logger.WriteToLog("No uniform named: {0} found in shader: {1}", name, _name);
+                Console.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
+                //write debug
+            }
         }
 
         public void SetUniformVec3GL(string name, Vec3 value)
@@ -202,6 +216,12 @@ namespace KirosEngine3.Shaders
                 GL.UseProgram(Handle);
                 GL.Uniform3(loc, value);
             }
+            else
+            {
+                Logger.WriteToLog("No uniform named: {0} found in shader: {1}", name, _name);
+                Console.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
+                //write debug
+            }
         }
 
         public void SetUniformVec4GL(string name, Vec4 value)
@@ -210,6 +230,12 @@ namespace KirosEngine3.Shaders
             {
                 GL.UseProgram(Handle);
                 GL.Uniform4(loc, value);
+            }
+            else
+            {
+                Logger.WriteToLog("No uniform named: {0} found in shader: {1}", name, _name);
+                Console.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
+                //write debug
             }
         }
 
@@ -225,6 +251,12 @@ namespace KirosEngine3.Shaders
             {
                 GL.UseProgram(Handle);
                 GL.UniformMatrix4(loc, true, ref v2);
+            }
+            else
+            {
+                Logger.WriteToLog("No uniform named: {0} found in shader: {1}", name, _name);
+                Console.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
+                //write debug
             }
         }
         #endregion

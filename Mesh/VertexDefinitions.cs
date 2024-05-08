@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
 using KirosEngine3.Math.Data;
+using System.Drawing;
 
 namespace KirosEngine3.Mesh
 {
@@ -12,8 +13,68 @@ namespace KirosEngine3.Mesh
         public Vec3 Position { get; set; }
 
         public static readonly int SizeInBytesU;
+
+        public abstract static void SetVertexAttribs(Shader sh, string[] attribNames);
     }
     //todo: vertex type checking against shader signature
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Vertex : IVertex
+    {
+        /// <summary>
+        /// The vertex's position
+        /// </summary>
+        public Vec3 Position { get; set; }
+
+        /// <summary>
+        /// The size of the vertex in bytes (Unsafe)
+        /// </summary>
+        public static readonly int SizeInBytesU = Unsafe.SizeOf<Vertex>();
+
+        /// <summary>
+        /// Defines the vertex attribute pointers for both position and color data at the named locations in the given shader
+        /// </summary>
+        /// <param name="sh">The shader to get the locations from</param>
+        /// <param name="attribNames">The names of the attributes in the shader, ordered by position then color</param>
+        /// <exception cref="InvalidOperationException">Thrown if no names are supplied for the attributes</exception>
+        public static void SetVertexAttribs(Shader sh, string[] attribNames)
+        {
+            if (attribNames.Length == 0)
+            {
+                throw new InvalidOperationException("No shader attribute names were defined.");
+            }
+
+            if (attribNames.Length == 1) //if only one is defined then it should be the position attrib
+            {
+                SetVertexPositionAttrib(sh, attribNames[0]);
+            }
+        }
+
+        /// <summary>
+        /// Defines the vertex attribute pointer for position data at the named location in the given shader
+        /// </summary>
+        /// <param name="sh">The shader to get the location from</param>
+        /// <param name="attribName">The attribute's name in the shader</param>
+        /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
+        public static void SetVertexPositionAttrib(Shader sh, string attribName)
+        {
+            int posAtt = sh.GetAttribLocationGL(attribName);
+
+            if (posAtt == -1)
+            {
+                throw new ArgumentException(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", attribName, sh));
+            }
+
+            GL.VertexAttribPointer(posAtt, 3, VertexAttribPointerType.Float, false, SizeInBytesU, 0);
+            GL.EnableVertexAttribArray(posAtt);
+        }
+
+        public override readonly string ToString()
+        {
+            return string.Format("Position: {0}", Position);
+        }
+    }
+
     /// <summary>
     /// Defines a Vertex with position and color with alpha
     /// </summary>
