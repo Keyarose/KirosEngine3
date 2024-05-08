@@ -28,6 +28,7 @@ namespace KirosEngine3
         Point? testPoint;
         Line? testLine;
         Triangle? testTriangle;
+        Quad? testQuad;
         BaseCamera? camera;
 
         public TestClient(int width, int height) : base (width, height, "Test Client")
@@ -49,13 +50,14 @@ namespace KirosEngine3
             base.OnLoad();
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);
+            GL.Enable(EnableCap.DepthTest);
 
             //system control setup
             KeyboardEventManager.CurrentContext = "system";
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
                 KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { Close(); });
 
-            camera = new BaseCamera(-Vec3.UnitZ, ClientSize.X, ClientSize.Y);
+            camera = new BaseCamera(3.0f * Vec3.UnitZ, ClientSize.X, ClientSize.Y);
 
             ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag");
 
@@ -65,18 +67,29 @@ namespace KirosEngine3
 
             testText = new Text(new Vec2(0.0f), df!, "t");
             testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
+            testPoint.Init();
+
 
             testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), Color4.Red);
             testLine.Init();
 
             testTriangle = new Triangle([new Vec3(0.0f, 0.3f, 0.0f), new Vec3(0.2f, -0.2f, 0.0f), new Vec3(-0.2f, -0.2f, 0.0f)], Color4.Aqua);
+            testTriangle.Init();
+
+            Vec3[] qPoints =
+            {
+                new Vec3(-0.5f, 0.5f, 0.0f),//tl
+                new Vec3(0.5f, 0.5f, 0.0f),//tr
+                new Vec3(0.5f, -0.5f, 0.0f),//br
+                new Vec3(-0.5f, -0.5f, 0.0f)//bl
+            };
+            testQuad = new Quad(qPoints, [0, 1, 2, 2, 3, 0], Color4.Black);
+            testQuad.Init();
+
 
             //kem testing
             KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B,
                 KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
-            
-            Console.WriteLine(KeyboardEventManager.ListDelegates("test"));
-            Console.WriteLine(KeyboardEventManager.ListDelegates("system"));
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -94,7 +107,7 @@ namespace KirosEngine3
         {
             base.OnRenderFrame(args);
 
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             ViewMatrixes viewMatrixes = new ViewMatrixes
             {
@@ -104,10 +117,12 @@ namespace KirosEngine3
                 Orthographic = (camera != null) ? camera.Orthographic : Matrix4.Identity
             };
 
-            testTriangle?.DrawGL();
-            testPoint?.DrawGL();
-            testLine?.DrawGL();
-            
+            //Console.WriteLine(viewMatrixes.Projection.ToString());
+
+            testTriangle?.DrawGL(viewMatrixes);
+            testPoint?.DrawGL(viewMatrixes);
+            //testLine?.DrawGL();
+            //testQuad?.DrawGL();
 
             //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
 

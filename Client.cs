@@ -30,13 +30,6 @@ namespace KirosEngine3
         /// </summary>
         public const string GRAPHICSMODE_DX_VAL = "DIRECTX";
 
-        /// <summary>
-        /// Key for the name of the default font
-        /// </summary>
-        public const string DEFAULT_FONT_NAME_KEY = "DEFAULT_FONT_NAME";
-
-        public const string DEFAULT_FONT_FILE_KEY = "DEFAULT_FONT_FILE";
-
         public Client(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
         {
 
