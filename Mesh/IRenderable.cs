@@ -12,7 +12,7 @@ namespace KirosEngine3.Mesh
     /// </summary>
     public interface IRenderable
     {
-        public void DrawGL();
+        public void DrawGL(ViewMatrixes vm);
 
         public ColorVertex[] GetVertexData();
 

@@ -29,6 +29,7 @@ namespace KirosEngine3
         Line? testLine;
         Triangle? testTriangle;
         Quad? testQuad;
+        Cube? testCube;
         BaseCamera? camera;
 
         public TestClient(int width, int height) : base (width, height, "Test Client")
@@ -57,7 +58,8 @@ namespace KirosEngine3
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
                 KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { Close(); });
 
-            camera = new BaseCamera(3.0f * Vec3.UnitZ, ClientSize.X, ClientSize.Y);
+            camera = new BaseCamera(2.0f * Vec3.UnitZ, ClientSize.X, ClientSize.Y);
+            camera.LookAt = Vec3.Zero;
 
             ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag");
 
@@ -76,16 +78,12 @@ namespace KirosEngine3
             testTriangle = new Triangle([new Vec3(0.0f, 0.3f, 0.0f), new Vec3(0.2f, -0.2f, 0.0f), new Vec3(-0.2f, -0.2f, 0.0f)], Color4.Aqua);
             testTriangle.Init();
 
-            Vec3[] qPoints =
-            {
-                new Vec3(-0.5f, 0.5f, 0.0f),//tl
-                new Vec3(0.5f, 0.5f, 0.0f),//tr
-                new Vec3(0.5f, -0.5f, 0.0f),//br
-                new Vec3(-0.5f, -0.5f, 0.0f)//bl
-            };
-            testQuad = new Quad(qPoints, [0, 1, 2, 2, 3, 0], Color4.Black);
+            testQuad = Quad.UnitQuad;
             testQuad.Init();
 
+            testCube = Cube.UnitCube;
+            testCube.SetColors([Color4.Red, Color4.Blue, Color4.Green, Color4.Yellow]);
+            testCube.Init();
 
             //kem testing
             KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B,
@@ -99,8 +97,6 @@ namespace KirosEngine3
             if(!IsFocused) { return; }
             //check keyboard state and notify subscribers
             KeyboardEventManager.Update(KeyboardState);
-
-
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -119,10 +115,11 @@ namespace KirosEngine3
 
             //Console.WriteLine(viewMatrixes.Projection.ToString());
 
-            testTriangle?.DrawGL(viewMatrixes);
+            /*testTriangle?.DrawGL(viewMatrixes);
             testPoint?.DrawGL(viewMatrixes);
-            //testLine?.DrawGL();
-            //testQuad?.DrawGL();
+            testLine?.DrawGL(viewMatrixes);*/
+            //testQuad?.DrawGL(viewMatrixes);
+            testCube?.DrawGL(viewMatrixes);
 
             //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
 

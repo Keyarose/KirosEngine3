@@ -65,7 +65,11 @@ namespace KirosEngine3.Camera
         public Vec3 LookAt
         {
             get { return _lookAt; }
-            set { _lookAt = value; }
+            set 
+            { 
+                _lookAt = value;
+                LookAtSet();
+            }
         }
 
         /// <summary>
@@ -331,6 +335,15 @@ namespace KirosEngine3.Camera
         private void UpdateOrthoMatrix()
         {
             _orthographic = Matrix4.CreateOrthographic(_width, _height, _nearClip, _farClip);
+        }
+
+        /// <summary>
+        /// Sets the view matrix so that the camera looks at the point _lookAt
+        /// </summary>
+        private void LookAtSet()
+        {
+            _view = Matrix4.LookAt(_position, _lookAt, _up);
+            //todo: update camera data based on normalize(lookat - position)
         }
 
         private void UpdateVectors()

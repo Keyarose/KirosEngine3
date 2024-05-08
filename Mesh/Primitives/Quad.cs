@@ -53,6 +53,19 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
 
+        private static readonly Vec3[] qPoints =
+        [
+            new Vec3(-0.5f, 0.5f, 0.0f),//tl
+            new Vec3(0.5f, 0.5f, 0.0f),//tr
+            new Vec3(0.5f, -0.5f, 0.0f),//br
+            new Vec3(-0.5f, -0.5f, 0.0f)//bl
+        ];
+
+        /// <summary>
+        /// Unit sized predefined Quad with a color of red
+        /// </summary>
+        public static readonly Quad UnitQuad = new Quad(qPoints, [0, 1, 2, 2, 3, 0], Color4.Red);
+
         public Quad(Vec3[] points, uint[] indices, Color4[] colors, string shaderName = "color")
         {
             //todo: handle input arrays being too short
@@ -74,6 +87,32 @@ namespace KirosEngine3.Mesh.Primitives
         public Quad(Vec3[] points, uint[] indices, Color4 color, string shaderName = "color") :
             this(points, indices, [color, color, color, color], shaderName)
         { }
+
+        /// <summary>
+        /// Sets all vertices to the given color, the quad needs to be reinitialized for it to 
+        /// take effect if Init has already been called
+        /// </summary>
+        /// <param name="color">The color to set the vertices</param>
+        public void SetColor(Color4 color)
+        {
+            for (int i = 0; i < _verts.Length; i++)
+            {
+                _verts[i].Color = color;
+            }
+        }
+
+        /// <summary>
+        /// Sets the vertices to the given colors, reinit if already loaded
+        /// </summary>
+        /// <param name="colors">The colors to set the vertices</param>
+        public void SetColors(Color4[] colors)
+        {
+            //todo: array size check
+            for (int i = 0; i < _verts.Length; i++)
+            {
+                _verts[i].Color = colors[i];
+            }
+        }
 
         #region Loading
         /// <summary>
@@ -107,7 +146,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// Draws the Quad on the screen using the draw mode and named shader (OpenGL)
         /// </summary>
-        public void DrawGL()
+        public void DrawGL(ViewMatrixes vm)
         {
             if (_disposed || !_loaded)
             {
@@ -117,7 +156,16 @@ namespace KirosEngine3.Mesh.Primitives
                 return;
             }
 
-            ShaderManager.TryUseShader(_shaderName);
+            //if the shader fails to be added to the pipeline log it
+            if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
+            {
+                return;
+            }
+            sh.UseGL();
+
+            sh.SetUniformMat4GL("model", vm.Model);
+            sh.SetUniformMat4GL("view", vm.View);
+            sh.SetUniformMat4GL("proj", vm.Projection);
 
             GL.BindVertexArray(_VAO);
 

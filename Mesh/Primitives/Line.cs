@@ -147,7 +147,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// Draws the point on the screen using the named shader (OpenGL)
         /// </summary>
-        public void DrawGL()
+        public void DrawGL(ViewMatrixes vm)
         {
             if (_disposed || !_loaded)
             {
@@ -157,7 +157,16 @@ namespace KirosEngine3.Mesh.Primitives
                 return;
             }
 
-            ShaderManager.TryUseShader(_shaderName);
+            //if the shader fails to be added to the pipeline log it
+            if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
+            {
+                return;
+            }
+            sh.UseGL();
+
+            sh.SetUniformMat4GL("model", vm.Model);
+            sh.SetUniformMat4GL("view", vm.View);
+            sh.SetUniformMat4GL("proj", vm.Projection);
 
             GL.BindVertexArray(_VAO);
 

@@ -5,6 +5,7 @@ using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace KirosEngine3.Mesh.Primitives
     {
         protected ColorVertex[] _verts = new ColorVertex[8];
 
-        protected uint[] _indices = new uint[8];
+        protected uint[] _indices = new uint[36];
 
         protected int _VAO;
 
@@ -44,7 +45,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// The mathematical representation of the Cube
         /// </summary>
-        public Rect3D MathCube { get { return new Rect3D(Points); } }
+        public Rect3D MathCube { get { return new Rect3D(Points); } }//todo: change to RectCuboid
 
         /// <summary>
         /// The name of the shader to use in rendering
@@ -56,10 +57,38 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
 
-        public Cube(Vec3[] points, uint[]indices, Color4[] color, string shaderName)
+        private static readonly Vec3[] cPoints =
+        [
+            new Vec3(-0.5f, 0.5f, 0.5f),//ftl
+            new Vec3(0.5f, 0.5f, 0.5f),//ftr
+            new Vec3(0.5f, -0.5f, 0.5f),//fbr
+            new Vec3(-0.5f, -0.5f, 0.5f),//fbl
+
+            new Vec3(-0.5f, 0.5f, -0.5f),//rtl
+            new Vec3(0.5f, 0.5f, -0.5f),//rtr
+            new Vec3(0.5f, -0.5f, -0.5f),//rbr
+            new Vec3(-0.5f, -0.5f, -0.5f)//rbl
+        ];
+
+        private static readonly uint[] cIndices =
+        [
+        0, 1, 2, 2, 3, 0,//front face
+        4, 0, 3, 3, 7, 4,//left face
+        5, 4, 7, 7, 6, 5,//back face
+        1, 5, 6, 6, 2, 1,//right face
+        4, 5, 1, 1, 0, 4,//top face
+        3, 2, 6, 6, 7, 3//bottom face
+        ];
+
+        /// <summary>
+        /// Unit sized predefined Cube with a color of red
+        /// </summary>
+        public static readonly Cube UnitCube = new Cube(cPoints, cIndices, Color4.Red);
+
+        public Cube(Vec3[] points, uint[] indices, Color4[] color, string shaderName = "color")
         {
             //todo: handle short parameter arrays
-            for (int i = 0; i < 8; i++) 
+            for (int i = 0; i < _verts.Length; i++) 
             {
                 _verts[i].Position = points[i];
                 _verts[i].Color = color[i];
@@ -67,6 +96,48 @@ namespace KirosEngine3.Mesh.Primitives
 
             _indices = indices;
             _shaderName = shaderName;
+        }
+
+        public Cube(Vec3[] points, uint[] indices, Color4 color, string shaderName = "color")
+        {
+            for (int i = 0; i < _verts.Length; i++)
+            {
+                _verts[i].Position = points[i];
+                _verts[i].Color = color;
+            }
+
+            _indices = indices;
+            _shaderName = shaderName;
+        }
+
+        /// <summary>
+        /// Sets all vertices to the given color, the cube needs to be reinitialized for it to 
+        /// take effect if Init has already been called
+        /// </summary>
+        /// <param name="color">The color to set the vertices</param>
+        public void SetColor(Color4 color) 
+        {
+            for (int i = 0; i < _verts.Length; i++)
+            {
+                _verts[i].Color = color;
+            }
+        }
+
+        /// <summary>
+        /// Sets the vertices to the given colors, cycling through the array until all vertices are
+        /// updated, reinit if already loaded
+        /// </summary>
+        /// <param name="colors">The colors to set the vertices</param>
+        public void SetColors(Color4[] colors)
+        {
+            //todo: array size check
+            int j = 0;
+            for (int i = 0; i < _verts.Length; i++)
+            {
+                _verts[i].Color = colors[j];
+
+                j = (j + 1) % colors.Length;
+            }
         }
 
         #region Loading
@@ -88,7 +159,7 @@ namespace KirosEngine3.Mesh.Primitives
 
             Shader sh = ShaderManager.Instance[_shaderName];
 
-            ColorVertex.SetVertexAttribs(sh, []);
+            ColorVertex.SetVertexAttribs(sh, ["aPosition", "aColor"]);
 
             GL.BindVertexArray(0);
 
@@ -100,7 +171,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// Draws the Cube on the screen using the draw mode and named shader (OpenGL)
         /// </summary>
-        public void DrawGL()
+        public void DrawGL(ViewMatrixes vm)
         {
             if (_disposed || !_loaded)
             {
@@ -110,7 +181,16 @@ namespace KirosEngine3.Mesh.Primitives
                 return;
             }
 
-            ShaderManager.TryUseShader(_shaderName);
+            //if the shader fails to be added to the pipeline log it
+            if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
+            {
+                return;
+            }
+            sh.UseGL();
+
+            sh.SetUniformMat4GL("model", vm.Model);
+            sh.SetUniformMat4GL("view", vm.View);
+            sh.SetUniformMat4GL("proj", vm.Projection);
 
             GL.BindVertexArray(_VAO);
 

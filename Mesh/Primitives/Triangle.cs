@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Mesh.Primitives
 {
-    public class Triangle : IDisposable//, IRenderable
+    public class Triangle : IDisposable, IRenderable
     {
         //protected Triangle3D _tri;
 
