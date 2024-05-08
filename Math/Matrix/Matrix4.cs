@@ -309,7 +309,7 @@ namespace KirosEngine3.Math.Matrix
         public static Matrix4 LookAt(Vec3 pos, Vec3 target, Vec3 up)
         {
             Vec3 zAxis = Vec3.Normalize(pos - target);
-            Vec3 xAxis = Vec3.Normalize(Vec3.Cross(zAxis, up));
+            Vec3 xAxis = Vec3.Normalize(Vec3.Cross(up, zAxis));
             Vec3 yAxis = Vec3.Normalize(Vec3.Cross(zAxis, xAxis));
             Matrix4 result = new Matrix4
             {
