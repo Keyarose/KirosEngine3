@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Mesh.Primitives
 {
-    public class Triangle : IDisposable
+    public class Triangle : IDisposable//, IRenderable
     {
         //protected Triangle3D _tri;
 
@@ -25,7 +25,10 @@ namespace KirosEngine3.Mesh.Primitives
 
         protected string _shaderName;
 
+        protected bool _loaded = false;
         protected bool _disposed = false;
+
+        protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
         /// <summary>
         /// The points of the triangle
@@ -50,6 +53,11 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public string ShaderName { get { return _shaderName; } set { _shaderName = value; } }
 
+        /// <summary>
+        /// The draw mode to be used during rendering
+        /// </summary>
+        public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
+
         public Triangle(Vec3[] points, Color4 color, string shaderName = "color")
         {
             if (points.Length < 3)
@@ -68,7 +76,14 @@ namespace KirosEngine3.Mesh.Primitives
 
             _verts[2].Position = points[2];
             _verts[2].Color = color;
+        }
 
+        #region Loading
+        /// <summary>
+        /// Called to initialize the renderable object if it is not being drawn as part of a group
+        /// </summary>
+        public void Init()
+        {
             _VAO = GL.GenVertexArray();
             GL.BindVertexArray(_VAO);
 
@@ -76,17 +91,24 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _verts.Length, _verts, BufferUsageHint.DynamicDraw);
 
-            Shader sh = ShaderManager.Instance[shaderName];
+            Shader sh = ShaderManager.Instance[_shaderName];
 
             ColorVertex.SetVertexPositionAttrib(sh, "aPosition");
             ColorVertex.SetVertexColorAttrib(sh, "aColor");
 
             GL.BindVertexArray(0);
-        }
 
-        public void DrawGL()
+            _loaded = true;
+        }
+        #endregion
+
+        #region Draw
+        /// <summary>
+        /// Draws the triangle on the screen using the named shader (OpenGL)
+        /// </summary>
+        public void DrawGL(ViewMatrixes vm)
         {
-            if (_disposed)
+            if (_disposed || !_loaded)
             {
                 Logger.WriteToLog("Attempt to draw unloaded triangle object: {0}", this);
                 Console.WriteLine("Attempt to draw unloaded triangle object: {0}", this);
@@ -94,7 +116,16 @@ namespace KirosEngine3.Mesh.Primitives
                 return;
             }
 
-            ShaderManager.TryUseShader(_shaderName);
+            //if the shader fails to be added to the pipeline log it
+            if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
+            {
+                return;
+            }
+            sh.UseGL();
+
+            sh.SetUniformMat4GL("model", vm.Model);
+            sh.SetUniformMat4GL("view", vm.View);
+            sh.SetUniformMat4GL("proj", vm.Projection);
 
             GL.BindVertexArray(_VAO);
 
@@ -102,6 +133,30 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindVertexArray(0);
         }
 
+        public ColorVertex[] GetVertexData()
+        {
+            return _verts;
+        }
+
+        public PrimitiveType GetDrawMode()
+        {
+            return _drawMode;
+        }
+
+        /// <summary>
+        /// Draws the triangle on the screen using the named shader (DirectX)
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        public void DrawDX()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        /// <summary>
+        /// Disposal of unmanaged objects
+        /// </summary>
+        /// <param name="disposing">If true the user code is calling, false the GC system</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -111,8 +166,11 @@ namespace KirosEngine3.Mesh.Primitives
                     //clear managed items
                 }
 
-                GL.DeleteBuffer(_VBO);
-                GL.DeleteVertexArray(_VAO);
+                if (_loaded)
+                {
+                    GL.DeleteBuffer(_VBO);
+                    GL.DeleteVertexArray(_VAO);
+                }
                 _disposed = true;
             }
         }

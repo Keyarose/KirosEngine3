@@ -1,50 +1,53 @@
 ﻿using KirosEngine3.Math.Data;
+using KirosEngine3.Math.Geometry;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace KirosEngine3.Mesh.Primitives
 {
-    /// <summary>
-    /// Defines a drawable point with color
-    /// </summary>
-    public class Point : IDisposable//, IRenderable
+    public class Cube : IDisposable, IRenderable
     {
-        //vertex data
-        protected ColorVertex[] _point = new ColorVertex[1];
+        protected ColorVertex[] _verts = new ColorVertex[8];
 
-        //vertex array object
+        protected uint[] _indices = new uint[8];
+
         protected int _VAO;
-        //vertex buffer object
+
         protected int _VBO;
+
+        protected int _EBO;
 
         protected string _shaderName;
 
         protected bool _loaded = false;
         protected bool _disposed = false;
 
-        protected PrimitiveType _drawMode = PrimitiveType.Points;
+        protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
         /// <summary>
-        /// The position of the point
+        /// The points that define the Cube
         /// </summary>
-        public Vec3 Position { get { return _point[0].Position; } set { _point[0].Position = value; } }
+        public Vec3[] Points
+        {
+            get 
+            {
+                return _verts.Select(vert => vert.Position).ToArray(); 
+            }
+        }
 
         /// <summary>
-        /// The color of the point
+        /// The mathematical representation of the Cube
         /// </summary>
-        public Color4 Color { get { return _point[0].Color; } set { _point[0].Color = value; } }
+        public Rect3D MathCube { get { return new Rect3D(Points); } }
 
         /// <summary>
-        /// The name of the shader used to render the line
+        /// The name of the shader to use in rendering
         /// </summary>
         public string ShaderName { get { return _shaderName; } set { _shaderName = value; } }
 
@@ -53,17 +56,16 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
 
-        /// <summary>
-        /// Basic constructor for a renderable point object
-        /// </summary>
-        /// <param name="position">The point's position</param>
-        /// <param name="color">The color of the point</param>
-        /// <param name="shaderName">The name of the shader to use in drawing</param>
-        public Point(Vec3 position, Color4 color, string shaderName = "color")
+        public Cube(Vec3[] points, uint[]indices, Color4[] color, string shaderName)
         {
-            _point[0].Position = position;
-            _point[0].Color = color;
+            //todo: handle short parameter arrays
+            for (int i = 0; i < 8; i++) 
+            {
+                _verts[i].Position = points[i];
+                _verts[i].Color = color[i];
+            }
 
+            _indices = indices;
             _shaderName = shaderName;
         }
 
@@ -78,12 +80,15 @@ namespace KirosEngine3.Mesh.Primitives
 
             _VBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _point.Length, _point, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _verts.Length, _verts, BufferUsageHint.StaticDraw);
+
+            _EBO = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _indices.Length, _indices, BufferUsageHint.StaticDraw);
 
             Shader sh = ShaderManager.Instance[_shaderName];
 
-            ColorVertex.SetVertexPositionAttrib(sh, "aPosition");//todo: get the shader attrib names from the shader object
-            ColorVertex.SetVertexColorAttrib(sh, "aColor");
+            ColorVertex.SetVertexAttribs(sh, []);
 
             GL.BindVertexArray(0);
 
@@ -93,38 +98,30 @@ namespace KirosEngine3.Mesh.Primitives
 
         #region Draw
         /// <summary>
-        /// Draws the point on the screen using the named shader (OpenGL)
+        /// Draws the Cube on the screen using the draw mode and named shader (OpenGL)
         /// </summary>
-        public void DrawGL(ViewMatrixes vm)
+        public void DrawGL()
         {
             if (_disposed || !_loaded)
             {
-                Logger.WriteToLog("Attempt to draw unloaded point object: {0}", this);
-                Console.WriteLine("Attempt to draw unloaded point object: {0}", this);
+                Logger.WriteToLog("Attempt to draw unloaded cube object: {0}", this);
+                Console.WriteLine("Attempt to draw unloaded cube object: {0}", this);
                 //todo: write to debug console
                 return;
             }
 
-            //if the shader fails to be added to the pipeline log it
-            if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
-            {
-                return;
-            }
-            sh.UseGL();
-
-            sh.SetUniformMat4GL("model", vm.Model);
-            sh.SetUniformMat4GL("view", vm.View);
-            sh.SetUniformMat4GL("proj", vm.Projection);
+            ShaderManager.TryUseShader(_shaderName);
 
             GL.BindVertexArray(_VAO);
 
-            GL.DrawArrays(_drawMode, 0, 1);
+            GL.DrawElements(_drawMode, _indices.Length, DrawElementsType.UnsignedInt, 0);
+
             GL.BindVertexArray(0);
         }
 
         public ColorVertex[] GetVertexData()
         {
-            return _point;
+            return _verts;
         }
 
         public PrimitiveType GetDrawMode()
@@ -133,7 +130,7 @@ namespace KirosEngine3.Mesh.Primitives
         }
 
         /// <summary>
-        /// Draws the point on the screen using the named shader (DirectX)
+        /// Draws the Cube on the screen using the named shader (DirectX)
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
         public void DrawDX()
@@ -142,22 +139,23 @@ namespace KirosEngine3.Mesh.Primitives
         }
         #endregion
 
+        #region Dispose
         /// <summary>
         /// Disposal of unmanaged objects
         /// </summary>
-        /// <param name="disposing">If true the user code is calling, false means the GC system is</param>
+        /// <param name="disposing">If true the user code is calling, false if the GC system is</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!_disposed)
+            if (!_disposed) 
             {
-                if (disposing)
+                if (disposing) 
                 {
                     //clear managed items
                 }
 
                 if (_loaded)
                 {
-                    GL.DeleteBuffer(_VBO);
+                    GL.DeleteBuffers(2, [_VBO, _EBO]);
                     GL.DeleteVertexArray(_VAO);
                 }
                 _disposed = true;
@@ -165,7 +163,7 @@ namespace KirosEngine3.Mesh.Primitives
         }
 
         /// <summary>
-        /// Release the point's resources for unloading
+        /// Release the Cube's resources for unloading
         /// </summary>
         public void Dispose()
         {
@@ -173,12 +171,10 @@ namespace KirosEngine3.Mesh.Primitives
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// Deconstructor
-        /// </summary>
-        ~Point()
+        ~Cube()
         {
             Dispose(false);
         }
+        #endregion
     }
 }

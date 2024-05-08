@@ -26,7 +26,10 @@ namespace KirosEngine3.Mesh.Primitives
         //name of the shader used in rendering
         protected string _shaderName;
 
+        protected bool _loaded = false;
         protected bool _disposed = false;
+
+        protected PrimitiveType _drawMode = PrimitiveType.Lines;
 
         /// <summary>
         /// The line's starting point
@@ -72,7 +75,11 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public string ShaderName { get { return _shaderName; } set { _shaderName = value; } }
 
-        #region Loading
+        /// <summary>
+        /// The draw mode to be used during rendering
+        /// </summary>
+        public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
+        
         /// <summary>
         /// Basic constructor for a renderable line object
         /// </summary>
@@ -112,6 +119,7 @@ namespace KirosEngine3.Mesh.Primitives
             this(start, end, [color, color], shaderName)
         { }
 
+        #region Loading
         /// <summary>
         /// Called to initialize the renderable object if it is not being drawn as part of a group
         /// </summary>
@@ -130,21 +138,8 @@ namespace KirosEngine3.Mesh.Primitives
             ColorVertex.SetVertexColorAttrib(sh, "aColor");
 
             GL.BindVertexArray(0);
-        }
 
-        /// <summary>
-        /// Called to initialize the renderable object for drawing as a part of similar objects
-        /// </summary>
-        public void BindToGroup()
-        {
-            _VBO = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _verts.Length, _verts, BufferUsageHint.DynamicDraw);
-
-            Shader sh = ShaderManager.Instance[_shaderName];
-
-            ColorVertex.SetVertexPositionAttrib(sh, "aPosition");//todo: get the shader attrib names from the shader object
-            ColorVertex.SetVertexColorAttrib(sh, "aColor");
+            _loaded = true;
         }
         #endregion
 
@@ -154,7 +149,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public void DrawGL()
         {
-            if (_disposed)
+            if (_disposed || !_loaded)
             {
                 Logger.WriteToLog("Attempt to draw unloaded line object: {0}", this);
                 Console.WriteLine("Attempt to draw unloaded line object: {0}", this);
@@ -170,22 +165,14 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindVertexArray(0);//clear the bound vertex array
         }
 
-        /// <summary>
-        /// Draws the point as part of a group of similar objects (OpenGL)
-        /// </summary>
-        public void DrawInGroupGL()
+        public ColorVertex[] GetVertexData()
         {
-            if (_disposed)
-            {
-                Logger.WriteToLog("Attempt to draw unloaded line object: {0}", this);
-                Console.WriteLine("Attempt to draw unloaded line object: {0}", this);
-                //todo: write to debug console
-                return;
-            }
+            return _verts;
+        }
 
-            //shader and vertex array should be set in the calling method
-
-            GL.DrawArrays(PrimitiveType.Lines, 0, _verts.Length);
+        public PrimitiveType GetDrawMode()
+        {
+            return _drawMode;
         }
 
         /// <summary>
@@ -233,6 +220,7 @@ namespace KirosEngine3.Mesh.Primitives
         }
         #endregion
 
+        #region Dispose
         /// <summary>
         /// Disposal of unmanaged objects
         /// </summary>
@@ -246,8 +234,11 @@ namespace KirosEngine3.Mesh.Primitives
                     //clear managed items
                 }
 
-                GL.DeleteBuffer(_VBO);
-                GL.DeleteVertexArray(_VAO);
+                if (_loaded)
+                {
+                    GL.DeleteBuffer(_VBO);
+                    GL.DeleteVertexArray(_VAO);
+                }
                 _disposed = true;
             }
         }
@@ -268,5 +259,6 @@ namespace KirosEngine3.Mesh.Primitives
         {
             Dispose(false);
         }
+        #endregion
     }
 }

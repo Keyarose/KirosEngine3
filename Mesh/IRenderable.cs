@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Graphics.OpenGL4;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,10 @@ namespace KirosEngine3.Mesh
     public interface IRenderable
     {
         public void DrawGL();
+
+        public ColorVertex[] GetVertexData();
+
+        public PrimitiveType GetDrawMode();
 
         public void DrawDX();
     }
