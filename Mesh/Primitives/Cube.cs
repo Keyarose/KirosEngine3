@@ -45,7 +45,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// The mathematical representation of the Cube
         /// </summary>
-        public Rect3D MathCube { get { return new Rect3D(Points); } }//todo: change to RectCuboid
+        public RectCuboid MathCube { get { return new RectCuboid(Points); } }//todo: change to RectCuboid
 
         /// <summary>
         /// The name of the shader to use in rendering
@@ -78,7 +78,7 @@ namespace KirosEngine3.Mesh.Primitives
         1, 5, 6, 6, 2, 1,//right face
         4, 5, 1, 1, 0, 4,//top face
         3, 2, 6, 6, 7, 3//bottom face
-        ];
+        ];//todo: reorder indices to form balanced tris ie: https://i.ibb.co/xD5Rjs4/Balanced-Smooth-Normals.png
 
         /// <summary>
         /// Unit sized predefined Cube with a color of red

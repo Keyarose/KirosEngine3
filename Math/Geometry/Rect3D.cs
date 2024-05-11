@@ -97,10 +97,10 @@ namespace KirosEngine3.Math.Geometry
         /// <exception cref="ArgumentException">Thrown if the array of vertices is too small</exception>
         public Rect3D(Vec3[] verts)
         {
-            if (verts.Length < 4)
-                throw new ArgumentException(string.Format("Rect3D requires a minimum of 4 vertices."));
+            if (verts.Length != 4)
+                throw new ArgumentException(string.Format("Rect3D requires 4 vertices."));
 
-            Vertices = verts[..4]; //if there are more than 4 vertices just discard the extra ones
+            Vertices = verts;
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace KirosEngine3.Math.Geometry
         }
 
         /// <inheritdoc/>
-        public readonly bool IsGeometricallyCorrect(out string? message)
+        public readonly bool IsGeometricallyCorrect([NotNullWhen(false)]out string? message)
         {
             //check that edges are parallel or perp as needed
             if (!Edge1.IsParallel(Edge3) || !Edge2.IsParallel(Edge4))
