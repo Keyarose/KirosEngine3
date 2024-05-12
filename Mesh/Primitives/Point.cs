@@ -61,6 +61,9 @@ namespace KirosEngine3.Mesh.Primitives
         /// <param name="shaderName">The name of the shader to use in drawing</param>
         public Point(Vec3 position, Color4 color, string shaderName = "color")
         {
+            if (shaderName == string.Empty)
+                throw new ArgumentNullException(nameof(shaderName), "No shader name specified.");
+
             _point[0].Position = position;
             _point[0].Color = color;
 

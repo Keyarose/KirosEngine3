@@ -14,8 +14,16 @@ namespace KirosEngine3.Mesh
     {
         public void DrawGL(ViewMatrixes vm);
 
+        /// <summary>
+        /// Get the renderable's vertex data as an array of ColorVertex
+        /// </summary>
+        /// <returns>The vertex data</returns>
         public ColorVertex[] GetVertexData();
 
+        /// <summary>
+        /// Get the renderable's draw mode
+        /// </summary>
+        /// <returns>The draw mode to be used in drawing</returns>
         public PrimitiveType GetDrawMode();
 
         public void DrawDX();

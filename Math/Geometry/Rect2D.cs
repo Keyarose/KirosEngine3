@@ -179,7 +179,7 @@ namespace KirosEngine3.Math.Geometry
         }
 
         /// <inheritdoc/>
-        public readonly bool IsGeometricallyCorrect(out string? message)
+        public readonly bool IsGeometricallyCorrect([NotNullWhen(false)] out string? message)
         {
             //check that edges are parallel or perp as needed
             if (!Edge1.IsParallel(Edge3) || !Edge2.IsParallel(Edge4))

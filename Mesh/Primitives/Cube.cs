@@ -45,7 +45,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// The mathematical representation of the Cube
         /// </summary>
-        public RectCuboid MathCube { get { return new RectCuboid(Points); } }//todo: change to RectCuboid
+        public RectCuboid MathCube { get { return new RectCuboid(Points); } }
 
         /// <summary>
         /// The name of the shader to use in rendering
@@ -57,6 +57,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
 
+        #region UnitCubeData
         private static readonly Vec3[] cPoints =
         [
             new Vec3(-0.5f, 0.5f, 0.5f),//ftl
@@ -73,33 +74,56 @@ namespace KirosEngine3.Mesh.Primitives
         private static readonly uint[] cIndices =
         [
         0, 1, 2, 2, 3, 0,//front face
-        4, 0, 3, 3, 7, 4,//left face
+        4, 0, 7, 7, 0, 3,//left face
         5, 4, 7, 7, 6, 5,//back face
-        1, 5, 6, 6, 2, 1,//right face
-        4, 5, 1, 1, 0, 4,//top face
-        3, 2, 6, 6, 7, 3//bottom face
-        ];//todo: reorder indices to form balanced tris ie: https://i.ibb.co/xD5Rjs4/Balanced-Smooth-Normals.png
-
+        1, 5, 2, 2, 5, 6,//right face
+        4, 5, 0, 0, 5, 1,//top face
+        3, 2, 7, 7, 2, 6//bottom face
+        ];
+        #endregion
         /// <summary>
         /// Unit sized predefined Cube with a color of red
         /// </summary>
         public static readonly Cube UnitCube = new Cube(cPoints, cIndices, Color4.Red);
 
-        public Cube(Vec3[] points, uint[] indices, Color4[] color, string shaderName = "color")
+        /// <summary>
+        /// Construct a Cube using the given points, indices, and colors.
+        /// </summary>
+        /// <param name="points">The points that define the cube</param>
+        /// <param name="indices">The vertex indices used to define the cube's triangles</param>
+        /// <param name="colors">The list of colors to be applied to each point</param>
+        /// <param name="shaderName">Optional, name of the shader to be used in drawing the Cube.
+        /// Defaults to "color"</param>
+        /// <exception cref="ArgumentException">Thrown if any of the array parameters are not of the correct length.</exception>
+        public Cube(Vec3[] points, uint[] indices, Color4[] colors, string shaderName = "color")
         {
-            //todo: handle short parameter arrays
+            if (points.Length != _verts.Length || indices.Length != _indices.Length || colors.Length != _verts.Length)
+                throw new ArgumentException(string.Format("Cube requires {0} vertices and colors, and {1} indices.", _verts.Length, _indices.Length));
+
             for (int i = 0; i < _verts.Length; i++) 
             {
                 _verts[i].Position = points[i];
-                _verts[i].Color = color[i];
+                _verts[i].Color = colors[i];
             }
 
             _indices = indices;
             _shaderName = shaderName;
         }
 
+        /// <summary>
+        /// Construct a Cube using the given points, indices, and colors.
+        /// </summary>
+        /// <param name="points">The points that define the cube</param>
+        /// <param name="indices">The vertex indices used to define the cube's triangles</param>
+        /// <param name="color">The color to be applied to every point</param>
+        /// <param name="shaderName">Optional, name of the shader to be used in drawing the Cube.
+        /// Defaults to "color"</param>
+        /// <exception cref="ArgumentException">Thrown if any of the array parameters are not of the correct length.</exception>
         public Cube(Vec3[] points, uint[] indices, Color4 color, string shaderName = "color")
         {
+            if (points.Length != _verts.Length || indices.Length != _indices.Length)
+                throw new ArgumentException(string.Format("Cube requires {0} vertices, and {1} indices.", _verts.Length, _indices.Length));
+
             for (int i = 0; i < _verts.Length; i++)
             {
                 _verts[i].Position = points[i];
@@ -199,11 +223,13 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindVertexArray(0);
         }
 
+        /// <inheritdoc/>
         public ColorVertex[] GetVertexData()
         {
             return _verts;
         }
 
+        /// <inheritdoc/>
         public PrimitiveType GetDrawMode()
         {
             return _drawMode;
@@ -218,6 +244,8 @@ namespace KirosEngine3.Mesh.Primitives
             throw new NotImplementedException();
         }
         #endregion
+
+        //todo: tostring()
 
         #region Dispose
         /// <summary>
