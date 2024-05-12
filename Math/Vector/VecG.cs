@@ -11,7 +11,7 @@ namespace KirosEngine3.Math.Vector
     /// <summary>
     /// General vector struct that can be defined for any size up to int.MaxValue and value type
     /// </summary>
-    internal struct VectorG<T> : IEquatable<VectorG<T>> where T : INumber<T>
+    internal struct VecG<T> : IEquatable<VecG<T>> where T : INumber<T>
     {
         T[] Comp = [];
         readonly int Size;
@@ -21,7 +21,7 @@ namespace KirosEngine3.Math.Vector
         /// </summary>
         /// <param name="index">Index that corresponds to the component</param>
         /// <returns>The value of Comp at the given index</returns>
-        public T this[int index]
+        public readonly T this[int index]
         {
             get { return Comp[index]; }
             set { Comp[index] = value; }
@@ -64,19 +64,19 @@ namespace KirosEngine3.Math.Vector
                 return lengthSqu;
             }
         }
-        public VectorG(int size)
+        public VecG(int size)
         {
             Size = size;
             Comp = new T[Size];
         }
 
-        public VectorG(T val)
+        public VecG(T val)
         {
             _ = Comp.Append(val);
             Size = Comp.Length;
         }
 
-        public VectorG(T[] vals)
+        public VecG(T[] vals)
         {
             Size = vals.Length;
             Comp = vals;
@@ -107,7 +107,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="v">The vector to normalize</param>
         /// <returns>The normalized vector</returns>
         /// <exception cref="InvalidOperationException">Thrown if the vector is a zero vector.</exception>
-        public static VectorG<T> Normalize(VectorG<T> v)
+        public static VecG<T> Normalize(VecG<T> v)
         {
             if(v.Length.Equals(T.Zero))
             {
@@ -127,7 +127,7 @@ namespace KirosEngine3.Math.Vector
         /// </summary>
         /// <returns>A normalized copy</returns>
         /// <exception cref="InvalidOperationException">Passed up from Normalize</exception>
-        public readonly VectorG<T> NormalizedCopy()
+        public readonly VecG<T> NormalizedCopy()
         {
             var c = this;
             try
@@ -145,11 +145,11 @@ namespace KirosEngine3.Math.Vector
         /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
-            return obj is VectorG<T> vec && Equals(vec);
+            return obj is VecG<T> vec && Equals(vec);
         }
 
         /// <inheritdoc/>
-        public readonly bool Equals(VectorG<T> other)
+        public readonly bool Equals(VecG<T> other)
         {
             if(Size != other.Size)
             {
@@ -178,7 +178,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="lhs">The left vector</param>
         /// <param name="rhs">The right vector</param>
         /// <returns>True if equivalent, false otherwise</returns>
-        public static bool operator ==(VectorG<T> lhs, VectorG<T> rhs)
+        public static bool operator ==(VecG<T> lhs, VecG<T> rhs)
         {
             return lhs.Equals(rhs);
         }
@@ -189,7 +189,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="lhs">The left vector</param>
         /// <param name="rhs">The right vector</param>
         /// <returns>False if equivalent, true otherwise</returns>
-        public static bool operator !=(VectorG<T> lhs, VectorG<T> rhs) 
+        public static bool operator !=(VecG<T> lhs, VecG<T> rhs) 
         {
             return !lhs.Equals(rhs);
         }
@@ -202,7 +202,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="v2">The second vector</param>
         /// <returns>The resulting vector</returns>
         /// <exception cref="ArgumentException">Thrown if the vectors are different sizes</exception>
-        public static VectorG<T> Add(VectorG<T> v1, VectorG<T> v2)
+        public static VecG<T> Add(VecG<T> v1, VecG<T> v2)
         {
             if(v1.Size != v2.Size)
             {
@@ -224,7 +224,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="rhs">The right vector</param>
         /// <returns>The resulting vector</returns>
         /// <exception cref="ArgumentException">Passed up from Add</exception>
-        public static VectorG<T> operator +(VectorG<T> lhs, VectorG<T> rhs)
+        public static VecG<T> operator +(VecG<T> lhs, VecG<T> rhs)
         {
             try
             {
@@ -245,7 +245,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="v2">The second vector</param>
         /// <returns>The resulting vector</returns>
         /// <exception cref="ArgumentException">Thrown if the two vectors are different sizes</exception>
-        public static VectorG<T> Subtract(VectorG<T> v1, VectorG<T> v2)
+        public static VecG<T> Subtract(VecG<T> v1, VecG<T> v2)
         {
             if(v1.Size != v2.Size) 
             {
@@ -267,7 +267,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="rhs">Right vector</param>
         /// <returns>The resulting vector</returns>
         /// <exception cref="ArgumentException">Passed up from Subtract</exception>
-        public static VectorG<T> operator -(VectorG<T> lhs, VectorG<T> rhs)
+        public static VecG<T> operator -(VecG<T> lhs, VecG<T> rhs)
         {
             try
             {
@@ -284,7 +284,7 @@ namespace KirosEngine3.Math.Vector
         /// </summary>
         /// <param name="v">The vector to invert</param>
         /// <returns>The resulting vector</returns>
-        public static VectorG<T> operator -(VectorG<T> v)
+        public static VecG<T> operator -(VecG<T> v)
         {
             for (int i = 0; i < v.Size; i++)
             {
