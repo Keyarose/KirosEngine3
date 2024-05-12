@@ -50,6 +50,10 @@ namespace KirosEngine3
         {
             base.OnLoad();
 
+            //test stuff zone
+
+            //end test stuff
+
             GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);
             GL.Enable(EnableCap.DepthTest);
 
@@ -58,7 +62,8 @@ namespace KirosEngine3
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
                 KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { Close(); });
 
-            camera = new BaseCamera(2.0f * Vec3.UnitZ, ClientSize.X, ClientSize.Y);
+            Vec3 moveC = new Vec3(0.0f, 0.0f, 0.0f);//todo: manual camera movement remove later
+            camera = new BaseCamera(2.0f * Vec3.UnitZ + moveC, ClientSize.X, ClientSize.Y);
             camera.LookAt = Vec3.Zero;
 
             ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag");
