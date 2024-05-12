@@ -832,7 +832,7 @@ namespace KirosEngine3.Math.Vector
         /// <inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
-            return string.Format("Vector 4D: ({0},{1},{2},{3})",
+            return string.Format("({0},{1},{2},{3})",
                 X.ToString(format, formatProvider),
                 Y.ToString(format, formatProvider),
                 Z.ToString(format, formatProvider),

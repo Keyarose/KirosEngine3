@@ -245,7 +245,7 @@ namespace KirosEngine3.Math.Vector
         /// <returns>True if they are parallel, false otherwise</returns>
         public readonly bool IsParallel(Vec2 v)
         {
-            if (Dot(this, v).Abs() == 1) { return true; }
+            if (X * v.Y == v.X * Y) { return true; }
 
             return false;
         }
@@ -333,8 +333,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The resulting vector</param>
         public static void Add(Vec2 v1, Vec2 v2, out Vec2 result)
         {
-            result.X = v1.X + v2.X;
-            result.Y = v1.Y + v2.Y;
+            result = Add(v1, v2);
         }
 
         /// <summary>
@@ -345,9 +344,7 @@ namespace KirosEngine3.Math.Vector
         /// <returns>The resulting vector</returns>
         public static Vec2 operator +(Vec2 v1, Vec2 v2)
         {
-            v1.X += v2.X;
-            v1.Y += v2.Y;
-            return v1;
+            return Add(v1, v2);
         }
         #endregion
 
@@ -371,8 +368,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The resulting vector</param>
         public static void Subtract(Vec2 v1, Vec2 v2, out Vec2 result)
         {
-            result.X = v1.X - v2.X;
-            result.Y = v1.Y - v2.Y;
+            result = Subtract(v1, v2);
         }
 
         /// <summary>
@@ -383,9 +379,7 @@ namespace KirosEngine3.Math.Vector
         /// <returns>The resulting vector</returns>
         public static Vec2 operator -(Vec2 v1, Vec2 v2)
         {
-            v1.X -= v2.X;
-            v1.Y -= v2.Y;
-            return v1;
+            return Subtract(v1, v2);
         }
 
         /// <summary>
@@ -421,8 +415,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The resulting vector</param>
         public static void Multiply(Vec2 v1, float scale, out Vec2 result)
         {
-            result.X = v1.X * scale;
-            result.Y = v1.Y * scale;
+            result = Multiply(v1, scale);
         }
 
         /// <summary>
@@ -444,8 +437,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The resulting vector</param>
         public static void Multiply(Vec2 v1, Vec2 v2, out Vec2 result)
         {
-            result.X = v1.X * v2.X;
-            result.Y = v1.Y * v2.Y;
+            result = Multiply(v1, v2);
         }
 
         /// <summary>
@@ -456,9 +448,7 @@ namespace KirosEngine3.Math.Vector
         /// <returns>The resulting vector</returns>
         public static Vec2 operator *(Vec2 v, float scale)
         {
-            v.X *= scale;
-            v.Y *= scale;
-            return v;
+            return Multiply(v, scale);
         }
 
         /// <summary>
@@ -469,9 +459,7 @@ namespace KirosEngine3.Math.Vector
         /// <returns>The resulting vector</returns>
         public static Vec2 operator *(float scale, Vec2 v)
         {
-            v.X *= scale;
-            v.Y *= scale;
-            return v;
+            return Multiply(v, scale);
         }
 
         /// <summary>
@@ -482,9 +470,7 @@ namespace KirosEngine3.Math.Vector
         /// <returns></returns>
         public static Vec2 operator *(Vec2 v1, Vec2 v2)
         {
-            v1.X *= v2.X;
-            v1.Y *= v2.Y;
-            return v1;
+            return Multiply(v1, v2);
         }
         #endregion
 
@@ -513,14 +499,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The resulting vector</param>
         public static void Divide(Vec2 v1, float divisor, out Vec2 result)
         {
-            if (divisor.IsZero())
-            {
-                Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
-                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
-            }
-
-            result.X = v1.X / divisor;
-            result.Y = v1.Y / divisor;
+            result = Divide(v1, divisor);
         }
 
         /// <summary>
@@ -548,14 +527,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The resulting vector</param>
         public static void Divide(Vec2 v1, Vec2 v2, out Vec2 result)
         {
-            if (v2.X.IsZero() || v2.Y.IsZero())
-            {
-                Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
-                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", v1));
-            }
-
-            result.X = v1.X / v2.X;
-            result.Y = v1.Y / v2.Y;
+            result = Divide(v1, v2);
         }
         
         /// <summary>
@@ -564,17 +536,9 @@ namespace KirosEngine3.Math.Vector
         /// <param name="left">The vector to divide</param>
         /// <param name="right">The scalar to divide by</param>
         /// <returns>The resulting vector</returns>
-        public static Vec2 operator /(Vec2 left, float right)
+        public static Vec2 operator /(Vec2 lhs, float rhs)
         {
-            if (right.IsZero())
-            {
-                Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
-                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
-            }
-
-            left.X /= right;
-            left.Y /= right;
-            return left;
+            return Divide(lhs, rhs);
         }
 
         /// <summary>
@@ -583,17 +547,9 @@ namespace KirosEngine3.Math.Vector
         /// <param name="left">The vector to divide</param>
         /// <param name="right">The vector to divide by</param>
         /// <returns>The resulting vector</returns>
-        public static Vec2 operator /(Vec2 left, Vec2 right)
+        public static Vec2 operator /(Vec2 lhs, Vec2 rhs)
         {
-            if (right.X.IsZero() || right.Y.IsZero())
-            {
-                Console.WriteLine(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
-                Logger.WriteToLog(string.Format("Division by zero in Vec2.Divide() Vector value: {0}", left));
-            }
-
-            left.X /= right.X;
-            left.Y /= right.Y;
-            return left;
+            return Divide(lhs, rhs);
         }
         #endregion
 
@@ -616,7 +572,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The resulting dot product</param>
         public static void Dot(Vec2 v1, Vec2 v2, out float result)
         {
-            result = v1.X * v2.X + v1.Y * v2.Y;
+            result = Dot(v1, v2);
         }
 
         /// <summary>
@@ -669,10 +625,9 @@ namespace KirosEngine3.Math.Vector
         /// <param name="v1">The first vector to use</param>
         /// <param name="v2">The second vector to use</param>
         /// <param name="result">A vector with the smallest components from the inputs</param>
-        public static void ComponentMin(Vec2 v1, Vec2 v2, Vec2 result)
+        public static void ComponentMin(Vec2 v1, Vec2 v2, out Vec2 result)
         {
-            result.X = v1.X < v2.X ? v1.X : v2.X;
-            result.Y = v1.Y < v2.Y ? v1.Y : v2.Y;
+            result = ComponentMin(v1, v2);
         }
 
         /// <summary>
@@ -695,8 +650,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">A vector with the largest components from the inputs</param>
         public static void ComponentMax(Vec2 v1, Vec2 v2, out Vec2 result)
         {
-            result.X = v1.X > v2.X ? v1.X : v2.X;
-            result.Y = v1.Y > v2.Y ? v1.Y : v2.Y;
+            result = ComponentMax(v1, v2);
         }
 
         /// <summary>
@@ -718,7 +672,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The vector with the smallest magnitude</param>
         public static void MagnitudeMin(Vec2 v1, Vec2 v2, out Vec2 result)
         {
-            result = v1.LengthSqr < v2.LengthSqr ? v1 : v2;
+            result = MagnitudeMin(v1, v2);
         }
 
         /// <summary>
@@ -740,7 +694,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="result">The vector with the largest magnitude</param>
         public static void MagnitudeMax(Vec2 v1, Vec2 v2, out Vec2 result)
         {
-            result = v1.LengthSqr > v2.LengthSqr ? v1 : v2;
+            result = MagnitudeMax(v1, v2);
         }
         #endregion
 

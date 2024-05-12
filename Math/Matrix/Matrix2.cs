@@ -100,7 +100,7 @@ namespace KirosEngine3.Math.Matrix
             set
             {
                 Row0.X = value.X;
-                Row1.X = value.Y;
+                Row1.Y = value.Y;
             }
         }
 
@@ -185,6 +185,108 @@ namespace KirosEngine3.Math.Matrix
             Row0 = new Vec2(m00, m01);
             Row1 = new Vec2(m10, m11);
         }
+
+        #region ElementaryMatrices
+        /// <summary>
+        /// Produce an elementary matrix for the scalar multiplication row operation on row 1
+        /// </summary>
+        /// <param name="scalar">The scalar the row is to be multiplied by</param>
+        /// <returns>The 2D elementary matrix that performs the row operation</returns>
+        public static Matrix2 RowMultiElemMatR1(float scalar)
+        {
+            return new Matrix2(scalar, 0.0f, 0.0f, 1.0f);
+        }
+
+        /// <summary>
+        /// Produce an elementary matrix for the scalar multiplication row operation on row 2
+        /// </summary>
+        /// <param name="scalar">The scalar the row is to be multiplied by</param>
+        /// <returns>The 2D elementary matrix that performs the row operation</returns>
+        public static Matrix2 RowMultiElemMatR2(float scalar)
+        {
+            return new Matrix2(1.0f, 0.0f, 0.0f, scalar);
+        }
+
+        /// <summary>
+        /// Produce an elementary matrix for row interchange operations
+        /// </summary>
+        /// <returns>The 2D elementary matrix that performs the row operation</returns>
+        public static Matrix2 RowInterchangeElemMat()
+        {
+            return new Matrix2(0.0f, 1.0f, 1.0f, 0.0f);
+        }
+
+        /// <summary>
+        /// Produce an elementary matrix for row addition row 1 to row 2
+        /// </summary>
+        /// <param name="scalar">The multiplier for the row to add</param>
+        /// <returns>The 2D elementary matrix that performs the row operation</returns>
+        public static Matrix2 RowAddR1ToR2ElemMat(float scalar)
+        {
+            return new Matrix2(1.0f, 0.0f, scalar, 1.0f);
+        }
+
+        /// <summary>
+        /// Produce an elementary matrix for row addition row 2 to row 1
+        /// </summary>
+        /// <param name="scalar">The multiplier for the row to add</param>
+        /// <returns>The 2D elementary matrix that performs the row operation</returns>
+        public static Matrix2 RowAddR2ToR1ElemMat(float scalar)
+        {
+            return new Matrix2(1.0f, scalar, 0.0f, 1.0f);
+        }
+        #endregion
+
+        #region RowOperations
+        /// <summary>
+        /// Perform the row interchange operation
+        /// </summary>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix2 RowInterchange()
+        {
+            return RowInterchangeElemMat() * this;
+        }
+
+        /// <summary>
+        /// Perform the row multiplication operation on row 1
+        /// </summary>
+        /// <param name="scalar">The scalar to multiply the row by</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix2 RowMultiplicationR1(float scalar)
+        {
+            return RowMultiElemMatR1(scalar) * this;
+        }
+
+        /// <summary>
+        /// Perform the row multiplication operation on row 2
+        /// </summary>
+        /// <param name="scalar">The scalar to multiply the row by</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix2 RowMultiplicationR2(float scalar)
+        {
+            return RowMultiElemMatR2(scalar) * this;
+        }
+
+        /// <summary>
+        /// Perform the row addition operation on row 2
+        /// </summary>
+        /// <param name="scalar">The multiple of the row to be added</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix2 RowAdditionR1R2(float scalar)
+        {
+            return RowAddR1ToR2ElemMat(scalar) * this;
+        }
+
+        /// <summary>
+        /// Perform the row addition operation on row 1
+        /// </summary>
+        /// <param name="scalar">The multiple of the row to be added</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix2 RowAdditionR2R1(float scalar)
+        {
+            return RowAddR2ToR1ElemMat(scalar) * this;
+        }
+        #endregion
 
         /// <summary>
         /// Convert the matrix into it's transpose
