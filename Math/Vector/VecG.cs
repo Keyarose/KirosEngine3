@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Vector
 {
     /// <summary>
     /// General vector struct that can be defined for any size up to int.MaxValue and value type
     /// </summary>
-    internal struct VecG<T> : IEquatable<VecG<T>> where T : INumber<T>
+    public class VecG<T> : IEquatable<VecG<T>> where T : INumber<T>
     {
         T[] Comp = [];
         readonly int Size;
@@ -21,7 +16,7 @@ namespace KirosEngine3.Math.Vector
         /// </summary>
         /// <param name="index">Index that corresponds to the component</param>
         /// <returns>The value of Comp at the given index</returns>
-        public readonly T this[int index]
+        public T this[int index]
         {
             get { return Comp[index]; }
             set { Comp[index] = value; }
@@ -30,7 +25,7 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// The vector's magnitude
         /// </summary>
-        public readonly T Magnitude
+        public T Magnitude
         {
             get
             {
@@ -41,7 +36,7 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// The vector's length, alias for Magnitude
         /// </summary>
-        public readonly T Length
+        public T Length
         {
             get
             {
@@ -52,18 +47,19 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// The vector's length squared
         /// </summary>
-        public readonly T LengthSqr
+        public T LengthSqr
         {
             get
             {
                 T lengthSqu = T.Zero;
-                foreach(var v in Comp)
+                foreach (var v in Comp)
                 {
                     lengthSqu += v * v;
                 }
                 return lengthSqu;
             }
         }
+
         public VecG(int size)
         {
             Size = size;
@@ -72,7 +68,7 @@ namespace KirosEngine3.Math.Vector
 
         public VecG(T val)
         {
-            _ = Comp.Append(val);
+            Comp = [.. Comp, val];
             Size = Comp.Length;
         }
 
@@ -82,6 +78,94 @@ namespace KirosEngine3.Math.Vector
             Comp = vals;
         }
 
+        #region CommonValueFactory
+        /// <summary>
+        /// Construct a vector of given size with all values set to one
+        /// </summary>
+        /// <param name="size">The size of the vector to create</param>
+        /// <returns>The resulting vector</returns>
+        public static VecG<T> One(int size)
+        {
+            return new VecG<T>(new T[size].Populate(T.One));
+        }
+
+        /// <summary>
+        /// Construct a vector of given size with all values set to zero
+        /// </summary>
+        /// <param name="size">The size of the vector to create</param>
+        /// <returns>The resulting vector</returns>
+        public static VecG<T> Zero(int size)
+        {
+            return new VecG<T>(new T[size].Populate(T.Zero));
+        }
+
+        /// <summary>
+        /// Construct a vector of given size with all values set to minus one
+        /// </summary>
+        /// <param name="size">The size of the vector to create</param>
+        /// <returns>The resulting vector</returns>
+        public static VecG<T> OneMinus(int size)
+        {
+            return new VecG<T>(new T[size].Populate(-T.One));
+        }
+        #endregion
+
+        #region StructFormFactory
+        /// <summary>
+        /// Create a Vec2 from the VecG's value truncating what doesn't fit
+        /// </summary>
+        /// <returns>The Vec2 result</returns>
+        public Vec2 AsVec2()
+        {
+            if (Size == 1)
+            {
+                return new Vec2(float.CreateTruncating(Comp[0]), 0.0f);
+            }
+            else
+                return new Vec2(float.CreateTruncating(Comp[0]), float.CreateTruncating(Comp[1]));
+        }
+
+        /// <summary>
+        /// Create a Vec3 from the VecG's value truncating what doesn't fit
+        /// </summary>
+        /// <returns>The resulting Vec3</returns>
+        public Vec3 AsVec3()
+        {
+            if (Size == 1)
+            {
+                return new Vec3(float.CreateTruncating(Comp[0]), 0.0f, 0.0f);
+            }
+            else if (Size == 2)
+            {
+                return new Vec3(float.CreateTruncating(Comp[0]), float.CreateTruncating(Comp[1]), 0.0f);
+            }
+            else
+                return new Vec3(float.CreateTruncating(Comp[0]), float.CreateTruncating(Comp[1]), float.CreateTruncating(Comp[2]));
+        }
+
+        /// <summary>
+        /// Create a Vec4 from the VecG's value truncating what doesn't fit
+        /// </summary>
+        /// <returns>The resulting Vec4</returns>
+        public Vec4 AsVec4()
+        {
+            if (Size == 1)
+            {
+                return new Vec4(float.CreateTruncating(Comp[0]), 0.0f, 0.0f, 0.0f);
+            }
+            else if (Size == 2)
+            {
+                return new Vec4(float.CreateTruncating(Comp[0]), float.CreateTruncating(Comp[1]), 0.0f, 0.0f);
+            }
+            else if (Size == 3)
+            {
+                return new Vec4(float.CreateTruncating(Comp[0]), float.CreateTruncating(Comp[1]), float.CreateTruncating(Comp[2]), 0.0f);
+            }
+            else
+                return new Vec4(float.CreateTruncating(Comp[0]), float.CreateTruncating(Comp[1]), float.CreateTruncating(Comp[2]), float.CreateTruncating(Comp[3]));
+        }
+        #endregion
+
         #region Normalize
         /// <summary>
         /// Normalize the vector
@@ -89,13 +173,13 @@ namespace KirosEngine3.Math.Vector
         /// <exception cref="InvalidOperationException">Thrown if the vector is a zero vector.</exception>
         public void Normalize()
         {
-            if(Length.Equals(T.Zero))
+            if (Length.Equals(T.Zero))
             {
                 throw new InvalidOperationException("Attempt to normalize a zero vector.");
             }
             T ratio = T.One / Length;
 
-            for (int i = 0;i < Size; i++)
+            for (int i = 0; i < Size; i++)
             {
                 Comp[i] *= ratio;
             }
@@ -109,13 +193,13 @@ namespace KirosEngine3.Math.Vector
         /// <exception cref="InvalidOperationException">Thrown if the vector is a zero vector.</exception>
         public static VecG<T> Normalize(VecG<T> v)
         {
-            if(v.Length.Equals(T.Zero))
+            if (v.Length.Equals(T.Zero))
             {
                 throw new InvalidOperationException("Attempt to normalize a zero vector.");
             }
             T ratio = T.One / v.Length;
-            
-            for(int i = 0; i < v.Size; i++)
+
+            for (int i = 0; i < v.Size; i++)
             {
                 v[i] *= ratio;
             }
@@ -127,14 +211,14 @@ namespace KirosEngine3.Math.Vector
         /// </summary>
         /// <returns>A normalized copy</returns>
         /// <exception cref="InvalidOperationException">Passed up from Normalize</exception>
-        public readonly VecG<T> NormalizedCopy()
+        public VecG<T> NormalizedCopy()
         {
             var c = this;
             try
             {
                 c.Normalize();
             }
-            catch (InvalidOperationException) 
+            catch (InvalidOperationException)
             {
                 throw;
             }
@@ -149,14 +233,19 @@ namespace KirosEngine3.Math.Vector
         }
 
         /// <inheritdoc/>
-        public readonly bool Equals(VecG<T> other)
+        public bool Equals(VecG<T>? other)
         {
-            if(Size != other.Size)
+            if (other is null)
             {
                 return false;
             }
 
-            for(int i = 0; i < Size; i++) 
+            if (Size != other.Size)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < Size; i++)
             {
                 if (Comp[i] != other.Comp[i])
                 {
@@ -167,7 +256,7 @@ namespace KirosEngine3.Math.Vector
         }
 
         /// <inheritdoc/>
-        public override readonly int GetHashCode() 
+        public override int GetHashCode()
         {
             return Comp.GetHashCode();
         }
@@ -189,7 +278,7 @@ namespace KirosEngine3.Math.Vector
         /// <param name="lhs">The left vector</param>
         /// <param name="rhs">The right vector</param>
         /// <returns>False if equivalent, true otherwise</returns>
-        public static bool operator !=(VecG<T> lhs, VecG<T> rhs) 
+        public static bool operator !=(VecG<T> lhs, VecG<T> rhs)
         {
             return !lhs.Equals(rhs);
         }
@@ -204,13 +293,13 @@ namespace KirosEngine3.Math.Vector
         /// <exception cref="ArgumentException">Thrown if the vectors are different sizes</exception>
         public static VecG<T> Add(VecG<T> v1, VecG<T> v2)
         {
-            if(v1.Size != v2.Size)
+            if (v1.Size != v2.Size)
             {
                 throw new ArgumentException("Attempting to add two different sizes of vector.");
             }
 
             var c = v1;
-            for (int i = 0; i < c.Size; i++) 
+            for (int i = 0; i < c.Size; i++)
             {
                 c[i] += v2[i];
             }
@@ -247,7 +336,7 @@ namespace KirosEngine3.Math.Vector
         /// <exception cref="ArgumentException">Thrown if the two vectors are different sizes</exception>
         public static VecG<T> Subtract(VecG<T> v1, VecG<T> v2)
         {
-            if(v1.Size != v2.Size) 
+            if (v1.Size != v2.Size)
             {
                 throw new ArgumentException("Attempting to subtract two different sizes of vector.");
             }
@@ -273,7 +362,7 @@ namespace KirosEngine3.Math.Vector
             {
                 return Subtract(lhs, rhs);
             }
-            catch (ArgumentException) 
+            catch (ArgumentException)
             {
                 throw;
             }

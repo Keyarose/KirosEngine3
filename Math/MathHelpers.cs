@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,6 +74,24 @@ namespace KirosEngine3.Math
         public static float Abs(this float a)
         {
             return MathF.Abs(a);
+        }
+
+        /// <summary>
+        /// Helper method to populate an array of generic type with the given value in all entries
+        /// </summary>
+        /// <typeparam name="T">The type of value in the array, must implement INumber</typeparam>
+        /// <param name="array">The array to populate</param>
+        /// <param name="value">The value to fill with</param>
+        /// <returns>The resulting array</returns>
+        /// <remarks>Based on https://stackoverflow.com/a/1014015</remarks>
+        public static T[] Populate<T>(this T[] array, T value) where T : INumber<T>
+        {
+            for (int i = 0; i < array.Length; i++) 
+            {
+                array[i] = value;
+            }
+
+            return array;
         }
     }
 }
