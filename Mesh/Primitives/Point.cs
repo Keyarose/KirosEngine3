@@ -2,21 +2,13 @@
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace KirosEngine3.Mesh.Primitives
 {
     /// <summary>
     /// Defines a drawable point with color
     /// </summary>
-    public class Point : IDisposable//, IRenderable
+    public class Point : IDisposable, IRenderable
     {
         //vertex data
         protected ColorVertex[] _point = new ColorVertex[1];
@@ -62,7 +54,7 @@ namespace KirosEngine3.Mesh.Primitives
         public Point(Vec3 position, Color4 color, string shaderName = "color")
         {
             if (shaderName == string.Empty)
-                throw new ArgumentNullException(nameof(shaderName), "No shader name specified.");
+                throw new ArgumentException("No shader name specified.", nameof(shaderName));
 
             _point[0].Position = position;
             _point[0].Color = color;
@@ -125,11 +117,13 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindVertexArray(0);
         }
 
+        /// <inheritdoc/>
         public ColorVertex[] GetVertexData()
         {
             return _point;
         }
 
+        /// <inheritdoc/>
         public PrimitiveType GetDrawMode()
         {
             return _drawMode;
@@ -145,6 +139,33 @@ namespace KirosEngine3.Mesh.Primitives
         }
         #endregion
 
+        #region ToString
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return string.Format("Point mesh: \n\tPoint: {0}", Position.ToString(format, formatProvider));
+        }
+        #endregion
+
+        #region Dispose
         /// <summary>
         /// Disposal of unmanaged objects
         /// </summary>
@@ -183,5 +204,6 @@ namespace KirosEngine3.Mesh.Primitives
         {
             Dispose(false);
         }
+        #endregion
     }
 }

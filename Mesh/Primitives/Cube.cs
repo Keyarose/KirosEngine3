@@ -3,16 +3,10 @@ using KirosEngine3.Math.Geometry;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.Mesh.Primitives
 {
-    public class Cube : IDisposable, IRenderable
+    public class Cube : IDisposable, IRenderable, IFormattable
     {
         protected ColorVertex[] _verts = new ColorVertex[8];
 
@@ -36,9 +30,9 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public Vec3[] Points
         {
-            get 
+            get
             {
-                return _verts.Select(vert => vert.Position).ToArray(); 
+                return _verts.Select(vert => vert.Position).ToArray();
             }
         }
 
@@ -100,7 +94,10 @@ namespace KirosEngine3.Mesh.Primitives
             if (points.Length != _verts.Length || indices.Length != _indices.Length || colors.Length != _verts.Length)
                 throw new ArgumentException(string.Format("Cube requires {0} vertices and colors, and {1} indices.", _verts.Length, _indices.Length));
 
-            for (int i = 0; i < _verts.Length; i++) 
+            if (shaderName == string.Empty)
+                throw new ArgumentException("No shader name specified.", nameof(shaderName));
+
+            for (int i = 0; i < _verts.Length; i++)
             {
                 _verts[i].Position = points[i];
                 _verts[i].Color = colors[i];
@@ -124,6 +121,9 @@ namespace KirosEngine3.Mesh.Primitives
             if (points.Length != _verts.Length || indices.Length != _indices.Length)
                 throw new ArgumentException(string.Format("Cube requires {0} vertices, and {1} indices.", _verts.Length, _indices.Length));
 
+            if (shaderName == string.Empty)
+                throw new ArgumentException("No shader name specified.", nameof(shaderName));
+
             for (int i = 0; i < _verts.Length; i++)
             {
                 _verts[i].Position = points[i];
@@ -139,7 +139,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// take effect if Init has already been called
         /// </summary>
         /// <param name="color">The color to set the vertices</param>
-        public void SetColor(Color4 color) 
+        public void SetColor(Color4 color)
         {
             for (int i = 0; i < _verts.Length; i++)
             {
@@ -149,12 +149,11 @@ namespace KirosEngine3.Mesh.Primitives
 
         /// <summary>
         /// Sets the vertices to the given colors, cycling through the array until all vertices are
-        /// updated, reinit if already loaded
+        /// updated, re-init if already loaded
         /// </summary>
         /// <param name="colors">The colors to set the vertices</param>
         public void SetColors(Color4[] colors)
         {
-            //todo: array size check
             int j = 0;
             for (int i = 0; i < _verts.Length; i++)
             {
@@ -245,7 +244,38 @@ namespace KirosEngine3.Mesh.Primitives
         }
         #endregion
 
-        //todo: tostring()
+        #region ToString
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            string result = string.Format("Cube mesh: \n\tPoints: ");
+
+            foreach (var v in Points)
+            {
+                result += v.ToString(format, formatProvider) + "\n\t\t";
+            }
+
+            return result;
+        }
+        #endregion
 
         #region Dispose
         /// <summary>
@@ -254,9 +284,9 @@ namespace KirosEngine3.Mesh.Primitives
         /// <param name="disposing">If true the user code is calling, false if the GC system is</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!_disposed) 
+            if (!_disposed)
             {
-                if (disposing) 
+                if (disposing)
                 {
                     //clear managed items
                 }
