@@ -15,7 +15,7 @@ namespace KirosEngine3.Mesh.Primitives
     /// <summary>
     /// Defines a drawable line with color
     /// </summary>
-    public class Line : IDisposable, IRenderable
+    public class Line : IDisposable, IRenderable, IFormattable
     {
         //the vertex data
         protected ColorVertex[] _verts = new ColorVertex[2];
@@ -58,6 +58,17 @@ namespace KirosEngine3.Mesh.Primitives
         }
 
         /// <summary>
+        /// The end points of the Line
+        /// </summary>
+        public Vec3[] Points
+        {
+            get
+            {
+                return [_verts[0].Position, _verts[1].Position];
+            }
+        }
+
+        /// <summary>
         /// The line's color
         /// </summary>
         public Color4[] Colors
@@ -89,6 +100,9 @@ namespace KirosEngine3.Mesh.Primitives
         /// <param name="shaderName">The name of the shader to use in drawing</param>
         public Line(Vec3 start, Vec3 end, Color4[] colors, string shaderName = "color")
         {
+            if (shaderName == string.Empty)
+                throw new ArgumentException("No shader name specified.", nameof(shaderName));
+
             _shaderName = shaderName;
 
             _verts[0].Position = start;
@@ -118,6 +132,34 @@ namespace KirosEngine3.Mesh.Primitives
         public Line(Vec3 start, Vec3 end, Color4 color, string shaderName = "color") :
             this(start, end, [color, color], shaderName)
         { }
+
+        /// <summary>
+        /// Sets both vertices to the given color
+        /// Init needs to be recalled if _loaded is true
+        /// </summary>
+        /// <param name="color">The color to set the vertices</param>
+        public void SetColor(Color4 color)
+        {
+            _verts[0].Color = color;
+            _verts[1].Color = color;
+        }
+
+        /// <summary>
+        /// Sets the vertices to the given colors, cycling through the array until all
+        /// vertices are updated
+        /// Init needs to be recalled if _loaded is true
+        /// </summary>
+        /// <param name="colors">The colors to assign to the vertices</param>
+        public void SetColors(Color4[] colors)
+        {
+            int j = 0;
+            for (int i = 0; i < _verts.Length; i++)
+            {
+                _verts[i].Color = colors[j];
+
+                j = (j + 1) % colors.Length;
+            }
+        }
 
         #region Loading
         /// <summary>
@@ -170,15 +212,17 @@ namespace KirosEngine3.Mesh.Primitives
 
             GL.BindVertexArray(_VAO);
 
-            GL.DrawArrays(PrimitiveType.Lines, 0, _verts.Length);
+            GL.DrawArrays(_drawMode, 0, _verts.Length);
             GL.BindVertexArray(0);//clear the bound vertex array
         }
 
+        /// <inheritdoc/>
         public ColorVertex[] GetVertexData()
         {
             return _verts;
         }
 
+        /// <inheritdoc/>
         public PrimitiveType GetDrawMode()
         {
             return _drawMode;
@@ -226,6 +270,40 @@ namespace KirosEngine3.Mesh.Primitives
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _verts.Length, _verts, BufferUsageHint.DynamicDraw);
+        }
+        #endregion
+
+
+        #region ToString
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            string result = string.Format("Line mesh: \n\tPoints: ");
+
+            foreach (var v in Points)
+            {
+                result += v.ToString(format, formatProvider) + "\n\t\t";
+            }
+
+            return result;
         }
         #endregion
 

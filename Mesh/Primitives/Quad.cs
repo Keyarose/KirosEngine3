@@ -11,7 +11,10 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Mesh.Primitives
 {
-    public class Quad : IDisposable, IRenderable
+    /// <summary>
+    /// Defines a primitive Quad mesh that can be rendered with color
+    /// </summary>
+    public class Quad : IDisposable, IRenderable, IFormattable
     {
         protected ColorVertex[] _verts = new ColorVertex[4];
 
@@ -53,6 +56,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
 
+        #region UnitQuadData
         private static readonly Vec3[] qPoints =
         [
             new Vec3(-0.5f, 0.5f, 0.0f),//tl
@@ -60,6 +64,7 @@ namespace KirosEngine3.Mesh.Primitives
             new Vec3(0.5f, -0.5f, 0.0f),//br
             new Vec3(-0.5f, -0.5f, 0.0f)//bl
         ];
+        #endregion
 
         /// <summary>
         /// Unit sized predefined Quad with a color of red
@@ -68,7 +73,12 @@ namespace KirosEngine3.Mesh.Primitives
 
         public Quad(Vec3[] points, uint[] indices, Color4[] colors, string shaderName = "color")
         {
-            //todo: handle input arrays being too short
+            if (points.Length != _verts.Length || indices.Length != _indices.Length || colors.Length != _verts.Length)
+                throw new ArgumentException(string.Format("Quad requires {0} vertices and colors, and {1} indices.", _verts.Length, _indices.Length));
+
+            if (shaderName == string.Empty)
+                throw new ArgumentException("No shader name specified.", nameof(shaderName));
+
             _shaderName = shaderName;
 
             for (int i = 0; i < 4; i++) 
@@ -102,15 +112,19 @@ namespace KirosEngine3.Mesh.Primitives
         }
 
         /// <summary>
-        /// Sets the vertices to the given colors, reinit if already loaded
+        /// Sets the vertices to the given colors, cycling through the array until all vertices are
+        /// updated
+        /// Init needs to be called again after setting the colors
         /// </summary>
         /// <param name="colors">The colors to set the vertices</param>
         public void SetColors(Color4[] colors)
         {
-            //todo: array size check
+            int j = 0;
             for (int i = 0; i < _verts.Length; i++)
             {
-                _verts[i].Color = colors[i];
+                _verts[i].Color = colors[j];
+
+                j = (j + 1) % colors.Length;
             }
         }
 
@@ -174,11 +188,13 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindVertexArray(0);//clear bound vertex array
         }
 
+        /// <inheritdoc/>
         public ColorVertex[] GetVertexData()
         {
             return _verts;
         }
 
+        /// <inheritdoc/>
         public PrimitiveType GetDrawMode()
         {
             return _drawMode;
@@ -191,6 +207,40 @@ namespace KirosEngine3.Mesh.Primitives
         public void DrawDX()
         {
             throw new NotImplementedException();
+        }
+        #endregion
+
+
+        #region ToString
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            string result = string.Format("Quad mesh: \n\tPoints: ");
+
+            foreach (var v in Points)
+            {
+                result += v.ToString(format, formatProvider) + "\n\t\t";
+            }
+
+            return result;
         }
         #endregion
 

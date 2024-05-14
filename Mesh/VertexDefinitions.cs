@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
 using KirosEngine3.Math.Data;
-using System.Drawing;
 
 namespace KirosEngine3.Mesh
 {
@@ -16,6 +15,125 @@ namespace KirosEngine3.Mesh
 
         public abstract static void SetVertexAttribs(Shader sh, string[] attribNames);
     }
+
+    public static class VertexHelpers
+    {
+        /// <summary>
+        /// Convert an array of Vertex to ColorVertex with the given color
+        /// </summary>
+        /// <param name="v">The array of Vertex to convert</param>
+        /// <param name="c">The color to set to all vertices</param>
+        /// <returns>The resulting ColorVertex array</returns>
+        public static ColorVertex[] ColorVertFromVertex(Vertex[] v, Color4 c)
+        {
+            ColorVertex[] result = new ColorVertex[v.Length];
+
+            for (int i = 0; i < v.Length; i++) 
+            {
+                result[i].Position = v[i].Position;
+                result[i].Color = c;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Convert an array of Vertex to ColorVertex with the given colors
+        /// </summary>
+        /// <param name="v">The array of Vertex to convert</param>
+        /// <param name="c">The colors to set to the vertices</param>
+        /// <returns>The resulting ColorVertex array</returns>
+        /// <exception cref="ArgumentException">Thrown if the two array parameters are of different sizes</exception>
+        public static ColorVertex[] ColorVertFromVertex(Vertex[] v, Color4[] c)
+        {
+            if (v.Length != c.Length)
+                throw new ArgumentException("The Vertex array and the Color array need to be the same length.");
+
+            ColorVertex[] result = new ColorVertex[v.Length];
+
+            for (int i = 0; i < v.Length; i++)
+            {
+                result[i].Position = v[i].Position;
+                result[i].Color = c[i];
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Convert an array of Vertex to TexturedVertex with the given UV coordinates
+        /// </summary>
+        /// <param name="v">The array of Vertex to convert</param>
+        /// <param name="uv">The UV coordinates</param>
+        /// <returns>The resulting TexturedVertex array</returns>
+        /// <exception cref="ArgumentException">Thrown if the two array parameters are of different sizes</exception>
+        public static TexturedVertex[] TextureVertFromVertex(Vertex[] v, Vec2[] uv)
+        {
+            if (uv.Length != v.Length)
+                throw new ArgumentException("The Vertex array and the UV array need to be the same length.");
+
+            TexturedVertex[] result = new TexturedVertex[v.Length];
+
+            for (int i = 0; i < v.Length; i++)
+            {
+                result[i].Position = v[i].Position;
+                result[i].UV = uv[i];
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Convert an array of Vertex to ColorTexVertex with the given UV coordinates and color
+        /// </summary>
+        /// <param name="v">The array of Vertex to convert</param>
+        /// <param name="uv">The UV coordinates</param>
+        /// <param name="c">The color to set to all the vertices</param>
+        /// <returns>The resulting ColorTexVertex array</returns>
+        /// <exception cref="ArgumentException">Thrown if the Vertex and UV arrays are different sizes</exception>
+        public static ColorTexVertex[] ColorTexVertFromVertex(Vertex[] v, Vec2[] uv, Color4 c)
+        {
+            if (uv.Length != v.Length)
+                throw new ArgumentException("The Vertex array and the UV array need to be the same length.");
+
+            ColorTexVertex[] result = new ColorTexVertex[v.Length];
+
+            for (int i = 0; i < v.Length; i++)
+            {
+                result[i].Position = v[i].Position;
+                result[i].UV = uv[i];
+                result[i].Color = c;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Convert an array of Vertex to ColorTexVertex with the given UV coordinates and colors
+        /// </summary>
+        /// <param name="v">The array of Vertex to convert</param>
+        /// <param name="uv">The UV coordinates</param>
+        /// <param name="c">The colors to set to the vertices</param>
+        /// <returns>The resulting ColorTexVertex array</returns>
+        /// <exception cref="ArgumentException">Thrown if the Vertex, UV, and Color arrays are different sizes</exception>
+        public static ColorTexVertex[] ColorTexVertFromVertex(Vertex[] v, Vec2[] uv, Color4[] c)
+        {
+            if (uv.Length != v.Length && v.Length != c.Length)
+                throw new ArgumentException("The Vertex array, UV array, and Color array need to be the same length.");
+
+            ColorTexVertex[] result = new ColorTexVertex[v.Length];
+
+            for (int i = 0; i < v.Length; i++)
+            {
+                result[i].Position = v[i].Position;
+                result[i].UV = uv[i];
+                result[i].Color = c[i];
+            }
+
+            return result;
+        }
+    }
+
     //todo: vertex type checking against shader signature
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
@@ -30,6 +148,8 @@ namespace KirosEngine3.Mesh
         /// The size of the vertex in bytes (Unsafe)
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<Vertex>();
+
+        public static readonly Type VertexType = typeof(Vertex);
 
         /// <summary>
         /// Defines the vertex attribute pointers for both position and color data at the named locations in the given shader
@@ -170,17 +290,17 @@ namespace KirosEngine3.Mesh
     /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct TexturedVertex
+    public struct TexturedVertex : IVertex
     {
         /// <summary>
         /// The vertex's position
         /// </summary>
-        public Vec3 Position;
+        public Vec3 Position { get; set; }
 
         /// <summary>
         /// The vertex's uv coordinates
         /// </summary>
-        public Vec2 UV;
+        public Vec2 UV { get; set; }
 
         /// <summary>
         /// The size of the vertex in bytes (Unsafe)
@@ -260,7 +380,7 @@ namespace KirosEngine3.Mesh
     /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct ColorTexVertex
+    public struct ColorTexVertex : IVertex
     {
         /// <summary>
         /// The vertex's position

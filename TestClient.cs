@@ -93,6 +93,9 @@ namespace KirosEngine3
             //kem testing
             KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B,
                 KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
+
+            //ToString testing
+            Console.WriteLine(testQuad.ToString());
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)

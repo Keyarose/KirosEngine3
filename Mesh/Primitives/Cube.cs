@@ -6,6 +6,9 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace KirosEngine3.Mesh.Primitives
 {
+    /// <summary>
+    /// Defines a primitive Cube mesh that can be rendered with color
+    /// </summary>
     public class Cube : IDisposable, IRenderable, IFormattable
     {
         protected ColorVertex[] _verts = new ColorVertex[8];

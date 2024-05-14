@@ -19,7 +19,7 @@ namespace KirosEngine3.Shaders
         protected string _fragPath;
 
         protected readonly Dictionary<string, int> _uniformLocations = [];
-        protected ShaderSignature _signature;
+        protected ShaderSignature _signature;//todo: reconfigure signature as dict<string, tuple<int, attribtype>
 
         public int Handle
         { get { return _handle; } }
@@ -35,7 +35,7 @@ namespace KirosEngine3.Shaders
         /// <param name="name">The name of the shader</param>
         /// <param name="vertPath">The path to the vertex shader file</param>
         /// <param name="fragPath">The path to the fragment shader file</param>
-        public Shader(string name, string vertPath, string fragPath)
+        public Shader(string name, string vertPath, string fragPath)//todo: string positionAttribName
         {
             _name = name;
             _vertPath = vertPath;
@@ -153,7 +153,7 @@ namespace KirosEngine3.Shaders
             //form shader signature from attributes
             GL.GetProgram(_handle, GetProgramParameterName.ActiveAttributes, out var attributesCount);
             _signature.Attributes = new Tuple<int, string, ActiveAttribType>[attributesCount];
-            for (int i = 0; i < attributesCount; i++)
+            for (int i = 0; i < attributesCount; i++) 
             {
                 string key = GL.GetActiveAttrib(_handle, i, out _, out ActiveAttribType type);
                 int location = GL.GetAttribLocation(_handle, key);
