@@ -199,7 +199,7 @@ namespace KirosEngine3.Mesh.Primitives
                 return;
             }
 
-            //if the shader fails to be added to the pipeline log it
+            //can't draw, the shader failed to be added to the pipeline, logged in TryGetShader
             if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
             {
                 return;

@@ -157,6 +157,8 @@ namespace KirosEngine3.Math.Data
 
         public static readonly Color4 Blue = new Color4(0, 0, 255, 255);
 
+        public static readonly Color4 Gray = new Color4(192, 192, 192, 255);
+
         public static readonly Color4 Green = new Color4(0, 255, 0, 255);
 
         public static readonly Color4 Red = new Color4(255, 0, 0, 255);

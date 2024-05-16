@@ -16,6 +16,7 @@ using KirosEngine3.Mesh.Primitives;
 using KirosEngine3.Math.Data;
 using KirosEngine3.Input;
 using KirosEngine3.Config;
+using KirosEngine3.Mesh;
 
 namespace KirosEngine3
 {
@@ -30,6 +31,9 @@ namespace KirosEngine3
         Triangle? testTriangle;
         Quad? testQuad;
         Cube? testCube;
+        CoordinateGrid? testGrid;
+        CoordinateGrid? testGridXZ;
+        CoordinateGrid? testGridYZ;
         BaseCamera? camera;
 
         public TestClient(int width, int height) : base (width, height, "Test Client")
@@ -56,13 +60,14 @@ namespace KirosEngine3
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);
             GL.Enable(EnableCap.DepthTest);
+            //GL.Enable(EnableCap.DebugOutput);
 
             //system control setup
             KeyboardEventManager.CurrentContext = "system";
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
                 KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { Close(); });
 
-            Vec3 moveC = new Vec3(0.0f, 0.0f, 0.0f);//todo: manual camera movement remove later
+            Vec3 moveC = new Vec3(1.5f, 3.0f, 5.0f);//todo: manual camera movement remove later
             camera = new BaseCamera(2.0f * Vec3.UnitZ + moveC, ClientSize.X, ClientSize.Y);
             camera.LookAt = Vec3.Zero;
 
@@ -90,12 +95,23 @@ namespace KirosEngine3
             testCube.SetColors([Color4.Red, Color4.Blue, Color4.Green, Color4.Yellow]);
             testCube.Init();
 
+            testGrid = CoordinateGrid.UnitGridXY;
+            testGrid.Init();
+
+            testGridXZ = CoordinateGrid.UnitGridXZ;
+            testGridXZ.Init();
+            
+            testGridXZ.Rotation = Matrix4.CreateRotationZ(MathF.PI / 2);
+
+            testGridYZ = CoordinateGrid.UnitGridYZ;
+            testGridYZ.Init();
+
             //kem testing
             KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B,
                 KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
 
             //ToString testing
-            Console.WriteLine(testQuad.ToString());
+            //Console.WriteLine(testQuad.ToString());
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -122,12 +138,15 @@ namespace KirosEngine3
             };
 
             //Console.WriteLine(viewMatrixes.Projection.ToString());
-
+            
             /*testTriangle?.DrawGL(viewMatrixes);
-            testPoint?.DrawGL(viewMatrixes);
-            testLine?.DrawGL(viewMatrixes);*/
+            testPoint?.DrawGL(viewMatrixes);*/
+            testLine?.DrawGL(viewMatrixes);
             //testQuad?.DrawGL(viewMatrixes);
-            testCube?.DrawGL(viewMatrixes);
+            //testCube?.DrawGL(viewMatrixes);
+            //testGrid?.DrawGL(viewMatrixes);
+            testGridXZ?.DrawGL(viewMatrixes);
+            //testGridYZ?.DrawGL(viewMatrixes);
 
             //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
 

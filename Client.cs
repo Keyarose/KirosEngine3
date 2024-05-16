@@ -5,6 +5,7 @@ using OpenTK.Windowing.Desktop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,9 +31,49 @@ namespace KirosEngine3
         /// </summary>
         public const string GRAPHICSMODE_DX_VAL = "DIRECTX";
 
+        protected static bool _showGLDebugNotify = false;
+
         public Client(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
         {
 
+        }
+
+        /// <summary>
+        /// OpenGL debug delegate method
+        /// </summary>
+        /// <param name="source">Source for the debug message</param>
+        /// <param name="type">The type of the message</param>
+        /// <param name="id">The message id</param>
+        /// <param name="severity">The severity of the message</param>
+        /// <param name="length">The length of the message</param>
+        /// <param name="pMessage">The pointer to the message</param>
+        /// <param name="pUser">The pointer to user callback data</param>
+        protected static void OnDebugMessage(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr pMessage, IntPtr pUser)
+        {
+            string message = Marshal.PtrToStringUTF8(pMessage, length);
+
+            if (severity == DebugSeverity.DebugSeverityNotification)
+            {
+                if (_showGLDebugNotify)
+                    Console.WriteLine("[{0} type={1} id={2}] {3}", severity, type, id, message);
+            }
+            else
+                Console.WriteLine("[{0} type={1} id={2}] {3}", severity, type, id, message);
+        }
+
+        /// <summary>
+        /// OpenGL debug delegate instance
+        /// </summary>
+        private static DebugProc DebugDelegate = new DebugProc(OnDebugMessage);
+
+        public static void EnableGLDebugNotify()
+        {
+            _showGLDebugNotify = true;
+        }
+
+        public static void DisableGLDebugNotify()
+        {
+            _showGLDebugNotify = false;
         }
 
         /// <summary>
@@ -41,6 +82,9 @@ namespace KirosEngine3
         protected override void OnLoad()
         {
             base.OnLoad();
+
+            //OpenGL debug messaging
+            GL.DebugMessageCallback(DebugDelegate, 0);
         }
 
         /// <summary>

@@ -254,6 +254,7 @@ namespace KirosEngine3.Math.Matrix
             }
         }
 
+        #region Constructors
         /// <summary>
         /// Basic constructor using Vec4s
         /// </summary>
@@ -298,6 +299,7 @@ namespace KirosEngine3.Math.Matrix
             Row2 = new Vec4(m20, m21, m22, m23);
             Row3 = new Vec4(m30, m31, m32, m33);
         }
+        #endregion
 
         /// <summary>
         /// Construct a world space to a camera space matrix
@@ -474,8 +476,8 @@ namespace KirosEngine3.Math.Matrix
         {
             var r = Identity;
             r.Row0.X = x;
-            r.Row0.Y = y;
-            r.Row0.Z = z;
+            r.Row1.Y = y;
+            r.Row2.Z = z;
             return r;
         }
 
@@ -542,6 +544,92 @@ namespace KirosEngine3.Math.Matrix
             return c;
         }
 
+        /// <summary>
+        /// Create a matrix for rotation around the X axis
+        /// </summary>
+        /// <param name="angle">The angle to rotate by</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix4 CreateRotationX(float angle)
+        {
+            var r = Identity;
+            float cos = MathF.Cos(angle);
+            float sin = MathF.Sin(angle);
+
+            r.M11 = cos;
+            r.M12 = -sin;
+            r.M21 = sin;
+            r.M22 = cos;
+
+            return r;
+        }
+
+        /// <summary>
+        /// Create a matrix for rotation around the X axis
+        /// </summary>
+        /// <param name="angle">The angle to rotate by</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void CreateRotationX(float angle, out Matrix4 result)
+        {
+            result = CreateRotationX(angle);
+        }
+
+        /// <summary>
+        /// Create a matrix for rotation around the Y axis
+        /// </summary>
+        /// <param name="angle">The angle to rotate by</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix4 CreateRotationY(float angle)
+        {
+            var r = Identity;
+            float cos = MathF.Cos(angle);
+            float sin = MathF.Sin(angle);
+
+            r.M00 = cos;
+            r.M20 = -sin;
+            r.M02 = sin;
+            r.M22 = cos;
+
+            return r;
+        }
+
+        /// <summary>
+        /// Create a matrix for rotation around the Y axis
+        /// </summary>
+        /// <param name="angle">The angle to rotate by</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void CreateRotationY(float angle, out Matrix4 result)
+        {
+            result = CreateRotationY(angle);
+        }
+
+        /// <summary>
+        /// Create a matrix for rotation around the Z axis
+        /// </summary>
+        /// <param name="angle">The angle to rotate by</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix4 CreateRotationZ(float angle)
+        {
+            var r = Identity;
+            float cos = MathF.Cos(angle);
+            float sin = MathF.Sin(angle);
+
+            r.M00 = cos;
+            r.M01 = -sin;
+            r.M10 = sin;
+            r.M11 = cos;
+
+            return r;
+        }
+
+        /// <summary>
+        /// Create a matrix for rotation around the Z axis
+        /// </summary>
+        /// <param name="angle">The angle to rotate by</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void CreateRotationZ(float angle, out Matrix4 result)
+        {
+            result = CreateRotationZ(angle);
+        }
         //todo: getRotation, createRotation
         #endregion
 
