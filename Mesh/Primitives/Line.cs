@@ -174,10 +174,9 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * _verts.Length, _verts, BufferUsageHint.DynamicDraw);
 
-            Shader sh = ShaderManager.Instance[_shaderName];
+            Shader sh = ShaderManager.Instance[_shaderName];//todo: handle shader not found
 
-            ColorVertex.SetVertexPositionAttrib(sh, "aPosition");//todo: get the shader attrib names from the shader object
-            ColorVertex.SetVertexColorAttrib(sh, "aColor");
+            sh.SetAttribsGL<ColorVertex>();
 
             GL.BindVertexArray(0);
 

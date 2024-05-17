@@ -71,8 +71,7 @@ namespace KirosEngine3
             camera = new BaseCamera(2.0f * Vec3.UnitZ + moveC, ClientSize.X, ClientSize.Y);
             camera.LookAt = Vec3.Zero;
 
-            ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag");
-
+            ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag", new ShaderAttribNames { Color = "aColor", Position = "aPosition"});
             ShaderManager.CreateShader("text", "Resources/Shaders/FontShader_default.vert", "Resources/Shaders/FontShader_default.frag");
 
             _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
@@ -101,7 +100,7 @@ namespace KirosEngine3
             testGridXZ = CoordinateGrid.UnitGridXZ;
             testGridXZ.Init();
             
-            testGridXZ.Rotation = Matrix4.CreateRotationZ(MathF.PI / 2);
+            //testGridXZ.Rotation = Matrix4.CreateRotationZ(MathF.PI / 2);
 
             testGridYZ = CoordinateGrid.UnitGridYZ;
             testGridYZ.Init();
@@ -139,14 +138,14 @@ namespace KirosEngine3
 
             //Console.WriteLine(viewMatrixes.Projection.ToString());
             
-            /*testTriangle?.DrawGL(viewMatrixes);
-            testPoint?.DrawGL(viewMatrixes);*/
-            testLine?.DrawGL(viewMatrixes);
+            //testTriangle?.DrawGL(viewMatrixes);
+            //testPoint?.DrawGL(viewMatrixes);
+            //testLine?.DrawGL(viewMatrixes);
             //testQuad?.DrawGL(viewMatrixes);
             //testCube?.DrawGL(viewMatrixes);
-            //testGrid?.DrawGL(viewMatrixes);
+            testGrid?.DrawGL(viewMatrixes);
             testGridXZ?.DrawGL(viewMatrixes);
-            //testGridYZ?.DrawGL(viewMatrixes);
+            testGridYZ?.DrawGL(viewMatrixes);
 
             //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
 

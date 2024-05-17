@@ -77,8 +77,7 @@ namespace KirosEngine3.Mesh.Primitives
 
             Shader sh = ShaderManager.Instance[_shaderName];
 
-            ColorVertex.SetVertexPositionAttrib(sh, "aPosition");//todo: get the shader attrib names from the shader object
-            ColorVertex.SetVertexColorAttrib(sh, "aColor");
+            sh.SetAttribsGL<ColorVertex>();
 
             GL.BindVertexArray(0);
 

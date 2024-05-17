@@ -185,7 +185,10 @@ namespace KirosEngine3.Mesh.Primitives
 
             Shader sh = ShaderManager.Instance[_shaderName];
 
-            ColorVertex.SetVertexAttribs(sh, ["aPosition", "aColor"]);
+            //sh.SetPositionAttribGL(3, ColorVertex.SizeInBytesU, 0);
+            //sh.SetColorAttribGL(4, ColorVertex.SizeInBytesU, ColorVertex.ColorOffset);
+
+            sh.SetAttribsGL<ColorVertex>();
 
             GL.BindVertexArray(0);
 

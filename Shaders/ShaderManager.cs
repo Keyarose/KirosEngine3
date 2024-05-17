@@ -50,9 +50,15 @@ namespace KirosEngine3.Shaders
         }
 
         /// <inheritdoc cref="AddShader(string, string, string)"/>
-        public static void CreateShader(string shaderName, string vertPath, string fragPath)
+        public static void CreateShader(string name, string vertPath, string fragPath)
         {
-            AddShader(shaderName, vertPath, fragPath);
+            AddShader(name, vertPath, fragPath);
+        }
+
+        /// <inheritdoc cref="AddShader(string, string, string, ShaderAttribNames)"/>
+        public static void CreateShader(string name, string vertPath, string fragPath, ShaderAttribNames attribNames)
+        {
+            AddShader(name, vertPath, fragPath, attribNames);
         }
 
         /// <summary>
@@ -64,7 +70,20 @@ namespace KirosEngine3.Shaders
         /// <exception cref="ArgumentException">Thrown if the name for the shader is already in use</exception>
         public static void AddShader(string name, string vertPath, string fragPath)
         {
-            if (!Instance._shaders.TryAdd(name, new Shader(name, vertPath, fragPath)))
+            AddShader(name, vertPath, fragPath, new ShaderAttribNames());
+        }
+
+        /// <summary>
+        /// Add a shader to the manager
+        /// </summary>
+        /// <param name="name">The name of the shader</param>
+        /// <param name="vertPath">The path for the vertex shader</param>
+        /// <param name="fragPath">The path for the fragment shader</param>
+        /// <param name="attribNames">The names for common shader attributes</param>
+        /// <exception cref="ArgumentException">Thrown if the name for the shader is already in use</exception>
+        public static void AddShader(string name, string vertPath, string fragPath, ShaderAttribNames attribNames)
+        {
+            if (!Instance._shaders.TryAdd(name, new Shader(name, vertPath, fragPath, attribNames)))
             {
                 throw new ArgumentException(string.Format("Shader name: {0} is already in use.", name), name);
             }
@@ -93,12 +112,20 @@ namespace KirosEngine3.Shaders
         /// <returns>True if the shader is successfully added, false if the name is already in use</returns>
         public static bool TryAddShader(string name, string vertPath, string fragPath)
         {
-            if (Instance._shaders.TryAdd(name, new Shader(name, vertPath, fragPath)))
-            { return true; }
+            return TryAddShader(name, new Shader(name, vertPath, fragPath));
+        }
 
-            Logger.WriteToLog(string.Format("Shader name: {0} is already in use.", name));
-            //todo: write to debug console
-            return false;
+        /// <summary>
+        /// Try to add a shader to the manager without throwing an exception on failure
+        /// </summary>
+        /// <param name="name">The name of the shader</param>
+        /// <param name="vertPath">The path for the vertex shader</param>
+        /// <param name="fragPath">The path for the fragment shader</param>
+        /// <param name="attribNames">The names for common shader attributes</param>
+        /// <returns></returns>
+        public static bool TryAddShader(string name, string vertPath, string fragPath, ShaderAttribNames attribNames)
+        {
+            return TryAddShader(name, new Shader(name, vertPath, fragPath, attribNames));
         }
 
         /// <summary>

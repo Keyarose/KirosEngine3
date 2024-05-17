@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -100,6 +101,8 @@ namespace KirosEngine3.Math.Data
                 }
             }
         }
+
+        public static readonly int SizeInBytesU = Unsafe.SizeOf<Color4>();
 
         #region Constructors
         /// <summary>

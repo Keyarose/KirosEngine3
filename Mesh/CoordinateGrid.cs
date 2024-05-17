@@ -12,7 +12,7 @@ namespace KirosEngine3.Mesh
     /// </summary>
     public class CoordinateGrid : IRenderable, IDisposable
     {
-        private List<Line> _lines = [];
+        private readonly List<Line> _lines = [];
 
         private Vec3 _origin;
 
@@ -51,7 +51,7 @@ namespace KirosEngine3.Mesh
         /// </summary>
         private static readonly Line[] _unitGridDataXY =
             [
-                new Line(new Vec3(-5.0f, 0.0f, 0.0f), new Vec3(5.0f, 0.0f, 0.0f), Color4.Black),//x-axis
+                new Line(new Vec3(-5.0f, 0.0f, 0.0f), new Vec3(5.0f, 0.0f, 0.0f), Color4.Red),//x-axis
                 new Line(new Vec3(-5.0f, 1.0f, 0.0f), new Vec3(5.0f, 1.0f, 0.0f), Color4.Gray),
                 new Line(new Vec3(-5.0f, -1.0f, 0.0f), new Vec3(5.0f, -1.0f, 0.0f), Color4.Gray),
                 new Line(new Vec3(-5.0f, 2.0f, 0.0f), new Vec3(5.0f, 2.0f, 0.0f), Color4.Gray),
@@ -63,7 +63,7 @@ namespace KirosEngine3.Mesh
                 new Line(new Vec3(-5.0f, 5.0f, 0.0f), new Vec3(5.0f, 5.0f, 0.0f), Color4.Black),
                 new Line(new Vec3(-5.0f, -5.0f, 0.0f), new Vec3(5.0f, -5.0f, 0.0f), Color4.Black),
 
-                new Line(new Vec3(0.0f, 5.0f, 0.0f), new Vec3(0.0f, -5.0f, 0.0f), Color4.Black),//y-axis
+                new Line(new Vec3(0.0f, 5.0f, 0.0f), new Vec3(0.0f, -5.0f, 0.0f), Color4.Green),//y-axis
                 new Line(new Vec3(1.0f, 5.0f, 0.0f), new Vec3(1.0f, -5.0f, 0.0f), Color4.Gray),
                 new Line(new Vec3(-1.0f, 5.0f, 0.0f), new Vec3(-1.0f, -5.0f, 0.0f), Color4.Gray),
                 new Line(new Vec3(2.0f, 5.0f, 0.0f), new Vec3(2.0f, -5.0f, 0.0f), Color4.Gray),
@@ -162,7 +162,6 @@ namespace KirosEngine3.Mesh
         public void Init()
         {
             ColorVertex[] verts = new ColorVertex[_lines.Count * 2];
-            uint[] indices = new uint[_lines.Count * 2];
 
             for (int i = 0; i < _lines.Count; i++)
             {
@@ -179,9 +178,9 @@ namespace KirosEngine3.Mesh
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, ColorVertex.SizeInBytesU * verts.Length, verts, BufferUsageHint.StaticDraw);
 
-            Shader sh = ShaderManager.Instance["color"];
+            Shader sh = ShaderManager.Instance["color"];//todo: better shader handling
 
-            ColorVertex.SetVertexAttribs(sh, ["aPosition", "aColor"]);
+            sh.SetAttribsGL<ColorVertex>();
 
             GL.BindVertexArray(0);
 
@@ -249,6 +248,8 @@ namespace KirosEngine3.Mesh
                 //todo: write to debug console
                 return;
             }
+
+            vm.Model *= _rotation;
 
             foreach (var line in _lines)
             {
