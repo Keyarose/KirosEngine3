@@ -1,6 +1,7 @@
 ﻿using KirosEngine3.Math.Vector;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -157,7 +158,43 @@ namespace KirosEngine3.Math.Matrix
                         Row1[column] = value;
                         break;
                     default:
-                        throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix2.", column));
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix2.", row));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Array type accessor for the rows of the matrix
+        /// </summary>
+        /// <param name="row">Row index</param>
+        /// <returns>The row at the given index</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the index value is outside the allowed range of 0,1</exception>
+        public Vec2 this[int row]
+        {
+            readonly get
+            {
+                switch (row)
+                {
+                    case 0:
+                        return Row0;
+                    case 1:
+                        return Row1;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix2.", row));
+                }
+            }
+            set
+            {
+                switch (row)
+                {
+                    case 0:
+                        Row0 = value;
+                        break;
+                    case 1:
+                        Row1 = value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix2.", row));
                 }
             }
         }
@@ -288,6 +325,7 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        #region Transpose
         /// <summary>
         /// Convert the matrix into it's transpose
         /// </summary>
@@ -297,12 +335,148 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
+        /// Get a transposed copy of the matrix
+        /// </summary>
+        /// <returns>The resulting transpose</returns>
+        public readonly Matrix2 TransposedCopy()
+        {
+            return Transpose(this);
+        }
+
+        /// <summary>
+        /// Find a copy of the transpose of a matrix
+        /// </summary>
+        /// <param name="m">The matrix to transpose</param>
+        /// <returns>The transpose in a new instance</returns>
+        public static Matrix2 Transpose(Matrix2 m)
+        {
+            var r = new Matrix2
+            {
+                Row0 = m.Column0,
+                Row1 = m.Column1,
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Find the transpose of a matrix
+        /// </summary>
+        /// <param name="m">The matrix to transpose</param>
+        /// <param name="result">The transpose in a new instance</param>
+        public static void Transpose(Matrix2 m, out Matrix2 result)
+        {
+            result = Transpose(m);
+        }
+        #endregion
+
+        #region Invert
+        /// <summary>
         /// Convert the matrix into it's inverse
         /// </summary>
         public void Invert()
         {
             this = Invert(this);
         }
+
+        /// <summary>
+        /// Get an inverted copy of the matrix
+        /// </summary>
+        /// <returns></returns>
+        public readonly Matrix2 InvertedCopy()
+        {
+            return Invert(this);
+        }
+
+        /// <summary>
+        /// Get an inverted copy of the given matrix
+        /// </summary>
+        /// <param name="m">The matrix to invert</param>
+        /// <returns>The resulting matrix</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the matrix's determinant is 0, thus singular</exception>
+        public static Matrix2 Invert(Matrix2 m)
+        {
+            if (m.Determinant.IsZero())
+            {
+                throw new InvalidOperationException("Matrix cannot be inverted as it's singular.");
+            }
+
+            var invDet = 1f / m.Determinant;
+
+            return new Matrix2(m.Row1.Y * invDet, -m.Row0.Y * invDet, -m.Row1.X * invDet, m.Row0.X * invDet);
+        }
+
+        /// <summary>
+        /// Invert the given matrix
+        /// </summary>
+        /// <param name="m">The matrix to invert</param>
+        /// <param name="result">The resulting matrix</param>
+        /// /// <exception cref="InvalidOperationException">Thrown if the matrix's determinant is 0, thus singular</exception>
+        public static void Invert(Matrix2 m, out Matrix2 result)
+        {
+            try
+            {
+                result = Invert(m);
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region Swizzle
+        /// <summary>
+        /// Swizzle, switch the rows of the matrix
+        /// </summary>
+        /// <param name="mat">The matrix to swizzle</param>
+        /// <param name="rowZeroRow">The index of the row to be moved to row 0</param>
+        /// <param name="rowOneRow">The index of the row to be moved to row 1</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix2 Swizzle(Matrix2 mat, int rowZeroRow, int rowOneRow)
+        {
+            Matrix2 result = new Matrix2
+            {
+                Row0 = mat[rowZeroRow],
+                Row1 = mat[rowOneRow]
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Swizzle, switch the rows of the matrix
+        /// </summary>
+        /// <param name="mat">The matrix to swizzle</param>
+        /// <param name="rowZeroRow">The index of the row to be moved to row 0</param>
+        /// <param name="rowOneRow">The index of the row to be moved to row 1</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void Swizzle(Matrix2 mat, int rowZeroRow, int rowOneRow, out Matrix2 result)
+        {
+            result = Swizzle(mat, rowZeroRow, rowOneRow);
+        }
+
+        /// <summary>
+        /// Create a swizzled copy of the matrix
+        /// </summary>
+        /// <param name="rowZeroRow">The index of the row to be moved to row 0</param>
+        /// <param name="rowOneRow">The index of the row to be moved to row 1</param>
+        /// <returns>The swizzled copy</returns>
+        public readonly Matrix2 SwizzleCopy(int rowZeroRow, int rowOneRow)
+        {
+            return Swizzle(this, rowZeroRow, rowOneRow);
+        }
+
+        /// <summary>
+        /// Swizzle the matrix
+        /// </summary>
+        /// <param name="rowZeroRow">The index of the row to be moved to row 0</param>
+        /// <param name="rowOneRow">The index of the row to be moved to row 1</param>
+        public void Swizzle(int rowZeroRow, int rowOneRow)
+        {
+            this = Swizzle(this, rowZeroRow, rowOneRow);
+        }
+        #endregion
 
         #region Scale
         /// <summary>
@@ -370,9 +544,9 @@ namespace KirosEngine3.Math.Matrix
 
         #region Rotate
         /// <summary>
-        /// Create a matrix to represent the rotation
+        /// Create a matrix to represent the rotation (radians)
         /// </summary>
-        /// <param name="angle">The angle to rotate by</param>
+        /// <param name="angle">The angle to rotate by in radians</param>
         /// <returns>The resulting matrix</returns>
         public static Matrix2 CreateRotation(float angle)
         {
@@ -383,16 +557,16 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Create a matrix to represent the rotation
+        /// Create a matrix to represent the rotation (radians)
         /// </summary>
-        /// <param name="angle">The angle to rotate by</param>
+        /// <param name="angle">The angle to rotate by in radians</param>
         /// <param name="result">The resulting matrix</param>
         public static void CreateRotation(float angle, out Matrix2 result)
         {
             result = CreateRotation(angle);
         }
         #endregion
-
+                
         #region Add
         /// <summary>
         /// Add two matrices together
@@ -563,73 +737,25 @@ namespace KirosEngine3.Math.Matrix
             return Multiply(rhs, lhs);
         }
         #endregion
-
-        /// <summary>
-        /// Invert the given matrix
-        /// </summary>
-        /// <param name="m">The matrix to invert</param>
-        /// <returns>The resulting matrix</returns>
-        /// <exception cref="InvalidOperationException">Thrown if the matrix's determinant is 0, thus singular</exception>
-        public static Matrix2 Invert(Matrix2 m)
-        {
-            if (m.Determinant.IsZero())
-            {
-                throw new InvalidOperationException("Matrix cannot be inverted as it's singular.");
-            }
-
-            var invDet = 1f / m.Determinant;
-
-            return new Matrix2(m.Row1.Y * invDet, -m.Row0.Y * invDet, -m.Row1.X * invDet, m.Row0.X * invDet);
-        }
-
-        /// <summary>
-        /// Invert the given matrix
-        /// </summary>
-        /// <param name="m">The matrix to invert</param>
-        /// <param name="result">The resulting matrix</param>
-        /// /// <exception cref="InvalidOperationException">Thrown if the matrix's determinant is 0, thus singular</exception>
-        public static void Invert(Matrix2 m, out Matrix2 result)
-        {
-            try
-            {
-                result = Invert(m);
-            }
-            catch (InvalidOperationException)
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Find the transpose of a matrix
-        /// </summary>
-        /// <param name="m">The matrix to transpose</param>
-        /// <returns>The transpose in a new instance</returns>
-        public static Matrix2 Transpose(Matrix2 m)
-        {
-            var r = new Matrix2
-            {
-                Row0 = m.Column0,
-                Row1 = m.Column1,
-            };
-
-            return r;
-        }
-
-        /// <summary>
-        /// Find the transpose of a matrix
-        /// </summary>
-        /// <param name="m">The matrix to transpose</param>
-        /// <param name="result">The transpose in a new instance</param>
-        public static void Transpose(Matrix2 m, out Matrix2 result)
-        {
-            result = Transpose(m);
-        }
-
+                
+        #region Comparison
         /// <inheritdoc/>
         public readonly bool Equals(Matrix2 other)
         {
+            //todo: compare runtime to Equals(other, 0.0f)
             return Row0 == other.Row0 && Row1 == other.Row1;
+        }
+
+        /// <summary>
+        /// Indicates whether the current Matrix2 is equal to another within the provided tolerance
+        /// </summary>
+        /// <param name="other">The other Matrix2</param>
+        /// <param name="tolerance">The allowed difference between the values</param>
+        /// <returns>True if the difference between the two Matrix2s is less than the tolerance,
+        /// false otherwise.</returns>
+        public readonly bool Equals(Matrix2 other, float tolerance)
+        {
+            return Row0.Equals(other.Row0, tolerance) && Row1.Equals(other.Row1, tolerance);
         }
 
         /// <inheritdoc/>
@@ -665,6 +791,7 @@ namespace KirosEngine3.Math.Matrix
         {
             return HashCode.Combine(Row0, Row1);
         }
+        #endregion
 
         #region ToString
         /// <inheritdoc/>

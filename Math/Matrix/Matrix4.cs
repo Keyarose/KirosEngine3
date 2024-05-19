@@ -453,6 +453,8 @@ namespace KirosEngine3.Math.Matrix
             c.Row3.Xyz = Vec3.Zero;
             return c;
         }
+
+        //todo: create translation
         #endregion
 
         #region Scale

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math
 {
-    internal static class MathHelpers
+    public static class MathHelpers
     {
         internal static readonly float PiOver2 = MathF.PI / 2;
 
@@ -63,7 +63,7 @@ namespace KirosEngine3.Math
         /// <returns>True if the difference is less than the margin, false otherwise</returns>
         public static bool CloseTo(this float a, float b, float margin = float.Epsilon)
         {
-            return (a - b) <= margin;
+            return (a - b).Abs() <= margin;
         }
 
         /// <summary>

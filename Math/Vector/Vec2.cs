@@ -241,6 +241,7 @@ namespace KirosEngine3.Math.Vector
             return float.IsFinite(X) && float.IsFinite(Y) && !(float.IsNaN(X) || float.IsNaN(Y));
         }
 
+        #region Comparison
         /// <summary>
         /// Check if the vector is parallel to the given vector
         /// </summary>
@@ -266,32 +267,27 @@ namespace KirosEngine3.Math.Vector
         }
 
         /// <inheritdoc/>
-        public override readonly bool Equals([NotNullWhen(true)] object? obj)
-        {
-            return obj is Vec2 vec && Equals(vec);
-        }
-
-        /// <inheritdoc/>
-        public override readonly int GetHashCode() 
-        {
-            return HashCode.Combine(X, Y);
-        }
-
-        /// <inheritdoc/>
         public readonly bool Equals(Vec2 other) 
         {
-            return X == other.X && Y == other.Y;
+            return X.CloseTo(other.X) && Y.CloseTo(other.Y);
         }
 
         /// <summary>
-        /// Extract the vector's components
+        /// Indicates whether the current Vec2 is equal to another within the provided
+        /// tolerance
         /// </summary>
-        /// <param name="x">The vector's X component</param>
-        /// <param name="y">The vector's Y component</param>
-        public readonly void Deconstruct(out float x, out float y)
+        /// <param name="other">The other Vec2</param>
+        /// <param name="tolerance">The acceptable difference between the values</param>
+        /// <returns>True if the current Vec2 is close enough to the other, false otherwise</returns>
+        public readonly bool Equals(Vec2 other, float tolerance)
         {
-            x = X; 
-            y = Y;
+            return X.CloseTo(other.X, tolerance) && Y.CloseTo(other.Y, tolerance);
+        }
+
+        /// <inheritdoc/>
+        public override readonly bool Equals([NotNullWhen(true)] object? obj)
+        {
+            return obj is Vec2 vec && Equals(vec);
         }
 
         /// <summary>
@@ -314,6 +310,24 @@ namespace KirosEngine3.Math.Vector
         public static bool operator !=(Vec2 left, Vec2 right)
         {
             return !(left == right);
+        }
+
+        /// <inheritdoc/>
+        public override readonly int GetHashCode()
+        {
+            return HashCode.Combine(X, Y);
+        }
+        #endregion
+
+        /// <summary>
+        /// Extract the vector's components
+        /// </summary>
+        /// <param name="x">The vector's X component</param>
+        /// <param name="y">The vector's Y component</param>
+        public readonly void Deconstruct(out float x, out float y)
+        {
+            x = X; 
+            y = Y;
         }
 
         #region Add
