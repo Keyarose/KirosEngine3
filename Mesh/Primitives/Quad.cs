@@ -69,7 +69,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// Unit sized predefined Quad with a color of red
         /// </summary>
-        public static readonly Quad UnitQuad = new Quad(qPoints, [0, 1, 2, 2, 3, 0], Color4.Red);
+        public static Quad UnitQuad => new Quad(qPoints, [0, 1, 2, 2, 3, 0], Color4.Red);
 
         public Quad(Vec3[] points, uint[] indices, Color4[] colors, string shaderName = "color")
         {

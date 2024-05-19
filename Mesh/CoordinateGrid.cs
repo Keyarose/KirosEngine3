@@ -140,17 +140,17 @@ namespace KirosEngine3.Mesh
         /// <summary>
         /// Predefined 10x10 grid on the X-Y plane
         /// </summary>
-        public static CoordinateGrid UnitGridXY = new CoordinateGrid(_unitGridDataXY, Vec3.Zero);
+        public static CoordinateGrid UnitGridXY => new CoordinateGrid(_unitGridDataXY, Vec3.Zero);
 
         /// <summary>
         /// Predefined 10x10 grid on the X-Z plane
         /// </summary>
-        public static CoordinateGrid UnitGridXZ = new CoordinateGrid(_unitGridDataXZ, Vec3.Zero);
+        public static CoordinateGrid UnitGridXZ => new CoordinateGrid(_unitGridDataXZ, Vec3.Zero);
 
         /// <summary>
         /// Predefined 10x10 grid on the Y-Z plane
         /// </summary>
-        public static CoordinateGrid UnitGridYZ = new CoordinateGrid(_unitGridDataYZ, Vec3.Zero);
+        public static CoordinateGrid UnitGridYZ => new CoordinateGrid(_unitGridDataYZ, Vec3.Zero);
 
         public CoordinateGrid(Line[] lines, Vec3 origin)
         {

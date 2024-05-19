@@ -81,7 +81,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// Unit sized predefined Cube with a color of red
         /// </summary>
-        public static readonly Cube UnitCube = new Cube(cPoints, cIndices, Color4.Red);
+        public static Cube UnitCube => new Cube(cPoints, cIndices, Color4.Red);
 
         /// <summary>
         /// Construct a Cube using the given points, indices, and colors.

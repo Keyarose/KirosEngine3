@@ -14,6 +14,11 @@ namespace KirosEngine3.Mesh
         public static readonly int SizeInBytesU;
     }
 
+    public interface IVertex2D
+    {
+        public Vec2 Position { get; set; }
+    }
+
     public static class VertexHelpers
     {
         /// <summary>
@@ -130,6 +135,16 @@ namespace KirosEngine3.Mesh
 
             return result;
         }
+    }
+
+    public struct ColorVertex2D : IVertex2D
+    {
+        public Vec2 Position { get; set; }
+
+        public Color4 Color { get; set; }
+        public static readonly int ColorOffset = Vec2.SizeInBytesU;
+
+        public static readonly int SizeInBytesU = Unsafe.SizeOf<ColorVertex2D>();
     }
 
     //todo: vertex type checking against shader signature
