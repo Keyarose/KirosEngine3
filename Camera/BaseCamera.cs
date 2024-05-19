@@ -332,9 +332,14 @@ namespace KirosEngine3.Camera
             _view = Matrix4.LookAt(Position, Position + Forward, Up);
         }
 
+        /// <summary>
+        /// Update the orthographic matrix based on changes to camera data
+        /// </summary>
         private void UpdateOrthoMatrix()
         {
-            _orthographic = Matrix4.CreateOrthographic(_width, _height, _nearClip, _farClip);
+            //_orthographic = Matrix4.CreateOrthographic(_width, _height, _nearClip, _farClip);
+            //height as bottom sets 0,0 at upper left
+            _orthographic = Matrix4.CreateOrthographicOffCenter(0f, _width, _height, 0f, _nearClip, _farClip);
         }
 
         /// <summary>

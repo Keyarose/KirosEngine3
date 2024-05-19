@@ -17,6 +17,7 @@ using KirosEngine3.Math.Data;
 using KirosEngine3.Input;
 using KirosEngine3.Config;
 using KirosEngine3.Mesh;
+using KirosEngine3.UI;
 
 namespace KirosEngine3
 {
@@ -35,6 +36,8 @@ namespace KirosEngine3
         CoordinateGrid? testGridXZ;
         CoordinateGrid? testGridYZ;
         BaseCamera? camera;
+
+        ScreenButton? testSButton;
 
         public TestClient(int width, int height) : base (width, height, "Test Client")
         {
@@ -67,11 +70,12 @@ namespace KirosEngine3
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
                 KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { Close(); });
 
-            Vec3 moveC = new Vec3(1.5f, 3.0f, 5.0f);//todo: manual camera movement remove later
+            Vec3 moveC = new Vec3(0.0f, 0.0f, 0.0f);//todo: manual camera movement remove later
             camera = new BaseCamera(2.0f * Vec3.UnitZ + moveC, ClientSize.X, ClientSize.Y);
             camera.LookAt = Vec3.Zero;
 
-            ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag", new ShaderAttribNames { Color = "aColor", Position = "aPosition"});
+            ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag", new ShaderAttribNames { Color = "aColor", Position = "aPosition" });
+            ShaderManager.CreateShader("orthoColor", "Resources/Shaders/ColorOrtho.vert", "Resources/Shaders/ColorOrtho.frag", new ShaderAttribNames { Color = "aColor", Position = "aPosition" });
             ShaderManager.CreateShader("text", "Resources/Shaders/FontShader_default.vert", "Resources/Shaders/FontShader_default.frag");
 
             _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
@@ -105,6 +109,9 @@ namespace KirosEngine3
             testGridYZ = CoordinateGrid.UnitGridYZ;
             testGridYZ.Init();
 
+            testSButton = new ScreenButton(new Vec2(100.0f, 0.0f), Color4.Yellow, new Vec2(200f, 300f), "color");
+            testSButton.Init();
+
             //kem testing
             KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B,
                 KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
@@ -135,17 +142,17 @@ namespace KirosEngine3
                 View = (camera != null) ? camera.View : Matrix4.Identity,
                 Orthographic = (camera != null) ? camera.Orthographic : Matrix4.Identity
             };
-
-            //Console.WriteLine(viewMatrixes.Projection.ToString());
-            
+                        
             //testTriangle?.DrawGL(viewMatrixes);
             //testPoint?.DrawGL(viewMatrixes);
             //testLine?.DrawGL(viewMatrixes);
             //testQuad?.DrawGL(viewMatrixes);
             //testCube?.DrawGL(viewMatrixes);
-            testGrid?.DrawGL(viewMatrixes);
-            testGridXZ?.DrawGL(viewMatrixes);
-            testGridYZ?.DrawGL(viewMatrixes);
+            //testGrid?.DrawGL(viewMatrixes);
+            //testGridXZ?.DrawGL(viewMatrixes);
+            //testGridYZ?.DrawGL(viewMatrixes);
+
+            testSButton?.DrawGL(viewMatrixes);
 
             //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
 

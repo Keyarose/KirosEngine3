@@ -302,7 +302,7 @@ namespace KirosEngine3.Math.Matrix
         #endregion
 
         /// <summary>
-        /// Construct a world space to a camera space matrix
+        /// Construct a world space to a camera space matrix (row major)
         /// </summary>
         /// <param name="pos">The camera's position</param>
         /// <param name="target">The target to look at</param>
@@ -325,7 +325,7 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Construct a perspective projection matrix
+        /// Construct a perspective projection matrix (row major)
         /// </summary>
         /// <param name="fovy">Angle of the field of view in y axis</param>
         /// <param name="aspect">The ratio of the view width/height</param>
@@ -374,23 +374,36 @@ namespace KirosEngine3.Math.Matrix
         /// <returns>An orthographic projection matrix</returns>
         public static Matrix4 CreateOrthographic(float width, float height, float depthNear, float depthFar)
         {
-            float left = (0.0f - width) / 2.0f;
-            float right = width / 2.0f;
-            float bottom = (0.0f - height) / 2.0f;
-            float top = height / 2.0f;
+            return CreateOrthographicOffCenter(-width / 2.0f, width / 2.0f, -height / 2.0f, height / 2.0f, depthNear, depthFar);
+        }
 
+        /// <summary>
+        /// Construct an off center orthographic projection matrix (row major)
+        /// </summary>
+        /// <param name="left">Coordinate value for the left extent</param>
+        /// <param name="right">Coordinate value for the right extent</param>
+        /// <param name="bottom">Coordinate value for the bottom extent</param>
+        /// <param name="top">Coordinate value for the top extent</param>
+        /// <param name="depthNear">The near clip</param>
+        /// <param name="depthFar">The far clip</param>
+        /// <returns>The orthographic projection matrix (row major)</returns>
+        public static Matrix4 CreateOrthographicOffCenter(float left, float right, float bottom, float top, float depthNear, float depthFar)
+        {
             Matrix4 result = Identity;
-            float x = 1.0f / (right - left);
-            float y = 1.0f / (top - bottom);
-            float z = 1.0f / (depthFar - depthNear);
 
-            result.Row0.X = 2.0f * x;
-            result.Row1.Y = 2.0f * y;
-            result.Row2.Z = -2.0f * z;
+            var invertRightLeft = 1.0f / (right - left);
+            var invertTopBottom = 1.0f / (top - bottom);
+            var invertFarNear = 1.0f / (depthFar - depthNear);
 
-            result.Row3.X = (0.0f - (right + left)) * x;
-            result.Row3.Y = (0.0f - (top + bottom)) * y;
-            result.Row3.Z = (0.0f - (depthFar + depthNear)) * z;
+            //scale by the view
+            result.Row0.X = 2.0f * invertRightLeft;
+            result.Row1.Y = 2.0f * invertTopBottom;
+            result.Row2.Z = -2.0f * invertFarNear;
+
+            //translate by view size
+            result.Row3.X = -(right + left) * invertRightLeft;
+            result.Row3.Y = -(top + bottom) * invertTopBottom;
+            result.Row3.Z = -(depthFar + depthNear) * invertFarNear;
 
             return result;
         }
