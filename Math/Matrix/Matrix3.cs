@@ -1,12 +1,7 @@
 ﻿
 using KirosEngine3.Math.Vector;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Matrix
 {
@@ -185,7 +180,7 @@ namespace KirosEngine3.Math.Matrix
         {
             readonly get
             {
-                if (column < 0 && column > 2)
+                if (column < 0 || column > 2)
                 {
                     throw new IndexOutOfRangeException(string.Format("Column index: {0} out of range for Matrix3.", column));
                 }
@@ -209,7 +204,7 @@ namespace KirosEngine3.Math.Matrix
             }
             set
             {
-                if (column < 0 && column > 2)
+                if (column < 0 || column > 2)
                 {
                     throw new IndexOutOfRangeException(string.Format("Column index: {0} out of range for Matrix3.", column));
                 }
@@ -267,29 +262,201 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        #region ElementaryMatrices
         /// <summary>
-        /// Normalize the matrix by dividing by the determinant, should be checked for nan and infinites
+        /// Produce an elementary matrix for row interchange between the two specified rows.
         /// </summary>
-        public void Normalize()
+        /// <param name="r1">The index of the first row to interchange.</param>
+        /// <param name="r2">The index of the second row to interchange.</param>
+        /// <returns>The 3D elementary matrix that performs row interchange.</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown if one of the row indexes is out of the allowed range.</exception>
+        public static Matrix3 RowInterchangeElemMat(int r1, int r2)
         {
-            var determinant = Determinant;
-            Row0 /= determinant;
-            Row1 /= determinant;
-            Row2 /= determinant;
-            //todo: 0 division handling
+            if (r1 < 0 || r1 > 2)
+            {
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r1));
+            }
+
+            if (r2 < 0 || r2 > 2)
+            {
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
+            }
+
+            //switch row 0 and 2
+            if ((r1 == 0 && r2 == 2) || (r1 == 2 && r2 == 0))
+            {
+                return new Matrix3(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+            }
+
+            //switch row 0 and row 1
+            if ((r1 == 0 && r2 == 1) || (r1 == 1 && r2 == 0))
+            {
+                return new Matrix3(0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+            }
+            else
+            {
+                //switch row 1 and 2
+                return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
+            }
         }
 
         /// <summary>
-        /// Create a normalized copy of the matrix, should be checked for nan and infinites
+        /// Produce an elementary matrix for the scalar multiplication row operation.
         /// </summary>
-        /// <returns>A copy of the matrix that has been normalized</returns>
-        public readonly Matrix3 NormalizedCopy()
+        /// <param name="row">The row to be multiplied.</param>
+        /// <param name="scalar">The scalar to multiply by.</param>
+        /// <returns>The 3D elementary matrix that performs the scalar multiplication.</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the row index is out of range.</exception>
+        public static Matrix3 RowMultiplyElemMat(int row, float scalar)
         {
-            var c = this;
-            c.Normalize();
-            return c;
+            switch (row)
+            {
+                case 0:
+                    return new Matrix3(scalar, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+                case 1:
+                    return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, scalar, 0.0f, 0.0f, 0.0f, 1.0f);
+                case 2:
+                    return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, scalar);
+                default:
+                    throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", row));
+            }
         }
 
+        /// <summary>
+        /// Produce an elementary matrix for adding one row to another.
+        /// </summary>
+        /// <param name="r1">The index of the row to add.</param>
+        /// <param name="r2">The index of the row to add to.</param>
+        /// <param name="scalar">The number of times to add the first row.</param>
+        /// <returns>The 3D elementary matrix that performs the row operation.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the indexes are the same.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the indexes are out of range for Matrix3.</exception>
+        public static Matrix3 RowAddElemMat(int r1, int r2, float scalar)
+        {
+            if (r1 == r2)
+                throw new InvalidOperationException(string.Format("Adding a row to itself is not a valid operation."));
+
+            switch (r1)
+            {
+                case 0:
+                    {   
+                        if (r2 == 1)//add row 0 to row 1
+                        {
+                            return new Matrix3(1.0f, 0.0f, 0.0f, scalar, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 2)//add row 0 to row 2
+                        {
+                            return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, scalar, 0.0f, 1.0f);
+                        }
+                        else
+                            throw new ArgumentOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
+                    }
+                case 1:
+                    {
+                        if (r2 == 0)//add row 1 to row 0
+                        {
+                            return new Matrix3(1.0f, scalar, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 2)//add row 1 to row 2
+                        {
+                            return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, scalar, 1.0f);
+                        }
+                        else
+                            throw new ArgumentOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
+                    }
+                case 2:
+                    {
+                        if (r2 == 0)//add row 2 to row 0
+                        {
+                            return new Matrix3(1.0f, 0.0f, scalar, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 1)//add row 2 to row 1
+                        {
+                            return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, scalar, 0.0f, 0.0f, 1.0f);
+                        }
+                        else
+                            throw new ArgumentOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
+                    }
+                default:
+                    throw new ArgumentOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r1));
+            }
+        }
+        #endregion
+
+        #region RowOperations
+        /// <summary>
+        /// Perform the row interchange operation on this matrix.
+        /// </summary>
+        /// <param name="r1">Index of the first row to interchange.</param>
+        /// <param name="r2">Index of the second row to interchange.</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix3 RowInterchange(int r1, int r2)
+        {
+            return RowInterchangeElemMat(r1, r2) * this;
+        }
+
+        /// <summary>
+        /// Perform the row multiplication operation on this matrix.
+        /// </summary>
+        /// <param name="row">Index of the row to multiply.</param>
+        /// <param name="scalar">The scalar to multiply the row by.</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix3 RowMultiplication(int row, float scalar)
+        {
+            return RowMultiplyElemMat(row, scalar) * this;
+        }
+
+        /// <summary>
+        /// Perform the row addition operation on this matrix.
+        /// </summary>
+        /// <param name="r1">Index of the row to add.</param>
+        /// <param name="r2">Index of the row to add to.</param>
+        /// <param name="scalar">The number of times to add the first row.</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix3 RowAddition(int r1, int r2, float scalar)
+        {
+            return RowAddElemMat(r1, r2, scalar) * this;
+        }
+        #endregion
+
+        #region Transpose
+        /// <summary>
+        /// Converts a matrix into it's transpose
+        /// </summary>
+        public void Transpose()
+        {
+            this = Transpose(this);
+        }
+
+        /// <summary>
+        /// Find the transpose of a matrix
+        /// </summary>
+        /// <param name="m">The matrix to transpose</param>
+        /// <returns>A new instance containing the transposed matrix</returns>
+        public static Matrix3 Transpose(Matrix3 m)
+        {
+            var r = new Matrix3
+            {
+                Row0 = m.Column0,
+                Row1 = m.Column1,
+                Row2 = m.Column2
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Find the transpose of a matrix
+        /// </summary>
+        /// <param name="m">The matrix to transpose</param>
+        /// <param name="result">A new instance containing the transposed matrix</param>
+        public static void Transpose(Matrix3 m, out Matrix3 result)
+        {
+            result = Transpose(m);
+        }
+        #endregion
+
+        #region Invert
         /// <summary>
         /// Converts a matrix into it's inverse
         /// </summary>
@@ -305,7 +472,7 @@ namespace KirosEngine3.Math.Matrix
         public readonly Matrix3 InvertedCopy()
         {
             var c = this;
-            if(c.Determinant != 0)
+            if (c.Determinant != 0)
             {
                 c.Invert();
             }
@@ -313,12 +480,104 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Converts a matrix into it's transpose
+        /// Invert the given matrix
         /// </summary>
-        public void Transpose()
+        /// <param name="m">The matrix to invert</param>
+        /// <returns>A new instance containing the inverted matrix</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the matrix is singular</exception>
+        public static Matrix3 Invert(Matrix3 m)
         {
-            this = Transpose(this);
+            var r = new Matrix3();
+
+            float row0x = m.Row0.X, row0y = m.Row0.Y, row0z = m.Row0.Z;
+            float row1x = m.Row1.X, row1y = m.Row1.Y, row1z = m.Row1.Z;
+            float row2x = m.Row2.X, row2y = m.Row2.Y, row2z = m.Row2.Z;
+
+            float inRow0X = (+row1y * row2z) - (row1z * row2y);
+            float inRow1X = (-row1x * row2z) + (row1z * row2x);
+            float inRow2X = (+row1x * row2y) - (row1y * row2x);
+
+            //calculate the determinant here since we have to some of the work anyway
+            float determ = (row0x * inRow0X) + (row0y * inRow1X) + (row0z * inRow2X);
+
+            //check that the determinant isn't zero
+            if (determ.IsZero())
+            {
+                throw new InvalidOperationException("Matrix cannot be inverted as it is singular.");
+            }
+
+            //find matrix adjugate
+            r.Row0.X = inRow0X;
+            r.Row0.Y = (-row0y * row2z) + (row0z * row2y);
+            r.Row0.Z = (+row0y * row1z) - (row0z * row1y);
+
+            r.Row1.X = inRow1X;
+            r.Row1.Y = (+row0x * row2z) - (row0z * row2x);
+            r.Row1.Z = (-row0x * row1z) + (row0z * row1x);
+
+            r.Row2.X = inRow2X;
+            r.Row2.Y = (-row0x * row2y) + (row0y * row2x);
+            r.Row2.Z = (+row0x * row1y) - (row0y * row1x);
+
+            determ = 1.0f / determ;
+
+            r.Row0.X *= determ;
+            r.Row0.Y *= determ;
+            r.Row0.Z *= determ;
+            r.Row1.X *= determ;
+            r.Row1.Y *= determ;
+            r.Row1.Z *= determ;
+            r.Row2.X *= determ;
+            r.Row2.Y *= determ;
+            r.Row2.Z *= determ;
+
+            return r;
         }
+
+        /// <summary>
+        /// Inverts the given matrix
+        /// </summary>
+        /// <param name="m">The matrix to invert</param>
+        /// <param name="result">A new instance containing the inverted matrix</param>
+        /// <exception cref="InvalidOperationException">Thrown if the matrix is singular</exception>
+        public static void Invert(Matrix3 m, out Matrix3 result)
+        {
+            result = Invert(m);
+        }
+        #endregion
+
+        #region Normalzie
+        /// <summary>
+        /// Normalize the matrix by dividing by the determinant, should be checked for nan and infinites
+        /// </summary>
+        public void Normalize()
+        {
+            var determinant = Determinant;
+            if (determinant.IsZero())
+            {
+                Console.WriteLine("Matrix3: {0} has a determinant of 0. Thus normalize is undefined.", this);
+                Logger.WriteToLog("Matrix3: {0} has a determinant of 0. Thus normalize is undefined.", this);
+                //todo: write debug
+            }
+            else
+            {
+                Row0 /= determinant;
+                Row1 /= determinant;
+                Row2 /= determinant;
+            }
+        }
+
+        /// <summary>
+        /// Create a normalized copy of the matrix, should be checked for nan and infinites
+        /// </summary>
+        /// <returns>A copy of the matrix that has been normalized</returns>
+        public readonly Matrix3 NormalizedCopy()
+        {
+            var c = this;
+            c.Normalize();
+            return c;
+        }
+        #endregion
 
         #region Scale
         /// <summary>
@@ -570,7 +829,7 @@ namespace KirosEngine3.Math.Matrix
         /// <returns>The resulting matrix</returns>
         public static Matrix3 Multiply(Matrix3 lhs, float rhs)
         {
-            var r = new Matrix3 
+            var r = new Matrix3
             {
                 Row0 = lhs.Row0 * rhs,
                 Row1 = lhs.Row1 * rhs,
@@ -613,99 +872,6 @@ namespace KirosEngine3.Math.Matrix
             return Multiply(rhs, lhs);
         }
         #endregion
-
-        /// <summary>
-        /// Invert the given matrix
-        /// </summary>
-        /// <param name="m">The matrix to invert</param>
-        /// <returns>A new instance containing the inverted matrix</returns>
-        /// <exception cref="InvalidOperationException">Thrown if the matrix is singular</exception>
-        public static Matrix3 Invert(Matrix3 m)
-        {
-            var r = new Matrix3();
-
-            float row0x = m.Row0.X, row0y = m.Row0.Y, row0z = m.Row0.Z;
-            float row1x = m.Row1.X, row1y = m.Row1.Y, row1z = m.Row1.Z;
-            float row2x = m.Row2.X, row2y = m.Row2.Y, row2z = m.Row2.Z;
-
-            float inRow0X = (+row1y * row2z) - (row1z * row2y);
-            float inRow1X = (-row1x * row2z) + (row1z * row2x);
-            float inRow2X = (+row1x * row2y) - (row1y * row2x);
-
-            //calculate the determinant here since we have to some of the work anyway
-            float determ = (row0x * inRow0X) + (row0y * inRow1X) + (row0z * inRow2X);
-
-            //check that the determinant isn't zero
-            if(determ.IsZero())
-            {
-                throw new InvalidOperationException("Matrix cannot be inverted as it is singular.");
-            }
-
-            //find matrix adjugate
-            r.Row0.X = inRow0X;
-            r.Row0.Y = (-row0y * row2z) + (row0z * row2y);
-            r.Row0.Z = (+row0y * row1z) - (row0z * row1y);
-
-            r.Row1.X = inRow1X;
-            r.Row1.Y = (+row0x * row2z) - (row0z * row2x);
-            r.Row1.Z = (-row0x * row1z) + (row0z * row1x);
-
-            r.Row2.X = inRow2X;
-            r.Row2.Y = (-row0x * row2y) + (row0y * row2x);
-            r.Row2.Z = (+row0x * row1y) - (row0y * row1x);
-
-            determ = 1.0f / determ;
-
-            r.Row0.X *= determ;
-            r.Row0.Y *= determ;
-            r.Row0.Z *= determ;
-            r.Row1.X *= determ;
-            r.Row1.Y *= determ;
-            r.Row1.Z *= determ;
-            r.Row2.X *= determ;
-            r.Row2.Y *= determ;
-            r.Row2.Z *= determ;
-
-            return r;
-        }
-
-        /// <summary>
-        /// Inverts the given matrix
-        /// </summary>
-        /// <param name="m">The matrix to invert</param>
-        /// <param name="result">A new instance containing the inverted matrix</param>
-        /// <exception cref="InvalidOperationException">Thrown if the matrix is singular</exception>
-        public static void Invert(Matrix3 m, out Matrix3 result)
-        {
-            result = Invert(m);
-        }
-
-        /// <summary>
-        /// Find the transpose of a matrix
-        /// </summary>
-        /// <param name="m">The matrix to transpose</param>
-        /// <returns>A new instance containing the transposed matrix</returns>
-        public static Matrix3 Transpose(Matrix3 m)
-        {
-            var r = new Matrix3
-            {
-                Row0 = m.Column0,
-                Row1 = m.Column1,
-                Row2 = m.Column2
-            };
-
-            return r;
-        }
-
-        /// <summary>
-        /// Find the transpose of a matrix
-        /// </summary>
-        /// <param name="m">The matrix to transpose</param>
-        /// <param name="result">A new instance containing the transposed matrix</param>
-        public static void Transpose(Matrix3 m, out Matrix3 result)
-        {
-            result = Transpose(m);
-        }
 
         #region Comparison
         /// <inheritdoc/>
@@ -796,7 +962,7 @@ namespace KirosEngine3.Math.Matrix
         /// Handle conversion from OpenTK's Matrix3 to Matrix3
         /// </summary>
         /// <param name="m">The matrix to convert</param>
-        public static implicit operator Matrix3(OpenTK.Mathematics.Matrix3 m) 
+        public static implicit operator Matrix3(OpenTK.Mathematics.Matrix3 m)
         {
             return new Matrix3
             {

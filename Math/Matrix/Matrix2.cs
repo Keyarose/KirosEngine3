@@ -1,12 +1,6 @@
 ﻿using KirosEngine3.Math.Vector;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Matrix
 {
@@ -30,6 +24,7 @@ namespace KirosEngine3.Math.Matrix
         /// </summary>
         public static Matrix2 Zero => new Matrix2(Vec2.Zero, Vec2.Zero);
 
+        //todo: column setters
         /// <summary>
         /// The first column of the matrix
         /// </summary>
@@ -127,7 +122,7 @@ namespace KirosEngine3.Math.Matrix
         {
             readonly get
             {
-                if (column < 0 && column > 2)
+                if (column < 0 || column > 1)
                 {
                     throw new IndexOutOfRangeException(string.Format("Column index: {0} out of range for Matrix2.", column));
                 }
@@ -144,12 +139,12 @@ namespace KirosEngine3.Math.Matrix
             }
             set
             {
-                if (column < 0 && column > 2)
+                if (column < 0 || column > 1)
                 {
                     throw new IndexOutOfRangeException(string.Format("Column index: {0} out of range for Matrix2.", column));
                 }
 
-                switch (row) 
+                switch (row)
                 {
                     case 0:
                         Row0[column] = value;
@@ -199,6 +194,7 @@ namespace KirosEngine3.Math.Matrix
             }
         }
 
+        #region Constructors
         /// <summary>
         /// Basic constructor using Vec2s
         /// </summary>
@@ -222,8 +218,10 @@ namespace KirosEngine3.Math.Matrix
             Row0 = new Vec2(m00, m01);
             Row1 = new Vec2(m10, m11);
         }
+        #endregion
 
         #region ElementaryMatrices
+        //todo: align with mat3 implementations
         /// <summary>
         /// Produce an elementary matrix for the scalar multiplication row operation on row 1
         /// </summary>
@@ -275,6 +273,7 @@ namespace KirosEngine3.Math.Matrix
         #endregion
 
         #region RowOperations
+        //todo: align with mat3
         /// <summary>
         /// Perform the row interchange operation
         /// </summary>
@@ -344,19 +343,13 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Find a copy of the transpose of a matrix
+        /// Get a copy of the transpose of a matrix
         /// </summary>
         /// <param name="m">The matrix to transpose</param>
         /// <returns>The transpose in a new instance</returns>
         public static Matrix2 Transpose(Matrix2 m)
         {
-            var r = new Matrix2
-            {
-                Row0 = m.Column0,
-                Row1 = m.Column1,
-            };
-
-            return r;
+            return new Matrix2(m.Column0, m.Column1);
         }
 
         /// <summary>
@@ -426,6 +419,7 @@ namespace KirosEngine3.Math.Matrix
         #endregion
 
         #region Swizzle
+        //todo: make rename of row operations
         /// <summary>
         /// Swizzle, switch the rows of the matrix
         /// </summary>
@@ -566,20 +560,20 @@ namespace KirosEngine3.Math.Matrix
             result = CreateRotation(angle);
         }
         #endregion
-                
+
         #region Add
         /// <summary>
         /// Add two matrices together
         /// </summary>
-        /// <param name="m1">First matrix to add</param>
-        /// <param name="m2">Second matrix to add</param>
+        /// <param name="lhs">First matrix to add</param>
+        /// <param name="rhs">Second matrix to add</param>
         /// <returns>The resulting matrix</returns>
-        public static Matrix2 Add(Matrix2 m1, Matrix2 m2) 
+        public static Matrix2 Add(Matrix2 lhs, Matrix2 rhs)
         {
             var r = new Matrix2
             {
-                Row0 = m1.Row0 + m2.Row0,
-                Row1 = m1.Row1 + m2.Row1,
+                Row0 = lhs.Row0 + rhs.Row0,
+                Row1 = lhs.Row1 + rhs.Row1,
             };
             return r;
         }
@@ -652,15 +646,15 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// Multiply two matrices together
         /// </summary>
-        /// <param name="m1">First matrix</param>
-        /// <param name="m2">Second matrix</param>
+        /// <param name="lhs">First matrix</param>
+        /// <param name="rhs">Second matrix</param>
         /// <returns>The resulting matrix</returns>
-        public static Matrix2 Multiply(Matrix2 m1, Matrix2 m2)
+        public static Matrix2 Multiply(Matrix2 lhs, Matrix2 rhs)
         {
             var r = new Matrix2
             {
-                Row0 = new Vec2(Vec2.Dot(m1.Row0, m2.Column0), Vec2.Dot(m1.Row0, m2.Column1)),
-                Row1 = new Vec2(Vec2.Dot(m1.Row1, m2.Column0), Vec2.Dot(m1.Row1, m2.Column1))
+                Row0 = new Vec2(Vec2.Dot(lhs.Row0, rhs.Column0), Vec2.Dot(lhs.Row0, rhs.Column1)),
+                Row1 = new Vec2(Vec2.Dot(lhs.Row1, rhs.Column0), Vec2.Dot(lhs.Row1, rhs.Column1))
             };
             return r;
         }
@@ -668,38 +662,38 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// Multiply two matrices together
         /// </summary>
-        /// <param name="m1">First matrix</param>
-        /// <param name="m2">Second matrix</param>
+        /// <param name="lhs">First matrix</param>
+        /// <param name="rhs">Second matrix</param>
         /// <param name="result">The resulting matrix</param>
-        public static void Multiply(Matrix2 m1, Matrix2 m2, out Matrix2 result)
+        public static void Multiply(Matrix2 lhs, Matrix2 rhs, out Matrix2 result)
         {
-            result = Multiply(m1, m2);
+            result = Multiply(lhs, rhs);
         }
 
         /// <summary>
         /// Multiply the matrix by a scalar value
         /// </summary>
-        /// <param name="m">The matrix to multiply</param>
-        /// <param name="scale">The scalar to multiply by</param>
+        /// <param name="lhs">The matrix to multiply</param>
+        /// <param name="rhs">The scalar to multiply by</param>
         /// <returns>The resulting matrix</returns>
-        public static Matrix2 Multiply(Matrix2 m, float scale)
+        public static Matrix2 Multiply(Matrix2 lhs, float rhs)
         {
             return new Matrix2
             {
-                Row0 = m.Row0 * scale,
-                Row1 = m.Row1 * scale
+                Row0 = lhs.Row0 * rhs,
+                Row1 = lhs.Row1 * rhs
             };
         }
 
         /// <summary>
         /// Multiply the matrix by a scalar value
         /// </summary>
-        /// <param name="m">The matrix to multiply</param>
-        /// <param name="scale">The scalar to multiply by</param>
+        /// <param name="lhs">The matrix to multiply</param>
+        /// <param name="rhs">The scalar to multiply by</param>
         /// <param name="result">The resulting matrix</param>
-        public static void Multiply(Matrix2 m, float scale, out Matrix2 result)
+        public static void Multiply(Matrix2 lhs, float rhs, out Matrix2 result)
         {
-            result = Multiply(m, scale);
+            result = Multiply(lhs, rhs);
         }
 
         //todo: multiply(mat2,mat2x3), multiply(mat2, mat2x4)
@@ -710,7 +704,7 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="lhs">Left matrix</param>
         /// <param name="rhs">Right matrix</param>
         /// <returns></returns>
-        public static Matrix2 operator *(Matrix2 lhs, Matrix2 rhs) 
+        public static Matrix2 operator *(Matrix2 lhs, Matrix2 rhs)
         {
             return Multiply(lhs, rhs);
         }
@@ -737,7 +731,7 @@ namespace KirosEngine3.Math.Matrix
             return Multiply(rhs, lhs);
         }
         #endregion
-                
+
         #region Comparison
         /// <inheritdoc/>
         public readonly bool Equals(Matrix2 other)
@@ -747,10 +741,10 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Indicates whether the current Matrix2 is equal to another within the provided tolerance
+        /// Indicates whether the current Matrix2 is equal to another within the provided tolerance.
         /// </summary>
-        /// <param name="other">The other Matrix2</param>
-        /// <param name="tolerance">The allowed difference between the values</param>
+        /// <param name="other">The other Matrix2.</param>
+        /// <param name="tolerance">The allowed difference between the values.</param>
         /// <returns>True if the difference between the two Matrix2s is less than the tolerance,
         /// false otherwise.</returns>
         public readonly bool Equals(Matrix2 other, float tolerance)
@@ -770,7 +764,7 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="lhs">Left matrix</param>
         /// <param name="rhs">Right matrix</param>
         /// <returns>True if equal, false if not</returns>
-        public static bool operator ==(Matrix2 lhs, Matrix2 rhs) 
+        public static bool operator ==(Matrix2 lhs, Matrix2 rhs)
         {
             return lhs.Equals(rhs);
         }
@@ -781,9 +775,9 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="lhs">Left matrix</param>
         /// <param name="rhs">Right matrix</param>
         /// <returns>True if not equal, false if equal</returns>
-        public static bool operator !=(Matrix2 lhs, Matrix2 rhs) 
+        public static bool operator !=(Matrix2 lhs, Matrix2 rhs)
         {
-            return ! lhs.Equals(rhs);
+            return !lhs.Equals(rhs);
         }
 
         /// <inheritdoc/>
