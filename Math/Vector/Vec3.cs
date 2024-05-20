@@ -44,42 +44,42 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Predefined 3D vector 0,0,0
         /// </summary>
-        public static readonly Vec3 Zero = new Vec3(0.0f);
+        public static Vec3 Zero => new Vec3(0.0f);
 
         /// <summary>
         /// Predefined 3D vector 1,1,1
         /// </summary>
-        public static readonly Vec3 One = new Vec3(1.0f);
+        public static Vec3 One => new Vec3(1.0f);
 
         /// <summary>
         /// Predefined 3D vector -1,-1,-1
         /// </summary>
-        public static readonly Vec3 OneMinus = new Vec3(-1.0f);
+        public static Vec3 OneMinus => new Vec3(-1.0f);
 
         /// <summary>
         /// Predefined 3D vector 1,0,0
         /// </summary>
-        public static readonly Vec3 UnitX = new Vec3(1.0f, 0.0f, 0.0f);
+        public static Vec3 UnitX => new Vec3(1.0f, 0.0f, 0.0f);
 
         /// <summary>
         /// Predefined 3D vector 0,1,0
         /// </summary>
-        public static readonly Vec3 UnitY = new Vec3(0.0f, 1.0f, 0.0f);
+        public static Vec3 UnitY => new Vec3(0.0f, 1.0f, 0.0f);
 
         /// <summary>
         /// Predefined 3D vector 0,0,1
         /// </summary>
-        public static readonly Vec3 UnitZ = new Vec3(0.0f, 0.0f, 1.0f);
+        public static Vec3 UnitZ => new Vec3(0.0f, 0.0f, 1.0f);
 
         /// <summary>
         /// Predefined 3D vector float.MaxVal, float.MaxVal, float.MaxVal
         /// </summary>
-        public static readonly Vec3 MaxVal = new Vec3(float.MaxValue, float.MaxValue, float.MaxValue);
+        public static Vec3 MaxVal => new Vec3(float.MaxValue, float.MaxValue, float.MaxValue);
 
         /// <summary>
         /// Size of the Vec3 struct in bytes
         /// </summary>
-        public static readonly int SizeInBytesU = Unsafe.SizeOf<Vec3>();
+        public static int SizeInBytesU => Unsafe.SizeOf<Vec3>();
 
         /// <summary>
         /// Index accessor for the vector
@@ -292,6 +292,17 @@ namespace KirosEngine3.Math.Vector
         public readonly bool Equals(Vec3 other) 
         {
             return X == other.X && Y == other.Y && Z == other.Z;
+        }
+
+        /// <summary>
+        /// Indicates whether the current Vec3 is equal to another within the provided tolerance
+        /// </summary>
+        /// <param name="other">The other Vec3</param>
+        /// <param name="tolerance">The allowed difference between the values</param>
+        /// <returns>True if the difference between the two Vec3s is less than the tolerance, false otherwise.</returns>
+        public readonly bool Equals(Vec3 other, float tolerance)
+        {
+            return X.CloseTo(other.X, tolerance) && Y.CloseTo(other.Y, tolerance) && Z.CloseTo(other.Z, tolerance);
         }
 
         /// <summary>

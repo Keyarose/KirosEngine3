@@ -24,12 +24,12 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// The Identity matrix
         /// </summary>
-        public static readonly Matrix3 Identity = new Matrix3(Vec3.UnitX, Vec3.UnitY, Vec3.UnitZ);
+        public static Matrix3 Identity => new Matrix3(Vec3.UnitX, Vec3.UnitY, Vec3.UnitZ);
 
         /// <summary>
         /// The zero matrix
         /// </summary>
-        public static readonly Matrix3 Zero = new Matrix3(Vec3.Zero, Vec3.Zero, Vec3.Zero);
+        public static Matrix3 Zero => new Matrix3(Vec3.Zero, Vec3.Zero, Vec3.Zero);
 
         /// <summary>
         /// The first column of the matrix
@@ -233,6 +233,7 @@ namespace KirosEngine3.Math.Matrix
             }
         }
 
+        #region Constructors
         /// <summary>
         /// Basic constructor using Vec3s
         /// </summary>
@@ -264,6 +265,7 @@ namespace KirosEngine3.Math.Matrix
             Row1 = new Vec3(m10, m11, m12);
             Row2 = new Vec3(m20, m21, m22);
         }
+        #endregion
 
         /// <summary>
         /// Normalize the matrix by dividing by the determinant, should be checked for nan and infinites
@@ -468,7 +470,47 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
-        //todo: subtract
+        #region Subtract
+        /// <summary>
+        /// Subtract one matrix from another
+        /// </summary>
+        /// <param name="lhs">The matrix to subtract from</param>
+        /// <param name="rhs">The matrix to subtract</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix3 Subtract(Matrix3 lhs, Matrix3 rhs)
+        {
+            var r = new Matrix3
+            {
+                Row0 = lhs.Row0 - rhs.Row0,
+                Row1 = lhs.Row1 - rhs.Row1,
+                Row2 = lhs.Row2 - rhs.Row2
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Subtract one matrix from another
+        /// </summary>
+        /// <param name="lhs">The matrix to subtract from</param>
+        /// <param name="rhs">The matrix to subtract</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void Subtract(Matrix3 lhs, Matrix3 rhs, out Matrix3 result)
+        {
+            result = Subtract(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Define the subtraction operator between two matrices
+        /// </summary>
+        /// <param name="lhs">The left matrix operand</param>
+        /// <param name="rhs">The right matrix operand</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix3 operator -(Matrix3 lhs, Matrix3 rhs)
+        {
+            return Subtract(lhs, rhs);
+        }
+        #endregion
 
         #region Multiply
         /// <summary>
@@ -520,7 +562,56 @@ namespace KirosEngine3.Math.Matrix
             return Multiply(lhs, rhs);
         }
 
-        //todo: other multiplication
+        /// <summary>
+        /// Multiply the matrix by a scalar value
+        /// </summary>
+        /// <param name="lhs">The matrix</param>
+        /// <param name="rhs">The scalar value</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix3 Multiply(Matrix3 lhs, float rhs)
+        {
+            var r = new Matrix3 
+            {
+                Row0 = lhs.Row0 * rhs,
+                Row1 = lhs.Row1 * rhs,
+                Row2 = lhs.Row2 * rhs
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Multiply the matrix by a scalar value
+        /// </summary>
+        /// <param name="lhs">The matrix</param>
+        /// <param name="rhs">The scalar value</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void Multiply(Matrix3 lhs, float rhs, out Matrix3 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Matrix multiplied by scalar operator
+        /// </summary>
+        /// <param name="lhs">The matrix operand</param>
+        /// <param name="rhs">The scalar operand</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix3 operator *(Matrix3 lhs, float rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Matrix multiplied by scalar operator
+        /// </summary>
+        /// <param name="lhs">The scalar operand</param>
+        /// <param name="rhs">The matrix operand</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix3 operator *(float lhs, Matrix3 rhs)
+        {
+            return Multiply(rhs, lhs);
+        }
         #endregion
 
         /// <summary>
@@ -616,10 +707,22 @@ namespace KirosEngine3.Math.Matrix
             result = Transpose(m);
         }
 
+        #region Comparison
         /// <inheritdoc/>
         public readonly bool Equals(Matrix3 other)
         {
             return Row0 == other.Row0 && Row1 == other.Row1 && Row2 == other.Row2;
+        }
+
+        /// <summary>
+        /// Indicates whether the current Matrix3 is equal to another within the provided tolerance
+        /// </summary>
+        /// <param name="other">The other Matrix3</param>
+        /// <param name="tolerance">The allowed difference between the values</param>
+        /// <returns>True if the difference between the two Matrix3s is less than the tolerance, false otherwise.</returns>
+        public readonly bool Equals(Matrix3 other, float tolerance)
+        {
+            return Row0.Equals(other.Row0, tolerance) && Row1.Equals(other.Row1, tolerance) && Row2.Equals(other.Row2, tolerance);
         }
 
         /// <inheritdoc/>
@@ -655,6 +758,7 @@ namespace KirosEngine3.Math.Matrix
         {
             return HashCode.Combine(Row0, Row1, Row2);
         }
+        #endregion
 
         #region ToString
         /// <inheritdoc/>

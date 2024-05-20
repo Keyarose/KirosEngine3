@@ -23,12 +23,12 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// The Identity matrix
         /// </summary>
-        public static readonly Matrix2 Identity = new Matrix2(Vec2.UnitX, Vec2.UnitY);
+        public static Matrix2 Identity => new Matrix2(Vec2.UnitX, Vec2.UnitY);
 
         /// <summary>
         /// the zero matrix
         /// </summary>
-        public static readonly Matrix2 Zero = new Matrix2(Vec2.Zero, Vec2.Zero);
+        public static Matrix2 Zero => new Matrix2(Vec2.Zero, Vec2.Zero);
 
         /// <summary>
         /// The first column of the matrix
@@ -611,15 +611,15 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// Subtract one matrix from another
         /// </summary>
-        /// <param name="m1">The matrix to subtract from</param>
-        /// <param name="m2">The matrix to subtract</param>
+        /// <param name="lhs">The matrix to subtract from</param>
+        /// <param name="rhs">The matrix to subtract</param>
         /// <returns>The resulting matrix</returns>
-        public static Matrix2 Subtract(Matrix2 m1, Matrix2 m2)
+        public static Matrix2 Subtract(Matrix2 lhs, Matrix2 rhs)
         {
             var r = new Matrix2
             {
-                Row0 = m1.Row0 - m2.Row0,
-                Row1 = m1.Row1 - m2.Row1
+                Row0 = lhs.Row0 - rhs.Row0,
+                Row1 = lhs.Row1 - rhs.Row1
             };
 
             return r;
@@ -628,12 +628,12 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// Subtract one matrix from another
         /// </summary>
-        /// <param name="m1">The matrix to subtract from</param>
-        /// <param name="m2">The matrix to subtract</param>
+        /// <param name="lhs">The matrix to subtract from</param>
+        /// <param name="rhs">The matrix to subtract</param>
         /// <param name="result">The resulting matrix</param>
-        public static void Subtract(Matrix2 m1, Matrix2 m2, out Matrix2 result)
+        public static void Subtract(Matrix2 lhs, Matrix2 rhs, out Matrix2 result)
         {
-            result = Subtract(m1, m2);
+            result = Subtract(lhs, rhs);
         }
 
         /// <summary>
@@ -641,7 +641,7 @@ namespace KirosEngine3.Math.Matrix
         /// </summary>
         /// <param name="lhs">The left matrix</param>
         /// <param name="rhs">The right matrix</param>
-        /// <returns></returns>
+        /// <returns>The resulting matrix</returns>
         public static Matrix2 operator -(Matrix2 lhs, Matrix2 rhs)
         {
             return Subtract(lhs, rhs);

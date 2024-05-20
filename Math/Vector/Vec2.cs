@@ -45,32 +45,32 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Predefined 2D vector 0,0
         /// </summary>
-        public static readonly Vec2 Zero = new Vec2(0.0f);
+        public static Vec2 Zero => new Vec2(0.0f);
 
         /// <summary>
         /// Predefined 2D vector 1,1
         /// </summary>
-        public static readonly Vec2 One = new Vec2(1.0f);
+        public static Vec2 One => new Vec2(1.0f);
 
         /// <summary>
         /// Predefined 2D vector -1,-1
         /// </summary>
-        public static readonly Vec2 OneMinus = new Vec2(-1.0f);
+        public static Vec2 OneMinus => new Vec2(-1.0f);
 
         /// <summary>
         /// Predefined 2D vector 1,0
         /// </summary>
-        public static readonly Vec2 UnitX = new Vec2(1.0f, 0.0f);
+        public static Vec2 UnitX => new Vec2(1.0f, 0.0f);
 
         /// <summary>
         /// Predefined 2D vector 0,1
         /// </summary>
-        public static readonly Vec2 UnitY = new Vec2(0.0f, 1.0f);
+        public static Vec2 UnitY => new Vec2(0.0f, 1.0f);
 
         /// <summary>
         /// Size of the Vec2 struct in bytes
         /// </summary>
-        public static readonly int SizeInBytesU = Unsafe.SizeOf<Vec2>();
+        public static int SizeInBytesU => Unsafe.SizeOf<Vec2>();
 
         /// <summary>
         /// Index accessor for the vector
@@ -621,6 +621,16 @@ namespace KirosEngine3.Math.Vector
         public readonly Vec3 AsVec3()
         {
             return new Vec3(X, Y, 0.0f);
+        }
+
+        /// <summary>
+        /// Returns the 2D vector as a 3D vector with the given value for Z
+        /// </summary>
+        /// <param name="z">The Z component for the new vector</param>
+        /// <returns>The 2D vector as a 3D vector.</returns>
+        public readonly Vec3 AsVec3(float z)
+        {
+            return new Vec3(X, Y, z);
         }
 
         #region MinMax
