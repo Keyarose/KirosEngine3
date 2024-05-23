@@ -269,9 +269,13 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="r1">The index of the first row to interchange.</param>
         /// <param name="r2">The index of the second row to interchange.</param>
         /// <returns>The 3D elementary matrix that performs row interchange.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if both indexes are the same value.</exception>
         /// <exception cref="IndexOutOfRangeException">Thrown if one of the row indexes is out of the allowed range.</exception>
         public static Matrix3 RowInterchangeElemMat(int r1, int r2)
         {
+            if (r1 == r2)
+                throw new InvalidOperationException(string.Format("Cannot interchange a row with itself."));
+
             if (r1 < 0 || r1 > 2)
             {
                 throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r1));
@@ -330,7 +334,7 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="scalar">The number of times to add the first row.</param>
         /// <returns>The 3D elementary matrix that performs the row operation.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the indexes are the same.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the indexes are out of range for Matrix3.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the indexes are out of range for Matrix3.</exception>
         public static Matrix3 RowAddElemMat(int r1, int r2, float scalar)
         {
             if (r1 == r2)
@@ -349,7 +353,7 @@ namespace KirosEngine3.Math.Matrix
                             return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, scalar, 0.0f, 1.0f);
                         }
                         else
-                            throw new ArgumentOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
                     }
                 case 1:
                     {
@@ -362,7 +366,7 @@ namespace KirosEngine3.Math.Matrix
                             return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, scalar, 1.0f);
                         }
                         else
-                            throw new ArgumentOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
                     }
                 case 2:
                     {
@@ -375,10 +379,10 @@ namespace KirosEngine3.Math.Matrix
                             return new Matrix3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, scalar, 0.0f, 0.0f, 1.0f);
                         }
                         else
-                            throw new ArgumentOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r2));
                     }
                 default:
-                    throw new ArgumentOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r1));
+                    throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix3.", r1));
             }
         }
         #endregion

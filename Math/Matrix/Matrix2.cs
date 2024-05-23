@@ -9,7 +9,7 @@ namespace KirosEngine3.Math.Matrix
     /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Matrix2 : IEquatable<Matrix2>, IFormattable
+    public struct Matrix2 : IEquatable<Matrix2>, IFormattable, IMatrix<Matrix2, Vec2, Vec2, Vec2, Matrix2>
     {
         public Vec2 Row0;
         public Vec2 Row1;
@@ -24,16 +24,45 @@ namespace KirosEngine3.Math.Matrix
         /// </summary>
         public static Matrix2 Zero => new Matrix2(Vec2.Zero, Vec2.Zero);
 
-        //todo: column setters
+        #region Columns
         /// <summary>
         /// The first column of the matrix
         /// </summary>
-        public readonly Vec2 Column0 => new Vec2(Row0.X, Row1.X);
+        public Vec2 Column0
+        {
+            readonly get => new Vec2(Row0.X, Row1.X);
+            set
+            {
+                Row0.X = value.X;
+                Row1.X = value.Y;
+            }
+        }
 
         /// <summary>
         /// The second column of the matrix
         /// </summary>
-        public readonly Vec2 Column1 => new Vec2(Row0.Y, Row1.Y);
+        public  Vec2 Column1
+        {
+            readonly get => new Vec2(Row0.Y, Row1.Y);
+            set
+            {
+                Row0.Y = value.X;
+                Row1.Y = value.Y;
+            }
+        }
+        #endregion
+
+        /// <inheritdoc/>
+        public readonly Vec2[] GetColumns()
+        {
+            return [Column0, Column1];
+        }
+
+        /// <inheritdoc/>
+        public readonly Vec2[] GetRows()
+        {
+            return [Row0, Row1];
+        }
 
         /// <summary>
         /// Calculate the matrix's determinant
@@ -221,59 +250,75 @@ namespace KirosEngine3.Math.Matrix
         #endregion
 
         #region ElementaryMatrices
-        //todo: align with mat3 implementations
         /// <summary>
-        /// Produce an elementary matrix for the scalar multiplication row operation on row 1
+        /// Produce an elementary matrix for the scalar multiplication row operation on the given row.
         /// </summary>
-        /// <param name="scalar">The scalar the row is to be multiplied by</param>
-        /// <returns>The 2D elementary matrix that performs the row operation</returns>
-        public static Matrix2 RowMultiElemMatR1(float scalar)
+        /// <param name="row">The index of the row to multiply.</param>
+        /// <param name="scalar">The scalar the row is to be multiplied by.</param>
+        /// <returns>The 2D elementary matrix that performs the row operation.</returns>
+        public static Matrix2 RowMultiplyElemMat(int row, float scalar)
         {
-            return new Matrix2(scalar, 0.0f, 0.0f, 1.0f);
-        }
-
-        /// <summary>
-        /// Produce an elementary matrix for the scalar multiplication row operation on row 2
-        /// </summary>
-        /// <param name="scalar">The scalar the row is to be multiplied by</param>
-        /// <returns>The 2D elementary matrix that performs the row operation</returns>
-        public static Matrix2 RowMultiElemMatR2(float scalar)
-        {
-            return new Matrix2(1.0f, 0.0f, 0.0f, scalar);
+            switch (row) 
+            {
+                case 0:
+                    return new Matrix2(scalar, 0.0f, 0.0f, 1.0f);
+                case 1:
+                    return new Matrix2(1.0f, 0.0f, 0.0f, scalar);
+                default:
+                    throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix2.", row));
+            }
         }
 
         /// <summary>
         /// Produce an elementary matrix for row interchange operations
         /// </summary>
         /// <returns>The 2D elementary matrix that performs the row operation</returns>
-        public static Matrix2 RowInterchangeElemMat()
+        public static Matrix2 RowInterchangeElemMat()//doesn't follow the mat3 format there are only 2 rows
         {
             return new Matrix2(0.0f, 1.0f, 1.0f, 0.0f);
         }
 
         /// <summary>
-        /// Produce an elementary matrix for row addition row 1 to row 2
+        /// Produce an elementary matrix for adding one row to another.
         /// </summary>
-        /// <param name="scalar">The multiplier for the row to add</param>
-        /// <returns>The 2D elementary matrix that performs the row operation</returns>
-        public static Matrix2 RowAddR1ToR2ElemMat(float scalar)
+        /// <param name="r1">The index of the row to add.</param>
+        /// <param name="r2">The index of the row to add to.</param>
+        /// <param name="scalar">The number of times to add the first row.</param>
+        /// <returns>The 2D elementary matrix that performs the row operation.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the indexes are the same.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the indexes are out of range.</exception>
+        public static Matrix2 RowAddElemMat(int r1, int r2, float scalar)
         {
-            return new Matrix2(1.0f, 0.0f, scalar, 1.0f);
-        }
+            if (r1 == r2)
+                throw new InvalidOperationException(string.Format("Adding a row to itself is not a valid operation."));
 
-        /// <summary>
-        /// Produce an elementary matrix for row addition row 2 to row 1
-        /// </summary>
-        /// <param name="scalar">The multiplier for the row to add</param>
-        /// <returns>The 2D elementary matrix that performs the row operation</returns>
-        public static Matrix2 RowAddR2ToR1ElemMat(float scalar)
-        {
-            return new Matrix2(1.0f, scalar, 0.0f, 1.0f);
+            switch (r1)
+            {
+                case 0:
+                    {
+                        if (r2 == 1)//add row 0 to row 1
+                        {
+                            return new Matrix2(1.0f, 0.0f, scalar, 1.0f);
+                        }
+                        else
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix2.", r2));
+                    }
+                case 1:
+                    {
+                        if (r2 == 0)//add row 1 to row 0
+                        {
+                            return new Matrix2(1.0f, scalar, 0.0f, 1.0f);
+                        }
+                        else
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix2.", r2));
+                    }
+                default:
+                    throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix2.", r1));
+            }
         }
         #endregion
 
         #region RowOperations
-        //todo: align with mat3
         /// <summary>
         /// Perform the row interchange operation
         /// </summary>
@@ -288,39 +333,21 @@ namespace KirosEngine3.Math.Matrix
         /// </summary>
         /// <param name="scalar">The scalar to multiply the row by</param>
         /// <returns>The resulting matrix.</returns>
-        public readonly Matrix2 RowMultiplicationR1(float scalar)
+        public readonly Matrix2 RowMultiplication(int row, float scalar)
         {
-            return RowMultiElemMatR1(scalar) * this;
+            return RowMultiplyElemMat(row, scalar) * this;
         }
 
         /// <summary>
-        /// Perform the row multiplication operation on row 2
+        /// Perform the row addition operation on this matrix.
         /// </summary>
-        /// <param name="scalar">The scalar to multiply the row by</param>
+        /// <param name="r1">Index of the row to add.</param>
+        /// <param name="r2">Index of the row to add to.</param>
+        /// <param name="scalar">The number of times to add the first row.</param>
         /// <returns>The resulting matrix.</returns>
-        public readonly Matrix2 RowMultiplicationR2(float scalar)
+        public readonly Matrix2 RowAddition(int r1, int r2, float scalar)
         {
-            return RowMultiElemMatR2(scalar) * this;
-        }
-
-        /// <summary>
-        /// Perform the row addition operation on row 2
-        /// </summary>
-        /// <param name="scalar">The multiple of the row to be added</param>
-        /// <returns>The resulting matrix.</returns>
-        public readonly Matrix2 RowAdditionR1R2(float scalar)
-        {
-            return RowAddR1ToR2ElemMat(scalar) * this;
-        }
-
-        /// <summary>
-        /// Perform the row addition operation on row 1
-        /// </summary>
-        /// <param name="scalar">The multiple of the row to be added</param>
-        /// <returns>The resulting matrix.</returns>
-        public readonly Matrix2 RowAdditionR2R1(float scalar)
-        {
-            return RowAddR2ToR1ElemMat(scalar) * this;
+            return RowAddElemMat(r1, r2, scalar) * this;
         }
         #endregion
 
@@ -419,20 +446,25 @@ namespace KirosEngine3.Math.Matrix
         #endregion
 
         #region Swizzle
-        //todo: make rename of row operations
         /// <summary>
         /// Swizzle, switch the rows of the matrix
         /// </summary>
         /// <param name="mat">The matrix to swizzle</param>
-        /// <param name="rowZeroRow">The index of the row to be moved to row 0</param>
-        /// <param name="rowOneRow">The index of the row to be moved to row 1</param>
+        /// <param name="row0Row">The index of the row to be moved to row 0</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1</param>
         /// <returns>The resulting matrix</returns>
-        public static Matrix2 Swizzle(Matrix2 mat, int rowZeroRow, int rowOneRow)
+        /// /// <exception cref="IndexOutOfRangeException">Thrown if any of the indexes are out of range.</exception>
+        public static Matrix2 Swizzle(Matrix2 mat, int row0Row, int row1Row)
         {
+            if (row0Row < 0 || row0Row > 2)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix2.", row0Row));
+            if (row1Row < 0 || row1Row > 2)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix2.", row1Row));
+
             Matrix2 result = new Matrix2
             {
-                Row0 = mat[rowZeroRow],
-                Row1 = mat[rowOneRow]
+                Row0 = mat[row0Row],
+                Row1 = mat[row1Row]
             };
 
             return result;
@@ -442,33 +474,33 @@ namespace KirosEngine3.Math.Matrix
         /// Swizzle, switch the rows of the matrix
         /// </summary>
         /// <param name="mat">The matrix to swizzle</param>
-        /// <param name="rowZeroRow">The index of the row to be moved to row 0</param>
-        /// <param name="rowOneRow">The index of the row to be moved to row 1</param>
+        /// <param name="row0Row">The index of the row to be moved to row 0</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1</param>
         /// <param name="result">The resulting matrix</param>
-        public static void Swizzle(Matrix2 mat, int rowZeroRow, int rowOneRow, out Matrix2 result)
+        public static void Swizzle(Matrix2 mat, int row0Row, int row1Row, out Matrix2 result)
         {
-            result = Swizzle(mat, rowZeroRow, rowOneRow);
+            result = Swizzle(mat, row0Row, row1Row);
         }
 
         /// <summary>
         /// Create a swizzled copy of the matrix
         /// </summary>
-        /// <param name="rowZeroRow">The index of the row to be moved to row 0</param>
-        /// <param name="rowOneRow">The index of the row to be moved to row 1</param>
+        /// <param name="row0Row">The index of the row to be moved to row 0</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1</param>
         /// <returns>The swizzled copy</returns>
-        public readonly Matrix2 SwizzleCopy(int rowZeroRow, int rowOneRow)
+        public readonly Matrix2 SwizzleCopy(int row0Row, int row1Row)
         {
-            return Swizzle(this, rowZeroRow, rowOneRow);
+            return Swizzle(this, row0Row, row1Row);
         }
 
         /// <summary>
         /// Swizzle the matrix
         /// </summary>
-        /// <param name="rowZeroRow">The index of the row to be moved to row 0</param>
-        /// <param name="rowOneRow">The index of the row to be moved to row 1</param>
-        public void Swizzle(int rowZeroRow, int rowOneRow)
+        /// <param name="row0Row">The index of the row to be moved to row 0</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1</param>
+        public void Swizzle(int row0Row, int row1Row)
         {
-            this = Swizzle(this, rowZeroRow, rowOneRow);
+            this = Swizzle(this, row0Row, row1Row);
         }
         #endregion
 
@@ -589,6 +621,12 @@ namespace KirosEngine3.Math.Matrix
             result = Add(m1, m2);
         }
 
+        /// <inheritdoc/>
+        public readonly Matrix2 Add(Matrix2 rhs)
+        {
+            return Add(this, rhs);
+        }
+
         /// <summary>
         /// Add two matrices together
         /// </summary>
@@ -628,6 +666,12 @@ namespace KirosEngine3.Math.Matrix
         public static void Subtract(Matrix2 lhs, Matrix2 rhs, out Matrix2 result)
         {
             result = Subtract(lhs, rhs);
+        }
+
+        /// <inheritdoc/>
+        public readonly Matrix2 Subtract(Matrix2 rhs)
+        {
+            return Subtract(this, rhs);
         }
 
         /// <summary>
@@ -696,17 +740,82 @@ namespace KirosEngine3.Math.Matrix
             result = Multiply(lhs, rhs);
         }
 
-        //todo: multiply(mat2,mat2x3), multiply(mat2, mat2x4)
+        /// <inheritdoc cref="Matrix2x3.Multiply(Matrix2, Matrix2x3)"/>
+        public static Matrix2x3 Multiply(Matrix2 lhs, Matrix2x3 rhs)
+        {
+            return Matrix2x3.Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix2x3.Multiply(Matrix2, Matrix2x3, out Matrix2x3)"/>
+        public static void Multiply(Matrix2 lhs, Matrix2x3 rhs, out Matrix2x3 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+        
+        /// <summary>
+        /// Multiply a Matrix2 by a Matrix2x4.
+        /// </summary>
+        /// <param name="lhs">The Matrix2 operator.</param>
+        /// <param name="rhs">The Matrix2x4 operator.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix2x4 Multiply(Matrix2 lhs, Matrix2x4 rhs)
+        {
+            return new Matrix2x4
+            {
+                Row0 = new Vec4(Vec2.Dot(lhs.Row0, rhs.Column0), Vec2.Dot(lhs.Row0, rhs.Column1), Vec2.Dot(lhs.Row0, rhs.Column2), Vec2.Dot(lhs.Row0, rhs.Column3)),
+                Row1 = new Vec4(Vec2.Dot(lhs.Row1, rhs.Column0), Vec2.Dot(lhs.Row1, rhs.Column1), Vec2.Dot(lhs.Row1, rhs.Column2), Vec2.Dot(lhs.Row1, rhs.Column3))
+            };
+        }
 
         /// <summary>
-        /// Multiply two matrices together
+        /// Multiply a Matrix2 by a Matrix2x4.
         /// </summary>
-        /// <param name="lhs">Left matrix</param>
-        /// <param name="rhs">Right matrix</param>
-        /// <returns></returns>
-        public static Matrix2 operator *(Matrix2 lhs, Matrix2 rhs)
+        /// <param name="lhs">The Matrix2 operator.</param>
+        /// <param name="rhs">The Matrix2x4 operator.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Multiply(Matrix2 lhs, Matrix2x4 rhs, out Matrix2x4 result)
         {
-            return Multiply(lhs, rhs);
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix3x2.Multiply(Matrix3x2, Matrix2)"/>
+        public static Matrix3x2 Multiply(Matrix3x2 lhs, Matrix2 rhs)
+        {
+            return Matrix3x2.Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix3x2.Multiply(Matrix3x2, Matrix2, out Matrix3x2)"/>
+        public static void Multiply(Matrix3x2 lhs, Matrix2 rhs, out Matrix3x2 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Multiply a Matrix4x2 by a Matrix2
+        /// </summary>
+        /// <param name="lhs">The Matrix4x2 operator.</param>
+        /// <param name="rhs">The Matrix2 operator.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4x2 Multiply(Matrix4x2 lhs, Matrix2 rhs)
+        {
+            return new Matrix4x2
+            {
+                Row0 = new(Vec2.Dot(lhs.Row0, rhs.Column0), Vec2.Dot(lhs.Row0, rhs.Column1)),
+                Row1 = new(Vec2.Dot(lhs.Row1, rhs.Column0), Vec2.Dot(lhs.Row1, rhs.Column1)),
+                Row2 = new(Vec2.Dot(lhs.Row2, rhs.Column0), Vec2.Dot(lhs.Row2, rhs.Column1)),
+                Row3 = new(Vec2.Dot(lhs.Row3, rhs.Column0), Vec2.Dot(lhs.Row3, rhs.Column1))
+            };
+        }
+
+        /// <summary>
+        /// Multiply a Matrix4x2 by a Matrix2
+        /// </summary>
+        /// <param name="lhs">The Matrix4x2 operator.</param>
+        /// <param name="rhs">The Matrix2 operator.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Multiply(Matrix4x2 lhs, Matrix2 rhs, out Matrix4x2 result)
+        {
+            result = Multiply(lhs, rhs);
         }
 
         /// <summary>
@@ -729,6 +838,56 @@ namespace KirosEngine3.Math.Matrix
         public static Matrix2 operator *(float lhs, Matrix2 rhs)
         {
             return Multiply(rhs, lhs);
+        }
+
+        /// <summary>
+        /// Multiply two matrices together
+        /// </summary>
+        /// <param name="lhs">Left matrix</param>
+        /// <param name="rhs">Right matrix</param>
+        /// <returns></returns>
+        public static Matrix2 operator *(Matrix2 lhs, Matrix2 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Multiplication operator between Matrix2 and Matrix2x3
+        /// </summary>
+        /// <param name="lhs">The Matrix2 operand.</param>
+        /// <param name="rhs">The Matrix2x3 operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix2x3 operator *(Matrix2 lhs, Matrix2x3 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Multiplication operator between Matrix2 and Matrix2x4
+        /// </summary>
+        /// <param name="lhs">The Matrix2 operand.</param>
+        /// <param name="rhs">The Matrix2x4 operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix2x4 operator *(Matrix2 lhs, Matrix2x4 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /* Implemented in Matrix3x2
+        public static Matrix3x2 operator *(Matrix3x2 lhs, Matrix2 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }*/
+
+        /// <summary>
+        /// Multiplication operator between Matrix4x2 and Matrix2
+        /// </summary>
+        /// <param name="lhs">The Matrix4x2 operator.</param>
+        /// <param name="rhs">The Matrix2 operator.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4x2 operator *(Matrix4x2 lhs, Matrix2 rhs)
+        {
+            return Multiply(lhs, rhs);
         }
         #endregion
 

@@ -284,6 +284,11 @@ namespace KirosEngine3.Math.Vector
             return X == other.X && Y == other.Y && Z == other.Z && W == other.W;
         }
 
+        public readonly bool Equals(Vec4 other, float tolerance)
+        {
+            return X.CloseTo(other.X, tolerance) && Y.CloseTo(other.Y, tolerance) && Z.CloseTo(other.Z, tolerance) && W.CloseTo(other.W, tolerance);
+        }
+
         /// <summary>
         /// Extract the vector's components
         /// </summary>
