@@ -24,6 +24,7 @@ namespace KirosEngine3.Math.Matrix
         /// </summary>
         public static Matrix2x3 Zero => new Matrix2x3(Vec3.Zero, Vec3.Zero);
 
+        #region Columns
         /// <summary>
         /// The first column of the matrix.
         /// </summary>
@@ -62,6 +63,7 @@ namespace KirosEngine3.Math.Matrix
                 Row1.Z = value.Y;
             }
         }
+        #endregion
 
         /// <inheritdoc/>
         public readonly Vec2[] GetColumns()
@@ -410,7 +412,7 @@ namespace KirosEngine3.Math.Matrix
 
         #region Rotate
         /// <summary>
-        /// Create a matrix to represent rotation (radians)
+        /// Create a matrix to represent rotation (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by in radians.</param>
         /// <returns>The resulting matrix.</returns>
@@ -423,7 +425,7 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Create a matrix to represent rotation (radians)
+        /// Create a matrix to represent rotation (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by in radians.</param>
         /// <param name="result">The resulting matrix.</param>
@@ -682,6 +684,10 @@ namespace KirosEngine3.Math.Matrix
             result = Multiply(lhs, rhs);
         }
 
+        /*======================================================
+         Multiply operators
+         =======================================================*/
+
         /// <summary>
         /// Multiplication operator between Matrix2x3 and scalar value.
         /// </summary>
@@ -841,7 +847,7 @@ namespace KirosEngine3.Math.Matrix
 #if OPENTK
         #region OpenTKCompat
         /// <summary>
-        /// Handle conversion from OpenTK's Matrix2x3 to Matrix3x2.
+        /// Handle conversion from OpenTK's Matrix2x3 to Matrix2x3.
         /// </summary>
         /// <param name="m">The matrix to convert.</param>
         public static implicit operator Matrix2x3(OpenTK.Mathematics.Matrix2x3 m)

@@ -1,4 +1,5 @@
 ﻿
+using KirosEngine3.Math.Data;
 using KirosEngine3.Math.Vector;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -10,7 +11,7 @@ namespace KirosEngine3.Math.Matrix
     /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Matrix3 : IEquatable<Matrix3>, IFormattable
+    public struct Matrix3 : IEquatable<Matrix3>, IFormattable, IMatrix<Matrix3, Vec3, Vec3, Vec3, Matrix3>
     {
         public Vec3 Row0;
         public Vec3 Row1;
@@ -26,20 +27,60 @@ namespace KirosEngine3.Math.Matrix
         /// </summary>
         public static Matrix3 Zero => new Matrix3(Vec3.Zero, Vec3.Zero, Vec3.Zero);
 
+        #region Columns
         /// <summary>
         /// The first column of the matrix
         /// </summary>
-        public readonly Vec3 Column0 => new Vec3(Row0.X, Row1.X, Row2.X);
+        public Vec3 Column0
+        {
+            readonly get => new Vec3(Row0.X, Row1.X, Row2.X);
+            set
+            {
+                Row0.X = value.X;
+                Row1.X = value.Y;
+                Row2.X = value.Z;
+            }
+        }
 
         /// <summary>
         /// The second column of the matrix
         /// </summary>
-        public readonly Vec3 Column1 => new Vec3(Row0.Y, Row1.Y, Row2.Y);
+        public Vec3 Column1
+        {
+            readonly get => new Vec3(Row0.Y, Row1.Y, Row2.Y);
+            set
+            {
+                Row0.Y = value.X;
+                Row1.Y = value.Y;
+                Row2.Y = value.Z;
+            }
+        }
 
         /// <summary>
         /// The third column of the matrix
         /// </summary>
-        public readonly Vec3 Column2 => new Vec3(Row0.Z, Row1.Z, Row2.Z);
+        public Vec3 Column2
+        {
+            readonly get => new Vec3(Row0.Z, Row1.Z, Row2.Z);
+            set
+            {
+                Row0.Z = value.X;
+                Row1.Z = value.Y;
+                Row2.Z = value.Z;
+            }
+        }
+        #endregion
+
+        /// <inheritdoc/>
+        public readonly Vec3[] GetColumns()
+        {
+            return [Column0, Column1, Column2];
+        }
+
+        public readonly Vec3[] GetRows()
+        {
+            return [Row0, Row1, Row2];
+        }
 
         /// <summary>
         /// Calculate the matrix's determinant
@@ -228,6 +269,47 @@ namespace KirosEngine3.Math.Matrix
             }
         }
 
+        /// <summary>
+        /// Array type accessor for the rows of the matrix.
+        /// </summary>
+        /// <param name="row">Row index.</param>
+        /// <returns>The row at the given index.</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the index is outside the range of 0-2</exception>
+        public Vec3 this[int row]
+        {
+            readonly get
+            {
+                switch (row)
+                {
+                    case 0:
+                        return Row0;
+                    case 1:
+                        return Row1;
+                    case 2:
+                        return Row2;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix3.", row));
+                }
+            }
+            set
+            {
+                switch (row)
+                {
+                    case 0:
+                        Row0 = value;
+                        break;
+                    case 1:
+                        Row1 = value;
+                        break;
+                    case 2:
+                        Row2 = value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix3.", row));
+                }
+            }
+        }
+
         #region Constructors
         /// <summary>
         /// Basic constructor using Vec3s
@@ -343,7 +425,7 @@ namespace KirosEngine3.Math.Matrix
             switch (r1)
             {
                 case 0:
-                    {   
+                    {
                         if (r2 == 1)//add row 0 to row 1
                         {
                             return new Matrix3(1.0f, 0.0f, 0.0f, scalar, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
@@ -458,6 +540,15 @@ namespace KirosEngine3.Math.Matrix
         {
             result = Transpose(m);
         }
+
+        /// <summary>
+        /// Get a copy of the matrix's transpose.
+        /// </summary>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix3 TransposedCopy()
+        {
+            return Transpose(this);
+        }
         #endregion
 
         #region Invert
@@ -501,7 +592,7 @@ namespace KirosEngine3.Math.Matrix
             float inRow1X = (-row1x * row2z) + (row1z * row2x);
             float inRow2X = (+row1x * row2y) - (row1y * row2x);
 
-            //calculate the determinant here since we have to some of the work anyway
+            //calculate the determinant here since we have to do some of the work anyway
             float determ = (row0x * inRow0X) + (row0y * inRow1X) + (row0z * inRow2X);
 
             //check that the determinant isn't zero
@@ -550,9 +641,9 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
-        #region Normalzie
+        #region Normalize
         /// <summary>
-        /// Normalize the matrix by dividing by the determinant, should be checked for nan and infinites
+        /// Normalize the matrix by dividing by the determinant.
         /// </summary>
         public void Normalize()
         {
@@ -572,14 +663,81 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Create a normalized copy of the matrix, should be checked for nan and infinites
+        /// Create a normalized copy of the matrix.
         /// </summary>
-        /// <returns>A copy of the matrix that has been normalized</returns>
+        /// <returns>A copy of the matrix that has been normalized, or the original matrix
+        /// if it is undefined.</returns>
         public readonly Matrix3 NormalizedCopy()
         {
             var c = this;
             c.Normalize();
             return c;
+        }
+        #endregion
+
+        #region Swizzle
+        /// <summary>
+        /// Swizzle the matrix.
+        /// </summary>
+        /// <param name="mat">The matrix to swizzle.</param>
+        /// <param name="row0Row">The index of the row to be moved to row 0.</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1.</param>
+        /// <param name="row2Row">The index of the row to be moved to row 2.</param>
+        /// <returns>The resulting matrix.</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown if any of the indexes are out of range.</exception>
+        public static Matrix3 Swizzle(Matrix3 mat, int row0Row, int row1Row, int row2Row)
+        {
+            if (row0Row < 0 || row0Row > 2)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix3.", row0Row));
+            if (row1Row < 0 || row1Row > 2)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix3.", row1Row));
+            if (row2Row < 0 || row2Row > 2)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix3.", row2Row));
+
+            var result = new Matrix3
+            {
+                Row0 = mat[row0Row],
+                Row1 = mat[row1Row],
+                Row2 = mat[row2Row]
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Swizzle the matrix.
+        /// </summary>
+        /// <param name="mat">The matrix to swizzle.</param>
+        /// <param name="row0Row">The index of the row to be moved to row 0.</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1.</param>
+        /// <param name="row2Row">The index of the row to be moved to row 2.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Swizzle(Matrix3 mat, int row0Row, int row1Row, int row2Row, out Matrix3 result)
+        {
+            result = Swizzle(mat, row0Row, row1Row, row2Row);
+        }
+        
+        /// <summary>
+        /// Create a swizzled copy of the matrix.
+        /// </summary>
+        /// <param name="row0Row">The index of the row to be moved to row 0.</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1.</param>
+        /// <param name="row2Row">The index of the row to be moved to row 2.</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix3 SwizzleCopy(int row0Row, int row1Row, int row2Row)
+        {
+            return Swizzle(this, row0Row, row1Row, row2Row);
+        }
+
+        /// <summary>
+        /// Swizzle the matrix.
+        /// </summary>
+        /// <param name="row0Row">The index of the row to be moved to row 0.</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1.</param>
+        /// <param name="row2Row">The index of the row to be moved to row 2.</param>
+        public void Swizzle(int row0Row, int row1Row, int row2Row)
+        {
+            this = Swizzle(this, row0Row, row1Row, row2Row);
         }
         #endregion
 
@@ -680,7 +838,7 @@ namespace KirosEngine3.Math.Matrix
         /// Create a copy of the matrix with the rotation removed
         /// </summary>
         /// <returns>The matrix without rotation</returns>
-        public readonly Matrix3 ClearRotation()
+        public readonly Matrix3 ClearRotation()//todo: check math proof
         {
             var c = this;
             c.Row0 = new Vec3(Row0.Length, 0.0f, 0.0f);
@@ -689,23 +847,268 @@ namespace KirosEngine3.Math.Matrix
             return c;
         }
 
-        //todo: getRotation, createRotation
+        /// <summary>
+        /// Create a matrix to represent rotation around the x axis. (radians) (row major)
+        /// </summary>
+        /// <param name="angle">The angle to rotate by in radians.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3 CreateRotationX(float angle)//Todo: row/column major methods
+        {
+            var cos = MathF.Cos(angle);
+            var sin = MathF.Sin(angle);
+
+            var result = Identity;
+            result.Row1.Y = cos;
+            result.Row1.Z = sin;
+            result.Row2.Y = -sin;
+            result.Row2.Z = cos;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the x axis. (radians) (row major)
+        /// </summary>
+        /// <param name="angle">The angle to rotate by in radians.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateRotationX(float angle, out Matrix3 result)
+        {
+            result = CreateRotationX(angle);
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the Y axis. (radians) (row major)
+        /// </summary>
+        /// <param name="angle">The angle to rotate by in radians.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3 CreateRotationY(float angle)
+        {
+            var cos = MathF.Cos(angle);
+            var sin = MathF.Sin(angle);
+
+            var result = Identity;
+            result.Row0.X = cos;
+            result.Row0.Z = -sin;
+            result.Row2.X = sin;
+            result.Row2.Z = cos;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the Y axis. (radians) (row major)
+        /// </summary>
+        /// <param name="angle">The angle to rotate by in radians.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateRotationY(float angle, out Matrix3 result)
+        {
+            result = CreateRotationY(angle);
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the Z axis. (radians) (row major)
+        /// </summary>
+        /// <param name="angle">The angle to rotate by in radians.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3 CreateRotationZ(float angle)
+        {
+            var cos = MathF.Cos(angle);
+            var sin = MathF.Sin(angle);
+
+            var result = Identity;
+            result.Row0.X = cos;
+            result.Row0.Y = sin;
+            result.Row1.X = -sin;
+            result.Row1.Y = cos;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the Z axis. (radians) (row major)
+        /// </summary>
+        /// <param name="angle">The angle to rotate by in radians.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateRotationZ(float angle, out Matrix3 result)
+        {
+            result = CreateRotationZ(angle);
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the provided axis. (radians) (row major)
+        /// </summary>
+        /// <param name="axis">The axis to rotate around.</param>
+        /// <param name="angle">The angle to rotate by cc-wise looking in the axis' direction.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3 CreateRotationOnAxis(Vec3 axis, float angle)
+        {//todo: double check major
+            //get a normalized working copy
+            Vec3 axisNorm = axis.NormalizedCopy();
+
+            float cos = MathF.Cos(-angle);
+            float sin = MathF.Sin(-angle);
+            float t = 1.0f - cos;
+
+            //axis component conversion
+            float tXSq = t * axisNorm.X * axisNorm.X;
+            float tXY = t * axisNorm.X * axisNorm.Y;
+            float tXZ = t * axisNorm.X * axisNorm.Z;
+            float tYSq = t * axisNorm.Y * axisNorm.Y;
+            float tYZ = t * axisNorm.Y * axisNorm.Z;
+            float tZSq = t * axisNorm.Z * axisNorm.Z;
+
+            float sinX = sin * axisNorm.X;
+            float sinY = sin * axisNorm.Y;
+            float sinZ = sin * axisNorm.Z;
+
+            Matrix3 result = new Matrix3
+            {
+                M00 = cos + tXSq, M01 = tXY - sinZ, M02 = tXZ + sinY,
+                M10 = tXY + sinZ, M11 = cos + tYSq, M12 = tYZ - sinX,
+                M20 = tXZ - sinY, M21 = tYZ + sinX, M22 = cos + tZSq
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the provided axis. (radians) (row major)
+        /// </summary>
+        /// <param name="axis">The axis to rotate around.</param>
+        /// <param name="angle">The angle to rotate by cc-wise looking in the axis' direction.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateRotationOnAxis(Vec3 axis, float angle, out Matrix3 result)
+        {
+            result = CreateRotationOnAxis(axis, angle);
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation from a Quaternion. (row major)
+        /// </summary>
+        /// <param name="quat">The Quaternion to create the rotation from.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3 CreateRotFromQuaternion(Quaternion quat)
+        {
+            float sqX = quat.X * quat.X;
+            float sqY = quat.Y * quat.Y;
+            float sqZ = quat.Z * quat.Z;
+            float sqW = quat.W * quat.W;
+
+            float xy = quat.X * quat.Y;
+            float xz = quat.X * quat.Z;
+            float xw = quat.X * quat.W;
+
+            float yz = quat.Y * quat.Z;
+            float yw = quat.Y * quat.W;
+
+            float zw = quat.Z * quat.W;
+
+            float sumSqrU2 = 2.0f / (sqX + sqY + sqZ + sqW);
+
+            Matrix3 result = new Matrix3
+            {
+                M00 = 1.0f - (sumSqrU2 * (sqY + sqZ)), M01 = sumSqrU2 * (xy + zw), M02 = sumSqrU2 * (xz - yw),
+                M10 = sumSqrU2 * (xy - zw), M11 = 1.0f - (sumSqrU2 * (sqX + sqZ)), M12 = sumSqrU2 * (yz - xw),
+                M20 = sumSqrU2 * (xz + yw), M21 = sumSqrU2 * (yz - xw), M22 = 1.0f - (sumSqrU2 * (sqX - sqY)),
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation from a Quaternion. (row major)
+        /// </summary>
+        /// <param name="quat">The Quaternion to create the rotation from.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateRotFromQuaternion(Quaternion quat, out Matrix3 result)
+        {
+            result = CreateRotFromQuaternion(quat);
+        }
+
+        /// <summary>
+        /// Returns the rotation component of the matrix.
+        /// </summary>
+        /// <param name="preNormalized">Set true if the rows of the matrix are normalized, false otherwise.</param>
+        /// <returns>The rotation as a Quaternion.</returns>
+        public readonly Quaternion GetRotation(bool preNormalized = false)
+        {
+            //working copy of rows
+            var r0 = Row0;
+            var r1 = Row1;
+            var r2 = Row2;
+
+            //if the rows are not normalized do so
+            if (!preNormalized)
+            {
+                r0.Normalize();
+                r1.Normalize();
+                r2.Normalize();
+            }
+
+            var result = new Quaternion();
+
+            float trace = Trace;
+
+            if (trace > 0)
+            {
+                float sqrt = MathF.Sqrt(trace);
+
+                result.W = sqrt;
+                sqrt = 1.0f / (4.0f * sqrt);
+                result.X = (r1.Z - r2.Y) * sqrt;
+                result.Y = (r2.X - r0.Z) * sqrt;
+                result.Z = (r0.Y - r1.X) * sqrt;
+            }
+            else if (r0.X > r1.Y && r0.X > r2.Z)//if r0.X greater than both other diagonal components 
+            {
+                float sqrt = 2.0f * MathF.Sqrt(1.0f + r0.X - r1.Y - r2.Z);
+
+                result.X = 0.25f * sqrt;
+                sqrt = 1.0f / sqrt;
+                result.W = (r2.Y - r1.Z) * sqrt;
+                result.Y = (r1.X + r0.Y) * sqrt;
+                result.Z = (r2.X + r0.Y) * sqrt;
+            }
+            else if (r1.Y > r2.Z)//if Y of the diagonal is greater than the Z component
+            {
+                float sqrt = 2.0f * MathF.Sqrt(1.0f + r1.Y - r0.X - r2.Z);
+
+                result.Y = 0.25f * sqrt;
+                sqrt = 1.0f / sqrt;
+                result.W = (r2.X - r0.Z) * sqrt;
+                result.X = (r1.X + r0.Y) * sqrt;
+                result.Z = (r2.Y + r1.Z) * sqrt;
+            }
+            else
+            {
+                float sqrt = 2.0f * MathF.Sqrt(1.0f + r2.Z - r0.X - r1.Y);
+
+                result.Z = 0.25f * sqrt;
+                sqrt = 1.0f / sqrt;
+                result.W = (r1.X - r0.Y) * sqrt;
+                result.X = (r2.X + r0.Z) * sqrt;
+                result.Y = (r2.Y + r1.Z) * sqrt;
+            }
+
+            result.Normalize();
+            return result;
+        }
         #endregion
 
         #region Add
         /// <summary>
         /// Add two matrices together
         /// </summary>
-        /// <param name="m1">First matrix to add</param>
-        /// <param name="m2">Second matrix to add</param>
+        /// <param name="lhs">First matrix to add</param>
+        /// <param name="rhs">Second matrix to add</param>
         /// <returns>The resulting matrix in a new instance</returns>
-        public static Matrix3 Add(Matrix3 m1, Matrix3 m2)
+        public static Matrix3 Add(Matrix3 lhs, Matrix3 rhs)
         {
             var r = new Matrix3
             {
-                Row0 = m1.Row0 + m2.Row0,
-                Row1 = m1.Row1 + m2.Row1,
-                Row2 = m1.Row2 + m2.Row2
+                Row0 = lhs.Row0 + rhs.Row0,
+                Row1 = lhs.Row1 + rhs.Row1,
+                Row2 = lhs.Row2 + rhs.Row2
             };
             return r;
         }
@@ -713,12 +1116,18 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// Add two matrices together
         /// </summary>
-        /// <param name="m1">First matrix to add</param>
-        /// <param name="m2">Second matrix to add</param>
+        /// <param name="lhs">First matrix to add</param>
+        /// <param name="rhs">Second matrix to add</param>
         /// <param name="result">The resulting matrix in a new instance</param>
-        public static void Add(Matrix3 m1, Matrix3 m2, out Matrix3 result)
+        public static void Add(Matrix3 lhs, Matrix3 rhs, out Matrix3 result)
         {
-            result = Add(m1, m2);
+            result = Add(lhs, rhs);
+        }
+
+        /// <inheritdoc/>
+        public readonly Matrix3 Add(Matrix3 rhs)
+        {
+            return Add(this, rhs);
         }
 
         /// <summary>
@@ -763,6 +1172,12 @@ namespace KirosEngine3.Math.Matrix
             result = Subtract(lhs, rhs);
         }
 
+        /// <inheritdoc/>
+        public readonly Matrix3 Subtract(Matrix3 rhs)
+        {
+            return Subtract(this, rhs);
+        }
+
         /// <summary>
         /// Define the subtraction operator between two matrices
         /// </summary>
@@ -777,60 +1192,40 @@ namespace KirosEngine3.Math.Matrix
 
         #region Multiply
         /// <summary>
-        /// Multiply two matrices together
+        /// Multiply two matrices together.
         /// </summary>
-        /// <param name="m1">First matrix</param>
-        /// <param name="m2">Second matrix</param>
-        /// <returns>A new matrix containing the result</returns>
-        public static Matrix3 Multiply(Matrix3 m1, Matrix3 m2)
+        /// <param name="lhs">The left operand.</param>
+        /// <param name="rhs">The right operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3 Multiply(Matrix3 lhs, Matrix3 rhs)
         {
-            //todo: rework as a series of dot products
-            var r = new Matrix3
+            Matrix3 result = new Matrix3
             {
-                Row0 = new Vec3((m1[0, 0] * m2[0, 0]) + (m1[0, 1] * m2[1, 0]) + (m1[0, 2] * m2[2, 0]),
-                    (m1[0, 0] * m2[0, 1]) + (m1[0, 1] * m2[1, 1]) + (m1[0, 2] * m2[2, 1]),
-                    (m1[0, 0] * m2[0, 2]) + (m1[0, 1] * m2[1, 2]) + (m1[0, 2] * m2[2, 2])),
-
-                Row1 = new Vec3((m1[1, 0] * m2[0, 0]) + (m1[1, 1] * m2[1, 0]) + (m1[1, 2] * m2[2, 0]),
-                    (m1[1, 0] * m2[0, 1]) + (m1[1, 1] * m2[1, 1]) + (m1[1, 2] * m2[2, 1]),
-                    (m1[1, 0] * m2[0, 2]) + (m1[1, 1] * m2[1, 2]) + (m1[1, 2] * m2[2, 2])),
-
-                Row2 = new Vec3((m1[2, 0] * m2[0, 0]) + (m1[2, 1] * m2[1, 0]) + (m1[2, 2] * m2[2, 0]),
-                    (m1[2, 0] * m2[0, 1]) + (m1[2, 1] * m2[1, 1]) + (m1[2, 2] * m2[2, 1]),
-                    (m1[2, 0] * m2[0, 2]) + (m1[2, 1] * m2[1, 2]) + (m1[2, 2] * m2[2, 2]))
+                Row0 = new Vec3(Vec3.Dot(lhs.Row0, rhs.Column0), Vec3.Dot(lhs.Row0, rhs.Column1), Vec3.Dot(lhs.Row0, rhs.Column2)),
+                Row1 = new Vec3(Vec3.Dot(lhs.Row1, rhs.Column0), Vec3.Dot(lhs.Row1, rhs.Column1), Vec3.Dot(lhs.Row1, rhs.Column2)),
+                Row2 = new Vec3(Vec3.Dot(lhs.Row2, rhs.Column0), Vec3.Dot(lhs.Row2, rhs.Column1), Vec3.Dot(lhs.Row2, rhs.Column2))
             };
 
-            return r;
+            return result;
         }
 
         /// <summary>
-        /// Multiply two matrices together
+        /// Multiply two matrices together.
         /// </summary>
-        /// <param name="m1">First matrix</param>
-        /// <param name="m2">Second matrix</param>
-        /// <param name="result">A new matrix containing the result</param>
+        /// <param name="lhs">The left operand.</param>
+        /// <param name="rhs">The right operand.</param>
+        /// <param name="result">The resulting matrix.</param>
         public static void Multiply(Matrix3 m1, Matrix3 m2, out Matrix3 result)
         {
             result = Multiply(m1, m2);
         }
 
         /// <summary>
-        /// Multiply two matrices together
+        /// Multiply the matrix by a scalar value.
         /// </summary>
-        /// <param name="lhs">Left matrix</param>
-        /// <param name="rhs">Right matrix</param>
-        /// <returns>A new matrix containing the result</returns>
-        public static Matrix3 operator *(Matrix3 lhs, Matrix3 rhs)
-        {
-            return Multiply(lhs, rhs);
-        }
-
-        /// <summary>
-        /// Multiply the matrix by a scalar value
-        /// </summary>
-        /// <param name="lhs">The matrix</param>
-        /// <param name="rhs">The scalar value</param>
-        /// <returns>The resulting matrix</returns>
+        /// <param name="lhs">The matrix operand.</param>
+        /// <param name="rhs">The scalar operand.</param>
+        /// <returns>The resulting matrix.</returns>
         public static Matrix3 Multiply(Matrix3 lhs, float rhs)
         {
             var r = new Matrix3
@@ -844,36 +1239,164 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Multiply the matrix by a scalar value
+        /// Multiply the matrix by a scalar value.
         /// </summary>
-        /// <param name="lhs">The matrix</param>
-        /// <param name="rhs">The scalar value</param>
-        /// <param name="result">The resulting matrix</param>
+        /// <param name="lhs">The matrix operand.</param>
+        /// <param name="rhs">The scalar operand.</param>
+        /// <param name="result">The resulting matrix.</param>
         public static void Multiply(Matrix3 lhs, float rhs, out Matrix3 result)
         {
             result = Multiply(lhs, rhs);
         }
 
+        /// <inheritdoc cref="Matrix3x2.Multiply(Matrix3, Matrix3x2)"/>
+        public static Matrix3x2 Multiply(Matrix3 lhs, Matrix3x2 rhs)
+        {
+            return Matrix3x2.Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix3x2.Multiply(Matrix3, Matrix3x2, out Matrix3x2)"/>
+        public static void Multiply(Matrix3 lhs, Matrix3x2 rhs, out Matrix3x2 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
         /// <summary>
-        /// Matrix multiplied by scalar operator
+        /// Multiply a Matrix3 by a Matrix3x4
         /// </summary>
-        /// <param name="lhs">The matrix operand</param>
-        /// <param name="rhs">The scalar operand</param>
-        /// <returns>The resulting matrix</returns>
+        /// <param name="lhs">The Matrix3 operator.</param>
+        /// <param name="rhs">The Matrix3x4 operator.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3x4 Multiply(Matrix3 lhs, Matrix3x4 rhs)
+        {
+            return new Matrix3x4
+            {
+                Row0 = new Vec4(Vec3.Dot(lhs.Row0, rhs.Column0), Vec3.Dot(lhs.Row0, rhs.Column1), Vec3.Dot(lhs.Row0, rhs.Column2), Vec3.Dot(lhs.Row0, rhs.Column3)),
+                Row1 = new Vec4(Vec3.Dot(lhs.Row1, rhs.Column0), Vec3.Dot(lhs.Row1, rhs.Column1), Vec3.Dot(lhs.Row1, rhs.Column2), Vec3.Dot(lhs.Row1, rhs.Column3)),
+                Row2 = new Vec4(Vec3.Dot(lhs.Row2, rhs.Column0), Vec3.Dot(lhs.Row2, rhs.Column1), Vec3.Dot(lhs.Row2, rhs.Column2), Vec3.Dot(lhs.Row2, rhs.Column3))
+            };
+        }
+
+        /// <summary>
+        /// Multiply a Matrix3 by a Matrix3x4.
+        /// </summary>
+        /// <param name="lhs">The Matrix3 operator.</param>
+        /// <param name="rhs">The Matrix3x4 operator.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Multiply(Matrix3 lhs, Matrix3x4 rhs, out Matrix3x4 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix2x3.Multiply(Matrix2x3, Matrix3)"/>
+        public static Matrix2x3 Multiply(Matrix2x3 lhs, Matrix3 rhs)
+        {
+            return Matrix2x3.Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix2x3.Multiply(Matrix2x3, Matrix3, out Matrix2x3)"/>
+        public static void Multiply(Matrix2x3 lhs, Matrix3 rhs, out Matrix2x3 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Multiply a Matrix4x3 by a Matrix3.
+        /// </summary>
+        /// <param name="lhs">The Matrix4x3 operand.</param>
+        /// <param name="rhs">The matrix3 operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4x3 Multiply(Matrix4x3 lhs, Matrix3 rhs)
+        {
+            return new Matrix4x3
+            {
+                Row0 = new Vec3(Vec3.Dot(lhs.Row0, rhs.Column0), Vec3.Dot(lhs.Row0, rhs.Column1), Vec3.Dot(lhs.Row0, rhs.Column2)),
+                Row1 = new Vec3(Vec3.Dot(lhs.Row1, rhs.Column0), Vec3.Dot(lhs.Row1, rhs.Column1), Vec3.Dot(lhs.Row1, rhs.Column2)),
+                Row2 = new Vec3(Vec3.Dot(lhs.Row2, rhs.Column0), Vec3.Dot(lhs.Row2, rhs.Column1), Vec3.Dot(lhs.Row2, rhs.Column2)),
+                Row3 = new Vec3(Vec3.Dot(lhs.Row3, rhs.Column0), Vec3.Dot(lhs.Row3, rhs.Column1), Vec3.Dot(lhs.Row3, rhs.Column2))
+            };
+        }
+
+        /// <summary>
+        /// Multiply a Matrix4x3 by a Matrix3.
+        /// </summary>
+        /// <param name="lhs">The Matrix4x3 operand.</param>
+        /// <param name="rhs">The matrix3 operand.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Multiply(Matrix4x3 lhs, Matrix3 rhs, out Matrix4x3 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /*======================================================
+         Multiply operators
+         =======================================================*/
+
+        /// <summary>
+        /// Multiply two matrices together.
+        /// </summary>
+        /// <param name="lhs">The left operand.</param>
+        /// <param name="rhs">The right operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3 operator *(Matrix3 lhs, Matrix3 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Matrix multiplied by scalar operator.
+        /// </summary>
+        /// <param name="lhs">The matrix operand.</param>
+        /// <param name="rhs">The scalar operand.</param>
+        /// <returns>The resulting matrix.</returns>
         public static Matrix3 operator *(Matrix3 lhs, float rhs)
         {
             return Multiply(lhs, rhs);
         }
 
         /// <summary>
-        /// Matrix multiplied by scalar operator
+        /// Matrix multiplied by scalar operator.
         /// </summary>
-        /// <param name="lhs">The scalar operand</param>
-        /// <param name="rhs">The matrix operand</param>
-        /// <returns>The resulting matrix</returns>
+        /// <param name="lhs">The scalar operand.</param>
+        /// <param name="rhs">The matrix operand.</param>
+        /// <returns>The resulting matrix.</returns>
         public static Matrix3 operator *(float lhs, Matrix3 rhs)
         {
             return Multiply(rhs, lhs);
+        }
+
+        /* Implemented in Matrix3x2
+        public static Matrix3x2 operator *(Matrix3 lhs, Matrix3x2 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }*/
+
+        /// <summary>
+        /// Multiplication operator between Matrix3 and Matrix3x4.
+        /// </summary>
+        /// <param name="lhs">The Matrix3 operand.</param>
+        /// <param name="rhs">The Matrix3x4 operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix3x4 operator *(Matrix3 lhs, Matrix3x4 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /* Implemented in Matrix2x3
+        public static Matrix2x3 operator *(Matrix2x3 lhs, Matrix3 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }*/
+
+        /// <summary>
+        /// Multiplication operator between Matrix4x3 and Matrix3.
+        /// </summary>
+        /// <param name="lhs">The Matrix4x3 operand.</param>
+        /// <param name="rhs">The Matrix3 operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4x3 operator *(Matrix4x3 lhs, Matrix3 rhs)
+        {
+            return Multiply(lhs, rhs);
         }
         #endregion
 

@@ -1,4 +1,5 @@
 ﻿using KirosEngine3.Math.Vector;
+using KirosEngine3.Math.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,36 +12,96 @@ namespace KirosEngine3.Math.Matrix
 {
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Matrix4 : IEquatable<Matrix4>, IFormattable
+    public struct Matrix4 : IEquatable<Matrix4>, IFormattable, IMatrix<Matrix4, Vec4, Vec4, Vec4, Matrix4>
     {
         public Vec4 Row0;
         public Vec4 Row1; 
         public Vec4 Row2; 
         public Vec4 Row3;
 
-        public static readonly Matrix4 Identity = new Matrix4(Vec4.UnitX, Vec4.UnitY, Vec4.UnitZ, Vec4.UnitW);
+        /// <summary>
+        /// The Identity matrix.
+        /// </summary>
+        public static Matrix4 Identity => new Matrix4(Vec4.UnitX, Vec4.UnitY, Vec4.UnitZ, Vec4.UnitW);
 
-        public static readonly Matrix4 Zero = new Matrix4(Vec4.Zero, Vec4.Zero, Vec4.Zero, Vec4.Zero);
+        /// <summary>
+        /// The zero matrix.
+        /// </summary>
+        public static Matrix4 Zero => new Matrix4(Vec4.Zero, Vec4.Zero, Vec4.Zero, Vec4.Zero);
 
+        #region Columns
         /// <summary>
         /// The first column of the matrix
         /// </summary>
-        public readonly Vec4 Column0 => new Vec4(Row0.X, Row1.X, Row2.X, Row3.X);
+        public Vec4 Column0
+        {
+            readonly get => new Vec4(Row0.X, Row1.X, Row2.X, Row3.X);
+            set
+            {
+                Row0.X = value.X;
+                Row1.X = value.Y;
+                Row2.X = value.Z;
+                Row3.X = value.W;
+            }
+        }
 
         /// <summary>
         /// The second column of the matrix
         /// </summary>
-        public readonly Vec4 Column1 => new Vec4(Row0.Y, Row1.Y, Row2.Y, Row3.Y);
+        public Vec4 Column1
+        {
+            readonly get => new Vec4(Row0.Y, Row1.Y, Row2.Y, Row3.Y);
+            set
+            {
+                Row0.Y = value.X;
+                Row1.Y = value.Y;
+                Row2.Y = value.Z;
+                Row3.Y = value.W;
+            }
+        }
 
         /// <summary>
         /// The third column of the matrix
         /// </summary>
-        public readonly Vec4 Column2 => new Vec4(Row0.Z, Row1.Z, Row2.Z, Row3.Z);
+        public Vec4 Column2
+        {
+            readonly get => new Vec4(Row0.Z, Row1.Z, Row2.Z, Row3.Z);
+            set
+            {
+                Row0.Z = value.X;
+                Row1.Z = value.Y;
+                Row2.Z = value.Z;
+                Row3.Z = value.W;
+            }
+        }
 
         /// <summary>
         /// The fourth column of the matrix
         /// </summary>
-        public readonly Vec4 Column3 => new Vec4(Row0.W, Row1.W, Row2.W, Row3.W);
+        public Vec4 Column3
+        {
+            readonly get => new Vec4(Row0.W, Row1.W, Row2.W, Row3.W);
+            set
+            {
+                Row0.W = value.X;
+                Row1.W = value.Y;
+                Row2.W = value.Z;
+                Row3.W = value.W;
+            }
+        }
+        #endregion
+
+        /// <inheritdoc/>
+        public readonly Vec4[] GetColumns()
+        {
+            return [Column0, Column1, Column2, Column3];
+        }
+
+        /// <inheritdoc/>
+        public readonly Vec4[] GetRows()
+        {
+            return [Row0, Row1, Row2, Row3];
+        }
 
         /// <summary>
         /// Calculate the matrix's determinant
@@ -61,96 +122,144 @@ namespace KirosEngine3.Math.Matrix
         }
 
         #region Cell Accessors
+        /// <summary>
+        /// Accessor for row 0, column 0.
+        /// </summary>
         public float M00
         {
             readonly get { return Row0.X; }
             set { Row0.X = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 0, column 1.
+        /// </summary>
         public float M01
         {
             readonly get { return Row0.Y; }
             set { Row0.Y = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 0, column 2.
+        /// </summary>
         public float M02
         {
             readonly get { return Row0.Z; }
             set { Row0.Z = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 0, column 3.
+        /// </summary>
         public float M03
         {
             readonly get { return Row0.W; }
             set { Row0.W = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 1, column 0.
+        /// </summary>
         public float M10
         {
             readonly get { return Row1.X; }
             set { Row1.X = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 1, column 1.
+        /// </summary>
         public float M11
         {
             readonly get { return Row1.Y; }
             set { Row1.Y = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 1, column 2.
+        /// </summary>
         public float M12
         {
             readonly get { return Row1.Z; }
             set { Row1.Z = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 1, column 3.
+        /// </summary>
         public float M13
         {
             readonly get { return Row1.W; }
             set { Row1.W = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 2, column 0.
+        /// </summary>
         public float M20
         {
             readonly get { return Row2.X; }
             set { Row2.X = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 2, column 1.
+        /// </summary>
         public float M21
         {
             readonly get { return Row2.Y; }
             set { Row2.Y = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 2, column 2.
+        /// </summary>
         public float M22
         {
             readonly get { return Row2.Z; }
             set { Row2.Z = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 2, column 3.
+        /// </summary>
         public float M23
         {
             readonly get { return Row2.W; }
             set { Row2.W = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 3, column 0.
+        /// </summary>
         public float M30
         {
             readonly get { return Row3.X; }
             set { Row3.X = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 3, column 1.
+        /// </summary>
         public float M31
         {
             readonly get { return Row3.Y; }
             set { Row3.Y = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 3, column 2.
+        /// </summary>
         public float M32
         {
             readonly get { return Row3.Z; }
             set { Row3.Z = value; }
         }
 
+        /// <summary>
+        /// Accessor for row 3, column 3.
+        /// </summary>
         public float M33
         {
             readonly get { return Row3.W; }
@@ -198,58 +307,90 @@ namespace KirosEngine3.Math.Matrix
         {
             readonly get
             {
-                if (column < 0 && column > 3)
-                {
-                    throw new IndexOutOfRangeException(string.Format("Column index: {0} out of range for Matrix4.", column));
-                }
+                if (column < 0 || column > 3)
+                    throw new IndexOutOfRangeException(string.Format("Column index: {0} is out of range for Matrix4", column));
 
-                if (row == 0)
+                switch (row)
                 {
-                    return Row0[column];
-                }
-                else if (row == 1)
-                {
-                    return Row1[column];
-                }
-                else if (row == 2)
-                {
-                    return Row2[column];
-                }
-                else if (row == 3)
-                {
-                    return Row3[column];
-                }
-                else
-                {
-                    throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix4.", row));
+                    case 0:
+                        return Row0[column];
+                    case 1:
+                        return Row1[column];
+                    case 2:
+                        return Row2[column];
+                    case 3:
+                        return Row3[column];
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4", row));
                 }
             }
             set
             {
-                if (column < 0 && column > 3)
-                {
-                    throw new IndexOutOfRangeException(string.Format("Column index: {0} out of range for Matrix4.", column));
-                }
+                if (column < 0 || column > 3)
+                    throw new IndexOutOfRangeException(string.Format("Column index: {0} is out of range for Matrix4", column));
 
-                if (row == 0) 
+                switch (row)
                 {
-                    Row0[column] = value;
+                    case 0:
+                        Row0[column] = value;
+                        break;
+                    case 1:
+                        Row1[column] = value;
+                        break;
+                    case 2:
+                        Row2[column] = value;
+                        break;
+                    case 3:
+                        Row3[column] = value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4", row));
                 }
-                else if (row == 1)
+            }
+        }
+
+        /// <summary>
+        /// Array type accessor for the rows of the matrix.
+        /// </summary>
+        /// <param name="row">Row index.</param>
+        /// <returns>The row at the given index.</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the index is outside the range of 0-3</exception>
+        public Vec4 this[int row]
+        {
+            readonly get
+            {
+                switch (row)
                 {
-                    Row1[column] = value;
+                    case 0:
+                        return Row0;
+                    case 1:
+                        return Row1;
+                    case 2:
+                        return Row2;
+                    case 3:
+                        return Row3;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix4.", row));
                 }
-                else if (row == 2)
+            }
+            set
+            {
+                switch (row)
                 {
-                    Row2[column] = value;
-                }
-                else if (row == 3)
-                {
-                    Row3[column] = value;
-                }
-                else
-                {
-                    throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix4.", row));
+                    case 0:
+                        Row0 = value;
+                        break;
+                    case 1:
+                        Row1 = value;
+                        break;
+                    case 2:
+                        Row2 = value;
+                        break;
+                    case 3:
+                        Row3 = value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException(string.Format("Row index: {0} out of range for Matrix4.", row));
                 }
             }
         }
@@ -267,6 +408,40 @@ namespace KirosEngine3.Math.Matrix
             Row0 = r0;
             Row1 = r1;
             Row2 = r2;
+            Row3 = r3;
+        }
+
+        /// <summary>
+        /// Construct a Matrix4 from a Matrix3.
+        /// </summary>
+        /// <param name="m">The Matrix3 to use as a basis.</param>
+        /// <param name="w0">The W component for row 0, default 0.</param>
+        /// <param name="w1">The W component for row 1, default 0.</param>
+        /// <param name="w2">The W component for row 2, default 0.</param>
+        /// <param name="m30">Row 3, Column 0, default 0.</param>
+        /// <param name="m31">Row 3, Column 1, default 0.</param>
+        /// <param name="m32">Row 3, Column 2, default 0.</param>
+        /// <param name="m33">Row 3, Column 3, default 1.</param>
+        public Matrix4(Matrix3 m, float w0 = 0, float w1 = 0, float w2 = 0,
+                        float m30 = 0, float m31 = 0, float m32 = 0, float m33 = 1)
+        {
+            Row0 = new Vec4(m.Row0, w0);
+            Row1 = new Vec4(m.Row1, w1);
+            Row2 = new Vec4(m.Row2, w2);
+            Row3 = new Vec4(m30, m31, m32, m33);
+        }
+
+        /// <summary>
+        /// Construct a Matrix4 from a Matrix3.
+        /// </summary>
+        /// <param name="m">The Matrix3 to use as a basis.</param>
+        /// <param name="wVals">The W component values for rows 0-2.</param>
+        /// <param name="r3">Row 3 of the matrix.</param>
+        public Matrix4(Matrix3 m, Vec3 wVals, Vec4 r3)
+        {
+            Row0 = new Vec4(m.Row0, wVals.X);
+            Row1 = new Vec4(m.Row1, wVals.Y);
+            Row2 = new Vec4(m.Row2, wVals.Z);
             Row3 = r3;
         }
 
@@ -301,6 +476,275 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        #region ElementaryMatrices
+        /// <summary>
+        /// Produce an elementary matrix for row interchange between the two specified rows.
+        /// </summary>
+        /// <param name="r1">The index of the first row to interchange.</param>
+        /// <param name="r2">The index of the second row to interchange.</param>
+        /// <returns>The 3D elementary matrix that performs row interchange.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if both indexes are the same value.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown if one of the row indexes is out of the allowed range.</exception>
+        public static Matrix4 RowInterchangeElemMat(int r1, int r2)
+        {
+            if (r1 == r2)
+                throw new InvalidOperationException(string.Format("Cannot interchange a row with itself."));
+
+            if (r1 < 0 || r1 > 3)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4.", r1));
+            if (r2 < 0 || r2 > 3)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4.", r2));
+
+            if (r1 == 0 || r2 == 0)
+            {
+                if (r1 == 1 || r2 == 1)//switch row 0 and row 1
+                {
+                    return new Matrix4(0.0f, 1.0f, 0.0f, 0.0f,
+                                    1.0f, 0.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, 1.0f, 0.0f,
+                                    0.0f, 0.0f, 0.0f, 1.0f);
+                }
+                else if (r1 == 2 || r2 == 2)//switch row 0 and row 2
+                {
+                    return new Matrix4(0.0f, 0.0f, 1.0f, 0.0f,
+                                    0.0f, 1.0f, 0.0f, 0.0f,
+                                    1.0f, 0.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, 0.0f, 1.0f);
+                }
+                //switch row 0 and row 3
+                return new Matrix4(0.0f, 0.0f, 0.0f, 1.0f,
+                                    0.0f, 1.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, 1.0f, 0.0f,
+                                    1.0f, 0.0f, 0.0f, 0.0f);
+            }
+            else if (r1 == 1 || r2 == 1)
+            {
+                if (r1 == 2 || r2 == 2)//switch row 1 and row 2
+                {
+                    return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, 1.0f, 0.0f,
+                                    0.0f, 1.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, 0.0f, 1.0f);
+                }
+                //switch row 1 and row 3
+                return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, 0.0f, 1.0f,
+                                    0.0f, 0.0f, 1.0f, 0.0f,
+                                    0.0f, 1.0f, 0.0f, 0.0f);
+            }
+
+            //switch row 2 and row 3
+            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                0.0f, 1.0f, 0.0f, 0.0f,
+                                0.0f, 0.0f, 0.0f, 1.0f,
+                                0.0f, 0.0f, 1.0f, 0.0f);
+        }
+
+        /// <summary>
+        /// Produce an elementary matrix for the scalar multiplication row operation.
+        /// </summary>
+        /// <param name="row">The row to be multiplied.</param>
+        /// <param name="scalar">The scalar to multiply by, cannot be zero.</param>
+        /// <returns>The 3D elementary matrix that performs the scalar multiplication.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the scalar is zero.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the row index is out of range.</exception>
+        public static Matrix4 RowMultiplyElemMat(int row, float scalar)
+        {
+            if (scalar.IsZero())
+                throw new InvalidOperationException(string.Format("Multiplying a row by zero is not allowed."));
+
+            switch (row)
+            {
+                case 0:
+                    return new Matrix4(scalar, 0.0f, 0.0f, 0.0f, 
+                                    0.0f, 1.0f, 0.0f, 0.0f, 
+                                    0.0f, 0.0f, 1.0f, 0.0f,
+                                    0.0f, 0.0f, 0.0f, 1.0f);
+                case 1:
+                    return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f, 
+                                    0.0f, scalar, 0.0f, 0.0f, 
+                                    0.0f, 0.0f, 1.0f, 0.0f,
+                                    0.0f, 0.0f, 0.0f, 1.0f);
+                case 2:
+                    return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f, 
+                                    0.0f, 1.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, scalar, 0.0f,
+                                    0.0f, 0.0f, 0.0f, 1.0f);
+                case 3:
+                    return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                    0.0f, 1.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, 1.0f, 0.0f,
+                                    0.0f, 0.0f, 0.0f, scalar);
+                default:
+                    throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4.", row));
+            }
+        }
+
+        /// <summary>
+        /// Produce an elementary matrix for adding one row to another.
+        /// </summary>
+        /// <param name="r1">The index of the row to add.</param>
+        /// <param name="r2">The index of the row to add to.</param>
+        /// <param name="scalar">The number of times to add the first row, cannot be zero.</param>
+        /// <returns>The 3D elementary matrix that performs the row operation.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the indexes are the same, or if the scalar is zero.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the indexes are out of range for Matrix4.</exception>
+        public static Matrix4 RowAddElemMat(int r1, int r2, float scalar)
+        {
+            if (r1 == r2)
+                throw new InvalidOperationException(string.Format("Adding a row to itself is not a valid operation."));
+            if (scalar.IsZero())
+                throw new InvalidOperationException(string.Format("Multiplying a row by zero is not allowed."));
+
+            switch (r1)
+            {
+                case 0:
+                    {
+                        if (r2 == 1)//add row 0 to row 1
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            scalar, 1.0f, 0.0f, 0.0f, 
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 2)//add row 0 to row 2
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            scalar, 0.0f, 1.0f, 0.0f,
+                                            0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 3)//add row 0 to row 3
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            scalar, 0.0f, 0.0f, 1.0f);
+                        }
+                        else
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4.", r2));
+                    }
+                case 1:
+                    {
+                        if (r2 == 0)//add row 1 to row 0
+                        {
+                            return new Matrix4(1.0f, scalar, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 2)//add row 1 to row 2
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, scalar, 1.0f, 0.0f,
+                                            0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 3)//add row 1 to row 3
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            0.0f, scalar, 0.0f, 1.0f);
+                        }
+                        else
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4.", r2));
+                    }
+                case 2:
+                    {
+                        if (r2 == 0)//add row 2 to row 0
+                        {
+                            return new Matrix4(1.0f, 0.0f, scalar, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 1)//add row 2 to row 1
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, scalar, 0.0f,
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 3)//add row 2 to row 3
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            0.0f, 0.0f, scalar, 1.0f);
+                        }
+                        else
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4.", r2));
+                    }
+                case 3:
+                    {
+                        if (r2 == 0)//add row 3 to row 0
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, scalar,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 1)//add row 3 to row 1
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, scalar,
+                                            0.0f, 0.0f, 1.0f, 0.0f,
+                                            0.0f, 0.0f, 0.0f, 1.0f);
+                        }
+                        else if (r2 == 2)//add row 3 to row 2
+                        {
+                            return new Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
+                                            0.0f, 1.0f, 0.0f, 0.0f,
+                                            0.0f, 0.0f, 1.0f, scalar,
+                                            0.0f, 0.0f, 1.0f, 1.0f);
+                        }
+                        else
+                            throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4.", r2));
+                    }
+                default:
+                    throw new IndexOutOfRangeException(string.Format("Row index: {0} is out of range for Matrix4.", r1));
+            }
+        }
+        #endregion
+
+        #region RowOperations
+        /// <summary>
+        /// Perform the row interchange operation on this matrix.
+        /// </summary>
+        /// <param name="r1">Index of the first row to interchange.</param>
+        /// <param name="r2">Index of the second row to interchange.</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix4 RowInterchange(int r1, int r2)
+        {
+            return RowInterchangeElemMat(r1, r2) * this;
+        }
+
+        /// <summary>
+        /// Perform the row multiplication operation on this matrix.
+        /// </summary>
+        /// <param name="row">Index of the row to multiply.</param>
+        /// <param name="scalar">The scalar to multiply the row by.</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix4 RowMultiplication(int row, float scalar)
+        {
+            return RowMultiplyElemMat(row, scalar) * this;
+        }
+
+        /// <summary>
+        /// Perform the row addition operation on this matrix.
+        /// </summary>
+        /// <param name="r1">Index of the row to add.</param>
+        /// <param name="r2">Index of the row to add to.</param>
+        /// <param name="scalar">The number of times to add the first row.</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix4 RowAddition(int r1, int r2, float scalar)
+        {
+            return RowAddElemMat(r1, r2, scalar) * this;
+        }
+        #endregion
+
+        #region View&Proj
         /// <summary>
         /// Construct a world space to a camera space matrix (row major)
         /// </summary>
@@ -407,33 +851,9 @@ namespace KirosEngine3.Math.Matrix
 
             return result;
         }
+        #endregion
 
-        /// <summary>
-        /// Normalize the matrix by dividing by the determinant, should be checked for nan and infinites
-        /// </summary>
-        public void Normalize()
-        {
-            var det = Determinant;
-            Row0 /= det;
-            Row1 /= det;
-            Row2 /= det; 
-            Row3 /= det;
-            //todo: 0 division handling
-        }
-
-        /// <summary>
-        /// Create a normalized copy of the matrix
-        /// </summary>
-        /// <returns>A copy of the matrix that has been normalized</returns>
-        public readonly Matrix4 NormalizedCopy()
-        {
-            var c = this;
-            c.Normalize();
-            return c;
-        }
-
-        //todo:Invert(), InvertedCopy()
-
+        #region Transpose
         /// <summary>
         /// Convert a matrix into it's transpose
         /// </summary>
@@ -441,6 +861,245 @@ namespace KirosEngine3.Math.Matrix
         {
             this = Transpose(this);
         }
+
+        /// <summary>
+        /// Find the transpose of a matrix
+        /// </summary>
+        /// <param name="m">The matrix to transpose</param>
+        /// <returns>The resulting matrix</returns>
+        public static Matrix4 Transpose(Matrix4 m)
+        {
+            return new Matrix4(m.Column0, m.Column1, m.Column2, m.Column3);
+        }
+
+        /// <summary>
+        /// Find the transpose of a matrix
+        /// </summary>
+        /// <param name="m">The matrix to transpose</param>
+        /// <param name="result">The resulting matrix</param>
+        public static void Transpose(Matrix4 m, out Matrix4 result)
+        {
+            result = Transpose(m);
+        }
+
+        /// <summary>
+        /// Get a copy of the matrix's transpose.
+        /// </summary>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix4 TransposedCopy()
+        {
+            return Transpose(this);
+        }
+        #endregion
+
+        #region Invert
+        /// <summary>
+        /// Invert the given matrix.
+        /// </summary>
+        /// <param name="m">The matrix to invert.</param>
+        /// <returns>The inverted matrix.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the matrix is singular.</exception>
+        public static Matrix4 Invert(Matrix4 m)
+        {
+            float n00 = m.Row0.X, n01 = m.Row0.Y, n02 = m.Row0.Z, n03 = m.Row0.W;
+            float n10 = m.Row1.X, n11 = m.Row1.Y, n12 = m.Row1.Z, n13 = m.Row1.W;
+            float n20 = m.Row2.X, n21 = m.Row2.Y, n22 = m.Row2.Z, n23 = m.Row2.W;
+            float n30 = m.Row3.X, n31 = m.Row3.Y, n32 = m.Row3.Z, n33 = m.Row3.W;
+
+            //2x2 sub matrix determinants
+            float m22x33_23x32 = Matrix2.CalcDeterminant(n22, n33, n23, n32);
+            float m21x33_31x23 = Matrix2.CalcDeterminant(n21, n33, n31, n23);
+            float m21x32_31x22 = Matrix2.CalcDeterminant(n21, n32, n31, n22);
+            float m20x33_23x30 = Matrix2.CalcDeterminant(n20, n33, n23, n30);
+            float m20x32_30x22 = Matrix2.CalcDeterminant(n20, n32, n30, n22);
+            float m20x31_30x21 = Matrix2.CalcDeterminant(n20, n31, n30, n21);
+
+            //first row, determinants of 3x3 sub matrixes
+            float a0 = +(n11 * m22x33_23x32 - n12 * m21x33_31x23 + n13 * m21x32_31x22);
+            float a1 = -(n10 * m22x33_23x32 - n12 * m20x33_23x30 + n13 * m20x32_30x22);
+            float a2 = +(n10 * m21x33_31x23 - n11 * m20x33_23x30 + n13 * m20x31_30x21);
+            float a3 = -(n10 * m21x32_31x22 - n11 * m20x32_30x22 + n12 * m20x31_30x21);
+
+            //calc the determ here since we have to do some work anyway
+            float determ = n00 * a0 + n01 * a1 + n02 * a2 + n03 * a3;
+
+            if (determ.IsZero())
+                throw new InvalidOperationException("Matrix cannot be inverted as it is singular.");
+
+            float invertDet = 1.0f / determ;
+
+            //second row
+            float b0 = -(n01 * m22x33_23x32 - n02 * m21x33_31x23 + n03 * m21x32_31x22);
+            float b1 = +(n00 * m22x33_23x32 - n02 * m20x33_23x30 + n03 * m20x32_30x22);
+            float b2 = -(n00 * m21x33_31x23 - n01 * m20x33_23x30 + n03 * m20x31_30x21);
+            float b3 = +(n00 * m21x32_31x22 - n01 * m20x32_30x22 + n02 * m20x31_30x21);
+
+            //2x2 sub matrix determinants
+            float m12x33_13x32 = Matrix2.CalcDeterminant(n12, n13, n32, n33);
+            float m11x33_13x31 = Matrix2.CalcDeterminant(n11, n13, n31, n33);
+            float m11x32_12x31 = Matrix2.CalcDeterminant(n11, n12, n31, n32);
+            float m10x33_13x30 = Matrix2.CalcDeterminant(n10, n13, n30, n33);
+            float m10x32_12x30 = Matrix2.CalcDeterminant(n10, n12, n30, n32);
+            float m10x31_11x30 = Matrix2.CalcDeterminant(n10, n11, n30, n31);
+
+            //third row
+            float c0 = +(n01 * m12x33_13x32 - n02 * m11x33_13x31 + n03 * m11x32_12x31);
+            float c1 = -(n00 * m12x33_13x32 - n02 * m10x33_13x30 + n03 * m10x32_12x30);
+            float c2 = +(n00 * m11x33_13x31 - n01 * m10x33_13x30 + n03 * m10x31_11x30);
+            float c3 = -(n00 * m11x32_12x31 - n01 * m10x32_12x30 + n02 * m10x31_11x30);
+
+            //2x2 sub matrix det
+            float m12x23_13x22 = Matrix2.CalcDeterminant(n12, n13, n22, n23);
+            float m11x23_13x21 = Matrix2.CalcDeterminant(n11, n13, n21, n23);
+            float m11x22_12x21 = Matrix2.CalcDeterminant(n11, n12, n21, n22);
+            float m10x23_13x20 = Matrix2.CalcDeterminant(n10, n13, n20, n23);
+            float m10x22_12x20 = Matrix2.CalcDeterminant(n10, n12, n20, n22);
+            float m10x21_11x20 = Matrix2.CalcDeterminant(n10, n11, n20, n21);
+
+            //fourth row
+            float d0 = -(n01 * m12x23_13x22 - n02 * m11x23_13x21 + n03 * m11x22_12x21);
+            float d1 = +(n00 * m12x23_13x22 - n02 * m10x23_13x20 + n03 * m10x22_12x20);
+            float d2 = -(n00 * m11x23_13x21 - n01 * m10x23_13x20 + n03 * m10x21_11x20);
+            float d3 = +(n00 * m11x22_12x21 - n01 * m10x22_12x20 + n02 * m10x21_11x20);
+
+            var r = new Matrix4
+            {
+                Row0 = new Vec4(a0, a1, a2, a3) * invertDet,
+                Row1 = new Vec4(b0, b1, b2, b3) * invertDet,
+                Row2 = new Vec4(c0, c1, c2, c3) * invertDet,
+                Row3 = new Vec4(d0, d1, d2, d3) * invertDet
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Invert the given matrix.
+        /// </summary>
+        /// <param name="m">The matrix to invert.</param>
+        /// <param name="result">The inverted matrix.</param>
+        /// <exception cref="InvalidOperationException">Thrown if the matrix is singular.</exception>
+        public static void Invert(Matrix4 m, out Matrix4 result)
+        {
+            result = Invert(m);
+        }
+
+        /// <summary>
+        /// Convert the matrix into it's inverse.
+        /// </summary>
+        public void Invert()
+        {
+            this = Invert(this);
+        }
+        #endregion
+
+        #region Normalize
+        /// <summary>
+        /// Normalize the matrix by dividing by the determinant.
+        /// </summary>
+        public void Normalize()
+        {
+            var det = Determinant;
+            if (det.IsZero())
+            {
+                Console.WriteLine("Matrix4: {0} has a determinant of 0. Thus normalize is undefined.", this);
+                Logger.WriteToLog("Matrix4: {0} has a determinant of 0. Thus normalize is undefined.", this);
+                //todo: write debug
+            }
+            else
+            {
+                Row0 /= det;
+                Row1 /= det;
+                Row2 /= det;
+                Row3 /= det;
+            }
+        }
+
+        /// <summary>
+        /// Create a normalized copy of the matrix
+        /// </summary>
+        /// <returns>A copy of the matrix that has been normalized, or the original matrix
+        /// if it is undefined.</returns>
+        public readonly Matrix4 NormalizedCopy()
+        {
+            var c = this;
+            c.Normalize();
+            return c;
+        }
+        #endregion
+
+        #region Swizzle
+        /// <summary>
+        /// Swizzle the matrix.
+        /// </summary>
+        /// <param name="mat">The matrix to swizzle.</param>
+        /// <param name="row0Row">The index of the row to be moved to row 0.</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1.</param>
+        /// <param name="row2Row">The index of the row to be moved to row 2.</param>
+        /// <param name="row3Row">The index of the row to be moved to row 3.</param>
+        /// <returns>The resulting matrix.</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown if any of the indexes are out of range.</exception>
+        public static Matrix4 Swizzle(Matrix4 mat, int row0Row, int row1Row, int row2Row, int row3Row)
+        {
+            if (row0Row < 0 || row0Row > 3)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix4.", row0Row));
+            if (row1Row < 0 || row1Row > 3)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix4.", row1Row));
+            if (row2Row < 0 || row2Row > 3)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix4.", row2Row));
+            if (row3Row < 0 || row3Row > 3)
+                throw new IndexOutOfRangeException(string.Format("Row index: {0} is not valid for Matrix4.", row3Row));
+
+            var result = new Matrix4
+            {
+                Row0 = mat[row0Row],
+                Row1 = mat[row1Row],
+                Row2 = mat[row2Row],
+                Row3 = mat[row3Row]
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Swizzle the matrix.
+        /// </summary>
+        /// <param name="mat">The matrix to swizzle.</param>
+        /// <param name="row0Row">The index of the row to be moved to row 0.</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1.</param>
+        /// <param name="row2Row">The index of the row to be moved to row 2.</param>
+        /// <param name="row3Row">The index of the row to be moved to row 3.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Swizzle(Matrix4 mat, int row0Row, int row1Row, int row2Row, int row3Row, out Matrix4 result)
+        {
+            result = Swizzle(mat, row0Row, row1Row, row2Row, row3Row);
+        }
+
+        /// <summary>
+        /// Create a swizzled copy of the matrix.
+        /// </summary>
+        /// <param name="row0Row">The index of the row to be moved to row 0.</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1.</param>
+        /// <param name="row2Row">The index of the row to be moved to row 2.</param>
+        /// <param name="row3Row">The index of the row to be moved to row 3.</param>
+        /// <returns>The resulting matrix.</returns>
+        public readonly Matrix4 SwizzleCopy(int row0Row, int row1Row, int row2Row, int row3Row)
+        {
+            return Swizzle(this, row0Row, row1Row, row2Row, row3Row);
+        }
+
+        /// <summary>
+        /// Swizzle the matrix.
+        /// </summary>
+        /// <param name="row0Row">The index of the row to be moved to row 0.</param>
+        /// <param name="row1Row">The index of the row to be moved to row 1.</param>
+        /// <param name="row2Row">The index of the row to be moved to row 2.</param>
+        /// <param name="row3Row">The index of the row to be moved to row 3.</param>
+        public void Swizzle(int row0Row, int row1Row, int row2Row, int row3Row)
+        {
+            this = Swizzle(this, row0Row, row1Row, row2Row, row3Row);
+        }
+        #endregion
 
         #region Translation
         /// <summary>
@@ -454,14 +1113,69 @@ namespace KirosEngine3.Math.Matrix
             return c;
         }
 
-        //todo: create translation
+        /// <summary>
+        /// Returns the translation component of the matrix.
+        /// </summary>
+        /// <returns>The translation.</returns>
+        public readonly Vec3 GetTranslation()
+        {
+            return Row3.Xyz;
+        }
+
+        /// <summary>
+        /// Create a matrix with translation values.
+        /// </summary>
+        /// <param name="x">The X translation.</param>
+        /// <param name="y">The Y translation.</param>
+        /// <param name="z">The Z translation.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4 CreateTranslation(float x, float y, float z)
+        {
+            var result = Identity;
+
+            result.Row3 = new Vec4(x, y, z, 1.0f);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create a matrix with translation values.
+        /// </summary>
+        /// <param name="x">The X translation.</param>
+        /// <param name="y">The Y translation.</param>
+        /// <param name="z">The Z translation.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateTranslation(float x, float y, float z, out Matrix4 result)
+        {
+            result = CreateTranslation(x, y, z);
+        }
+
+        /// <summary>
+        /// Create a matrix with translation values.
+        /// </summary>
+        /// <param name="t">The translation as a vector.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4 CreateTranslation(Vec3 t)
+        {
+            return CreateTranslation(t.X, t.Y, t.Z);
+        }
+
+        /// <summary>
+        /// Create a matrix with translation values.
+        /// </summary>
+        /// <param name="t">The translation as a vector.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateTranslation(Vec3 t, out Matrix4 result)
+        {
+            result = CreateTranslation(t.X, t.Y, t.Z);
+        }
         #endregion
 
         #region Scale
         /// <summary>
-        /// Create a copy of the matrix without any scaling
+        /// Create a copy of the matrix without any scaling.
         /// </summary>
-        /// <returns>The matrix without scaling</returns>
+        /// <returns>The matrix without scaling.</returns>
         public readonly Matrix4 ClearScale()
         {
             var c = this;
@@ -472,9 +1186,9 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Get the scale components of the matrix
+        /// Get the scale components of the matrix.
         /// </summary>
-        /// <returns>The 3D vector representing the scale components</returns>
+        /// <returns>The 3D vector representing the scale components.</returns>
         public readonly Vec3 GetScale()
         {
             return new Vec3(Row0.Xyz.Length, Row1.Xyz.Length, Row2.Xyz.Length);
@@ -560,26 +1274,26 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Create a matrix for rotation around the X axis
+        /// Create a matrix for rotation around the X axis (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by</param>
         /// <returns>The resulting matrix</returns>
-        public static Matrix4 CreateRotationX(float angle)
+        public static Matrix4 CreateRotationX(float angle)//todo: row/column major methods
         {
             var r = Identity;
             float cos = MathF.Cos(angle);
             float sin = MathF.Sin(angle);
 
             r.M11 = cos;
-            r.M12 = -sin;
-            r.M21 = sin;
+            r.M12 = sin;
+            r.M21 = -sin;
             r.M22 = cos;
 
             return r;
         }
 
         /// <summary>
-        /// Create a matrix for rotation around the X axis
+        /// Create a matrix for rotation around the X axis (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by</param>
         /// <param name="result">The resulting matrix</param>
@@ -589,7 +1303,7 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Create a matrix for rotation around the Y axis
+        /// Create a matrix for rotation around the Y axis (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by</param>
         /// <returns>The resulting matrix</returns>
@@ -608,7 +1322,7 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Create a matrix for rotation around the Y axis
+        /// Create a matrix for rotation around the Y axis (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by</param>
         /// <param name="result">The resulting matrix</param>
@@ -618,7 +1332,7 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Create a matrix for rotation around the Z axis
+        /// Create a matrix for rotation around the Z axis (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by</param>
         /// <returns>The resulting matrix</returns>
@@ -629,15 +1343,15 @@ namespace KirosEngine3.Math.Matrix
             float sin = MathF.Sin(angle);
 
             r.M00 = cos;
-            r.M01 = -sin;
-            r.M10 = sin;
+            r.M01 = sin;
+            r.M10 = -sin;
             r.M11 = cos;
 
             return r;
         }
 
         /// <summary>
-        /// Create a matrix for rotation around the Z axis
+        /// Create a matrix for rotation around the Z axis (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by</param>
         /// <param name="result">The resulting matrix</param>
@@ -645,7 +1359,121 @@ namespace KirosEngine3.Math.Matrix
         {
             result = CreateRotationZ(angle);
         }
-        //todo: getRotation, createRotation
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the provided axis. (radians) (row major)
+        /// </summary>
+        /// <param name="axis">The axis to rotate around.</param>
+        /// <param name="angle">The angle to rotate by cc-wise looking in the axis' direction.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4 CreateRotationOnAxis(Vec3 axis, float angle)
+        {
+            Matrix3 rotMat = Matrix3.CreateRotationOnAxis(axis, angle);
+
+            return new Matrix4(rotMat);
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation around the provided axis. (radians) (row major)
+        /// </summary>
+        /// <param name="axis">The axis to rotate around.</param>
+        /// <param name="angle">The angle to rotate by cc-wise looking in the axis' direction.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateRotationOnAxis(Vec3 axis, float angle, out Matrix4 result)
+        {
+            result = CreateRotationOnAxis(axis, angle);
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation from a Quaternion. (row major)
+        /// </summary>
+        /// <param name="quat">The Quaternion to create the rotation from.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4 CreateRotFromQuaternion(Quaternion quat)
+        {
+            Matrix3 rotMat = Matrix3.CreateRotFromQuaternion(quat);
+
+            return new Matrix4(rotMat);
+        }
+
+        /// <summary>
+        /// Create a matrix to represent rotation from a Quaternion. (row major)
+        /// </summary>
+        /// <param name="quat">The Quaternion to create the rotation from.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void CreateRotFromQuaternion(Quaternion quat, out Matrix4 result)
+        {
+            result = CreateRotFromQuaternion(quat);
+        }
+
+        /// <summary>
+        /// Returns the rotation component of the matrix.
+        /// </summary>
+        /// <param name="preNormalized">Set true if the rows of the matrix are normalized, false otherwise.</param>
+        /// <returns>The rotation as a Quaternion.</returns>
+        public readonly Quaternion GetRotation(bool preNormalized = false)
+        {
+            //working copy of rows
+            var r0 = Row0.Xyz;
+            var r1 = Row1.Xyz;
+            var r2 = Row2.Xyz;
+
+            //if the rows are not normalized do so
+            if (!preNormalized)
+            {
+                r0.Normalize();
+                r1.Normalize();
+                r2.Normalize();
+            }
+
+            var result = new Quaternion();
+
+            float trace = Trace;
+
+            if (trace > 0)
+            {
+                float sqrt = MathF.Sqrt(trace);
+
+                result.W = sqrt;
+                sqrt = 1.0f / (4.0f * sqrt);
+                result.X = (r1.Z - r2.Y) * sqrt;
+                result.Y = (r2.X - r0.Z) * sqrt;
+                result.Z = (r0.Y - r1.X) * sqrt;
+            }
+            else if (r0.X > r1.Y && r0.X > r2.Z)//if r0.X greater than both other diagonal components 
+            {
+                float sqrt = 2.0f * MathF.Sqrt(1.0f + r0.X - r1.Y - r2.Z);
+
+                result.X = 0.25f * sqrt;
+                sqrt = 1.0f / sqrt;
+                result.W = (r2.Y - r1.Z) * sqrt;
+                result.Y = (r1.X + r0.Y) * sqrt;
+                result.Z = (r2.X + r0.Y) * sqrt;
+            }
+            else if (r1.Y > r2.Z)//if Y of the diagonal is greater than the Z component
+            {
+                float sqrt = 2.0f * MathF.Sqrt(1.0f + r1.Y - r0.X - r2.Z);
+
+                result.Y = 0.25f * sqrt;
+                sqrt = 1.0f / sqrt;
+                result.W = (r2.X - r0.Z) * sqrt;
+                result.X = (r1.X + r0.Y) * sqrt;
+                result.Z = (r2.Y + r1.Z) * sqrt;
+            }
+            else
+            {
+                float sqrt = 2.0f * MathF.Sqrt(1.0f + r2.Z - r0.X - r1.Y);
+
+                result.Z = 0.25f * sqrt;
+                sqrt = 1.0f / sqrt;
+                result.W = (r1.X - r0.Y) * sqrt;
+                result.X = (r2.X + r0.Z) * sqrt;
+                result.Y = (r2.Y + r1.Z) * sqrt;
+            }
+
+            result.Normalize();
+            return result;
+        }
         #endregion
 
         #region Add
@@ -678,6 +1506,12 @@ namespace KirosEngine3.Math.Matrix
             result = Add(m1, m2);
         }
 
+        /// <inheritdoc/>
+        public readonly Matrix4 Add(Matrix4 rhs)
+        {
+            return Add(this, rhs);
+        }
+
         /// <summary>
         /// Define the addition operator for two matrices
         /// </summary>
@@ -690,35 +1524,246 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
-        #region Multiply
+        #region Subtract
         /// <summary>
-        /// Multiply two matrices together
+        /// Subtract one matrix from another.
         /// </summary>
-        /// <param name="m1">First matrix</param>
-        /// <param name="m2">Second matrix</param>
-        /// <returns>The resulting matrix</returns>
-        public static Matrix4 Multiply(Matrix4 m1, Matrix4 m2)
+        /// <param name="lhs">The matrix to subtract from.</param>
+        /// <param name="rhs">The matrix to subtract.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4 Subtract(Matrix4 lhs, Matrix4 rhs)
         {
             var r = new Matrix4
             {
-                Row0 = new Vec4(Vec4.Dot(m1.Row0, m2.Column0), Vec4.Dot(m1.Row0, m2.Column1), Vec4.Dot(m1.Row0, m2.Column2), Vec4.Dot(m1.Row0, m2.Column3)),
-                Row1 = new Vec4(Vec4.Dot(m1.Row1, m2.Column0), Vec4.Dot(m1.Row1, m2.Column1), Vec4.Dot(m1.Row1, m2.Column2), Vec4.Dot(m1.Row1, m2.Column3)),
-                Row2 = new Vec4(Vec4.Dot(m1.Row2, m2.Column0), Vec4.Dot(m1.Row2, m2.Column1), Vec4.Dot(m1.Row2, m2.Column2), Vec4.Dot(m1.Row2, m2.Column3)),
-                Row3 = new Vec4(Vec4.Dot(m1.Row3, m2.Column0), Vec4.Dot(m1.Row3, m2.Column1), Vec4.Dot(m1.Row3, m2.Column2), Vec4.Dot(m1.Row3, m2.Column3))
+                Row0 = lhs.Row0 - rhs.Row0,
+                Row1 = lhs.Row1 - rhs.Row1,
+                Row2 = lhs.Row2 - rhs.Row2,
+                Row3 = lhs.Row3 - rhs.Row3
             };
 
             return r;
         }
 
         /// <summary>
-        /// Multiply two matrices together
+        /// Subtract one matrix from another.
         /// </summary>
-        /// <param name="m1">First matrix</param>
-        /// <param name="m2">Second matrix</param>
-        /// <param name="result">The resulting matrix</param>
-        public static void Multiply(Matrix4 m1, Matrix4 m2, out Matrix4 result)
+        /// <param name="lhs">The matrix to subtract from.</param>
+        /// <param name="rhs">The matrix to subtract.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Subtract(Matrix4 lhs, Matrix4 rhs, out Matrix4 result)
         {
-            result = Multiply(m1, m2);
+            result = Subtract(lhs, rhs);
+        }
+
+        /// <inheritdoc/>
+        public readonly Matrix4 Subtract(Matrix4 rhs)
+        {
+            return Subtract(this, rhs);
+        }
+
+        /// <summary>
+        /// Define the subtraction operator between two matrices.
+        /// </summary>
+        /// <param name="lhs">The left matrix operand.</param>
+        /// <param name="rhs">The right matrix operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4 operator -(Matrix4 lhs, Matrix4 rhs)
+        {
+            return Subtract(lhs, rhs);
+        }
+        #endregion
+
+        #region Multiply
+        /// <summary>
+        /// Multiply the matrix by a scalar value.
+        /// </summary>
+        /// <param name="lhs">The matrix operand.</param>
+        /// <param name="rhs">The scalar operand.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4 Multiply(Matrix4 lhs, float rhs)
+        {
+            var r = new Matrix4
+            {
+                Row0 = lhs.Row0 * rhs,
+                Row1 = lhs.Row1 * rhs,
+                Row2 = lhs.Row2 * rhs,
+                Row3 = lhs.Row3 * rhs
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// Multiply the matrix by a scalar value.
+        /// </summary>
+        /// <param name="lhs">The matrix operand.</param>
+        /// <param name="rhs">The scalar operand.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Multiply(Matrix4 lhs, float rhs, out Matrix4 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Matrix4x2 Multiply(Matrix4 lhs, Matrix4x2 rhs)
+        {
+            var r = new Matrix4x2
+            {
+                Row0 = new Vec2(Vec4.Dot(lhs.Row0, rhs.Column0), Vec4.Dot(lhs.Row0, rhs.Column1)),
+                Row1 = new Vec2(Vec4.Dot(lhs.Row1, rhs.Column0), Vec4.Dot(lhs.Row1, rhs.Column1)),
+                Row2 = new Vec2(Vec4.Dot(lhs.Row2, rhs.Column0), Vec4.Dot(lhs.Row2, rhs.Column1)),
+                Row3 = new Vec2(Vec4.Dot(lhs.Row3, rhs.Column0), Vec4.Dot(lhs.Row3, rhs.Column1))
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="result"></param>
+        public static void Multiply(Matrix4 lhs, Matrix4x2 rhs, out Matrix4x2 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Matrix4x3 Multiply(Matrix4 lhs, Matrix4x3 rhs)
+        {
+            var r = new Matrix4x3
+            {
+                Row0 = new Vec3(Vec4.Dot(lhs.Row0, rhs.Column0), Vec4.Dot(lhs.Row0, rhs.Column1), Vec4.Dot(lhs.Row0, rhs.Column2)),
+                Row1 = new Vec3(Vec4.Dot(lhs.Row1, rhs.Column0), Vec4.Dot(lhs.Row1, rhs.Column1), Vec4.Dot(lhs.Row1, rhs.Column2)),
+                Row2 = new Vec3(Vec4.Dot(lhs.Row2, rhs.Column0), Vec4.Dot(lhs.Row2, rhs.Column1), Vec4.Dot(lhs.Row2, rhs.Column2)),
+                Row3 = new Vec3(Vec4.Dot(lhs.Row3, rhs.Column0), Vec4.Dot(lhs.Row3, rhs.Column1), Vec4.Dot(lhs.Row3, rhs.Column2))
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="result"></param>
+        public static void Multiply(Matrix4 lhs, Matrix4x3 rhs, out Matrix4x3 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Multiply two matrices together.
+        /// </summary>
+        /// <param name="lhs">First matrix.</param>
+        /// <param name="rhs">Second matrix.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4 Multiply(Matrix4 lhs, Matrix4 rhs)
+        {
+            var r = new Matrix4
+            {
+                Row0 = new Vec4(Vec4.Dot(lhs.Row0, rhs.Column0), Vec4.Dot(lhs.Row0, rhs.Column1), Vec4.Dot(lhs.Row0, rhs.Column2), Vec4.Dot(lhs.Row0, rhs.Column3)),
+                Row1 = new Vec4(Vec4.Dot(lhs.Row1, rhs.Column0), Vec4.Dot(lhs.Row1, rhs.Column1), Vec4.Dot(lhs.Row1, rhs.Column2), Vec4.Dot(lhs.Row1, rhs.Column3)),
+                Row2 = new Vec4(Vec4.Dot(lhs.Row2, rhs.Column0), Vec4.Dot(lhs.Row2, rhs.Column1), Vec4.Dot(lhs.Row2, rhs.Column2), Vec4.Dot(lhs.Row2, rhs.Column3)),
+                Row3 = new Vec4(Vec4.Dot(lhs.Row3, rhs.Column0), Vec4.Dot(lhs.Row3, rhs.Column1), Vec4.Dot(lhs.Row3, rhs.Column2), Vec4.Dot(lhs.Row3, rhs.Column3))
+            };
+
+            return r;
+        }
+                
+        /// <summary>
+        /// Multiply two matrices together.
+        /// </summary>
+        /// <param name="lhs">First matrix.</param>
+        /// <param name="rhs">Second matrix.</param>
+        /// <param name="result">The resulting matrix.</param>
+        public static void Multiply(Matrix4 lhs, Matrix4 rhs, out Matrix4 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix2x4.Multiply(Matrix2x4, Matrix4)"/>
+        public static Matrix2x4 Multiply(Matrix2x4 lhs, Matrix4 rhs)
+        {
+            return Matrix2x4.Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix2x4.Multiply(Matrix2x4, Matrix4, out Matrix2x4)"/>
+        public static void Multiply(Matrix2x4 lhs, Matrix4 rhs, out Matrix2x4 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix3x4.Multiply(Matrix3x4, Matrix4)"/>
+        public static Matrix3x4 Multiply(Matrix3x4 lhs, Matrix4 rhs)
+        {
+            return Matrix3x4.Multiply(lhs, rhs);
+        }
+
+        /// <inheritdoc cref="Matrix3x4.Multiply(Matrix3x4, Matrix4, out Matrix3x4)"/>
+        public static void Multiply(Matrix3x4 lhs, Matrix4 rhs, out Matrix3x4 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /*======================================================
+         Multiply operators
+         =======================================================*/
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Matrix4 operator *(Matrix4 lhs, float rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Matrix4 operator *(float lhs, Matrix4 rhs)
+        {
+            return Multiply(rhs, lhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Matrix4x2 operator *(Matrix4 lhs, Matrix4x2 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Matrix4x3 operator *(Matrix4 lhs, Matrix4x3 rhs)
+        {
+            return Multiply(lhs, rhs);
         }
 
         /// <summary>
@@ -731,34 +1776,31 @@ namespace KirosEngine3.Math.Matrix
         {
             return Multiply(lhs, rhs);
         }
+
+        /* Implemented in Matrix2x4
+        public static Matrix2x4 operator *(Matrix2x4 lhs, Matrix4 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }*/
+
+        /* Implemented in Matrix3x4
+        public static Matrix3x4 operator *(Matrix3x4 lhs, Matrix4 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }*/
         #endregion
 
-        //todo: invert
-
-        /// <summary>
-        /// Find the transpose of a matrix
-        /// </summary>
-        /// <param name="m">The matrix to transpose</param>
-        /// <returns>The resulting matrix</returns>
-        public static Matrix4 Transpose(Matrix4 m)
-        {
-            return new Matrix4(m.Column0, m.Column1, m.Column2, m.Column3);
-        }
-
-        /// <summary>
-        /// Find the transpose of a matrix
-        /// </summary>
-        /// <param name="m">The matrix to transpose</param>
-        /// <param name="result">The resulting matrix</param>
-        public static void Transpose(Matrix4 m, out Matrix4 result)
-        {
-            result = Transpose(m);
-        }
-
+        #region Comparison
         /// <inheritdoc/>
         public readonly bool Equals(Matrix4 other)
         {
             return Row0 == other.Row0 && Row1 == other.Row1 && Row2 == other.Row2 && Row3 == other.Row3;
+        }
+
+        /// <inheritdoc/>
+        public readonly bool Equals(Matrix4 other, float tolerance)
+        {
+            return Row0.Equals(other.Row0, tolerance) && Row1.Equals(other.Row1, tolerance) && Row2.Equals(other.Row2, tolerance) && Row3.Equals(other.Row3, tolerance);
         }
 
         /// <inheritdoc/>
@@ -794,6 +1836,7 @@ namespace KirosEngine3.Math.Matrix
         {
             return HashCode.Combine(Row0, Row1, Row2, Row3);
         }
+        #endregion
 
         #region ToString
         /// <inheritdoc/>
@@ -822,7 +1865,7 @@ namespace KirosEngine3.Math.Matrix
             var r2 = Row2.ToString(format, formatProvider);
             var r3 = Row3.ToString(format, formatProvider);
 
-            return string.Format("Matrix4: \n\t({0}\n\t{1}\n\t{2}\n\t{3})", r0, r1, r2, r3);
+            return string.Format("{0}\n\t{1}\n\t{2}\n\t{3}", r0, r1, r2, r3);
         }
         #endregion
 

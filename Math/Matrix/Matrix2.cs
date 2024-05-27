@@ -75,6 +75,19 @@ namespace KirosEngine3.Math.Matrix
             }
         }
 
+        /// <summary>
+        /// Calculate the determinant for a matrix with the given values.
+        /// </summary>
+        /// <param name="m00">Row 0, Column 0.</param>
+        /// <param name="m01">Row 0, Column 1.</param>
+        /// <param name="m10">Row 1, Column 0.</param>
+        /// <param name="m11">Row 1, Column 1.</param>
+        /// <returns>The determinant.</returns>
+        public static float CalcDeterminant(float m00, float m01, float m10, float m11)
+        {
+            return (m00 * m11) - (m01 * m10);
+        }
+
         #region Cell Accessors
         /// <summary>
         /// Accessor for row 0, column 0
@@ -445,6 +458,39 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        #region Normalize
+        /// <summary>
+        /// Normalize the matrix by dividing by the determinant.
+        /// </summary>
+        public void Normalize()
+        {
+            var det = Determinant;
+            if (det.IsZero())
+            {
+                Console.WriteLine("Matrix2: {0} has a determinant of 0. Thus normalize is undefined.", this);
+                Logger.WriteToLog("Matrix2: {0} has a determinant of 0. Thus normalize is undefined.", this);
+                //todo: write debug
+            }
+            else
+            {
+                Row0 /= det;
+                Row1 /= det;
+            }
+        }
+
+        /// <summary>
+        /// Create a normalized copy of the matrix.
+        /// </summary>
+        /// <returns>A copy of the matrix that has been normalized, or the original matrix 
+        /// if it is undefined.</returns>
+        public readonly Matrix2 NormalizedCopy()
+        {
+            var c = this;
+            c.Normalize();
+            return c;
+        }
+        #endregion
+
         #region Swizzle
         /// <summary>
         /// Swizzle, switch the rows of the matrix
@@ -570,7 +616,7 @@ namespace KirosEngine3.Math.Matrix
 
         #region Rotate
         /// <summary>
-        /// Create a matrix to represent the rotation (radians)
+        /// Create a matrix to represent the rotation (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by in radians</param>
         /// <returns>The resulting matrix</returns>
@@ -583,7 +629,7 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Create a matrix to represent the rotation (radians)
+        /// Create a matrix to represent the rotation (radians) (row major)
         /// </summary>
         /// <param name="angle">The angle to rotate by in radians</param>
         /// <param name="result">The resulting matrix</param>
