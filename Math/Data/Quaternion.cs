@@ -557,6 +557,11 @@ namespace KirosEngine3.Math.Data
             return Axis == other.Axis && W == other.W;
         }
 
+        public readonly bool Equals(Quaternion other, float tolerance)
+        {
+            return Axis.Equals(other.Axis, tolerance) && W.CloseTo(other.W, tolerance);
+        }
+
         /// <inheritdoc/>
         public override readonly int GetHashCode()
         {

@@ -643,7 +643,8 @@ namespace KirosEngine3.Math.Matrix
 
         #region Normalize
         /// <summary>
-        /// Normalize the matrix by dividing by the determinant.
+        /// Normalize the matrix by dividing by the determinant. Also the final
+        /// step in Inverting.
         /// </summary>
         public void Normalize()
         {
@@ -716,7 +717,7 @@ namespace KirosEngine3.Math.Matrix
         {
             result = Swizzle(mat, row0Row, row1Row, row2Row);
         }
-        
+
         /// <summary>
         /// Create a swizzled copy of the matrix.
         /// </summary>
@@ -746,7 +747,7 @@ namespace KirosEngine3.Math.Matrix
         /// Create a copy of the matrix without any scaling
         /// </summary>
         /// <returns>The matrix without scaling</returns>
-        public readonly Matrix3 ClearScale()
+        public readonly Matrix3 ClearScale()//todo: does this actually work with combined transforms?
         {
             var c = this;
             c.Row0 = c.Row0.NormalizedCopy();
