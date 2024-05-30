@@ -7,5 +7,15 @@
       <directory name="Shaders">Resources/Shaders</directory>
     </directories>
     <font name="default" file="Resources/Fonts/latin_sas_math_16pt" fType=".xml"/>
+    <shaders>
+      <shader name="color" vertShader="ColorShader.vert" fragShader="ColorShader.frag">
+        <shaderAttribute name="aColor" type="color" value="vec4"/>
+        <shaderAttribute name="aPosition" type="position" value="vec3"/>
+      </shader>
+      <shader name="text" vertShader="FontShader_default.vert" fragShader="FontShader_default.frag">
+        <shaderAttribute name="aColor" type="color" value="vec4"/>
+        <shaderAttribute name="aPosition" type="position" value="vec3"/>
+      </shader>
+    </shaders>
   </defaults>
 </config>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using KirosEngine3.Exceptions;
+using KirosEngine3.Shaders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -91,6 +93,9 @@ namespace KirosEngine3.Config
                     AddVar(ConfigKeys.D_FONT_NAME_KEY, data.Defaults.DefaultFont.DefaultFontName);
                     AddVar(ConfigKeys.D_FONT_FILE_KEY, data.Defaults.DefaultFont.DefaultFontFile);
 
+                    //load default shaders
+                    LoadDefaultShaderData(data.Defaults.DefaultShaders);
+
                     sr.Close();
 
                     return true;
@@ -105,6 +110,48 @@ namespace KirosEngine3.Config
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Load the default shaders defined in the config file.
+        /// </summary>
+        /// <param name="defaultShaders">The shader data from the config file.</param>
+        /// <exception cref="MissingConfigException">Thrown if the shader directory config is missing.</exception>
+        /// <exception cref="NotImplementedException">Thrown if the shader data contains an unsupported attribute type.</exception>
+        private static void LoadDefaultShaderData(ConfigDefaultShader[] defaultShaders)
+        {
+            string? shaderDir = GetVar(ConfigKeys.D_DIR_SHADER_KEY) ?? throw new MissingConfigException("Default Shader Directory not defined in configuration.");
+
+            foreach (var shader in defaultShaders)
+            {
+                string vertPath = shaderDir + "/" + shader.VertFile;
+                string fragPath = shaderDir + "/" + shader.FragFile;
+
+                //get the shader attribute names
+                ShaderAttribNames attribNames = new ShaderAttribNames();
+                foreach (var name in shader.ShaderAttributes)
+                {
+                    switch (name.AttribType)
+                    {
+                        case "position":
+                            attribNames.Position = name.AttribName;
+                            break;
+                        case "color":
+                            attribNames.Color = name.AttribName;
+                            break;
+                        case "uv":
+                            attribNames.UV = name.AttribName;
+                            break;
+                        case "normal":
+                            attribNames.Normal = name.AttribName;
+                            break;
+                        default:
+                            throw new NotImplementedException(string.Format("Shader does not have an implementation for shader attribute of type: {0}", name.AttribType));
+                    }
+                }
+
+                ShaderManager.CreateShader(shader.ShaderName, vertPath, fragPath, attribNames);
+            }
         }
 
         /// <summary>
@@ -154,7 +201,7 @@ namespace KirosEngine3.Config
         /// </summary>
         /// <param name="name">The name of the variable to get</param>
         /// <returns>The value of the variable</returns>
-        public static object? GetVar(string name)
+        public static string? GetVar(string name)
         {
             if (Instance._vars.TryGetValue(name, out var obj))
             {
@@ -227,6 +274,10 @@ namespace KirosEngine3.Config
 
         [XmlElement("font")]
         public ConfigDefaultFont DefaultFont { get; set; }
+
+        [XmlArray("shaders")]
+        [XmlArrayItem("shader")]
+        public ConfigDefaultShader[] DefaultShaders { get; set; }
     }
 
     public struct ConfigDefaultDir
@@ -248,6 +299,33 @@ namespace KirosEngine3.Config
 
         [XmlAttribute("fType")]
         public string FileType { get; set; }
+    }
+
+    public struct ConfigDefaultShader
+    {
+        [XmlAttribute("name")]
+        public string ShaderName { get; set; }
+
+        [XmlAttribute ("vertShader")]
+        public string VertFile { get; set; }
+
+        [XmlAttribute ("fragShader")]
+        public string FragFile { get; set; }
+
+        [XmlElement ("shaderAttribute")]
+        public ConfigShaderAttrib[] ShaderAttributes { get; set; }
+    }
+
+    public struct ConfigShaderAttrib
+    {
+        [XmlAttribute("name")]
+        public string AttribName { get; set; }
+
+        [XmlAttribute ("type")]
+        public string AttribType { get; set; }//position, color, uv, etc.
+
+        /*[XmlAttribute ("value")]
+        public ShaderAttribValueType Value { get; set; }*/
     }
     #endregion
 }

@@ -138,11 +138,12 @@ namespace KirosEngine3.Textures
             {
                 Console.WriteLine(v.ToString());
             }
-            
 
-            TexturedVertex.SetVertexPositionAttrib(sh, "aPosition");
+            sh.SetAttribsGL<TexturedVertex>();
 
-            TexturedVertex.SetVertexUVAttrib(sh, "aUV");
+            //TexturedVertex.SetVertexPositionAttrib(sh, "aPosition");
+
+            //TexturedVertex.SetVertexUVAttrib(sh, "aUV");
 
             sh.SetUniformMat4GL("model", vm.Model);
             sh.SetUniformMat4GL("view", vm.View);

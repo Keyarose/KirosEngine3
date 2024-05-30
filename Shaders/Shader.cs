@@ -11,17 +11,22 @@ using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
 using KirosEngine3.Mesh;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+using System.Xml;
+using KirosEngine3.Config;
+using KirosEngine3.Exceptions;
 
 namespace KirosEngine3.Shaders
 {
-    public class Shader : IDisposable
+    public class Shader : IDisposable, IXmlSerializable
     {
         protected int _handle;
         protected bool _disposed;
-        protected string _name;
+        protected string _name = null!;
 
-        protected string _vertPath;
-        protected string _fragPath;
+        protected string _vertPath = null!;
+        protected string _fragPath = null!;
 
         protected ShaderAttribNames _attribNames;
 
@@ -57,6 +62,9 @@ namespace KirosEngine3.Shaders
         /// </summary>
         public string NormalAttribName
         { get { return _attribNames.Normal; } }
+
+        public Shader()
+        { }
 
         /// <summary>
         /// Construct a shader from a vertex shader and a fragment shader
@@ -625,6 +633,111 @@ namespace KirosEngine3.Shaders
         }
         #endregion
 
+        #region Xml
+        /// <inheritdoc/>
+        public XmlSchema? GetSchema()
+        {
+            return null;
+        }
+        //todo: xml testing
+        /// <inheritdoc/>
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("name", _name);
+
+            string vertFile = _vertPath.Split("/").Last();
+            string fragFile = _fragPath.Split("/").Last();
+            writer.WriteAttributeString("vertShader", vertFile);
+            writer.WriteAttributeString("fragShader", fragFile);
+
+            //write the position attrib if it is defined
+            if (!PositionAttribName.Equals(""))
+            {
+                WriteXmlShaderAttrib(writer, PositionAttribName, "position");
+            }
+
+            //write the color attrib if defined
+            if (!ColorAttribName.Equals(""))
+            {
+                WriteXmlShaderAttrib(writer, ColorAttribName, "color");
+            }
+
+            //write the uv attrib
+            if (!UVAttribName.Equals(""))
+            {
+                WriteXmlShaderAttrib(writer, UVAttribName, "uv");
+            }
+
+            //Write the normal attrib
+            if (!NormalAttribName.Equals(""))
+            {
+                WriteXmlShaderAttrib(writer, NormalAttribName, "normal");
+            }
+        }
+
+        /// <summary>
+        /// Serialize the specified shader attribute into xml.
+        /// </summary>
+        /// <param name="writer">The XmlWriter to use.</param>
+        /// <param name="attribName">The name of the attribute to serialize.</param>
+        /// <param name="type">The type of attribute.</param>
+        private void WriteXmlShaderAttrib(XmlWriter writer, string attribName, string type = "")
+        {
+            Tuple<int, ActiveAttribType> attrib = _attribList[attribName];
+
+            writer.WriteStartElement("shaderAttribute");
+            writer.WriteAttributeString("name", attribName);
+            writer.WriteAttributeString("type", type);
+            writer.WriteAttributeString("value", FromActiveAttribType(attrib.Item2).ToString());
+            writer.WriteEndAttribute();
+        }
+
+        /// <inheritdoc/>
+        public void ReadXml(XmlReader reader)
+        {
+            reader.MoveToContent();
+            string? name = reader.GetAttribute("name") ?? throw new XmlException("Name attribute not found in Shader element.");
+            _name = name;
+
+            string? vertShader = reader.GetAttribute("vertShader") ?? throw new XmlException("vertShader attribute not found in shader element.");
+            string? fragShader = reader.GetAttribute("fragShader") ?? throw new XmlException("fragShader attribute not found in shader element.");
+            string? shaderDir = ConfigVars.GetVar(ConfigKeys.D_DIR_SHADER_KEY) ?? throw new MissingConfigException("Default Shader Directory not defined in configuration.");
+
+            _vertPath = shaderDir + "/" + vertShader;
+            _fragPath = shaderDir + "/" + fragShader;
+
+            ShaderAttribNames attribNames = new ShaderAttribNames();
+            //read attribs
+            while(reader.Read())
+            {
+                bool isEmpty = reader.IsEmptyElement;
+                if(!isEmpty)
+                {
+                    string? aName = reader.GetAttribute("name") ?? throw new XmlException("name attribute not found in shaderAttribute element.");
+                    string? aType = reader.GetAttribute("type") ?? throw new XmlException("type attribute not found in shaderAttribute element.");
+
+                    switch (aType) 
+                    {
+                        case "position":
+                            attribNames.Position = aName;
+                            break;
+                        case "color":
+                            attribNames.Color = aName;
+                            break;
+                        case "uv":
+                            attribNames.UV = aName;
+                            break;
+                        case "normal":
+                            attribNames.Normal = aName;
+                            break;
+                        default:
+                            throw new NotImplementedException(string.Format("Shader does not have an implementation for shader attribute of type: {0}", aType));
+                    }
+                }
+            }
+        }
+        #endregion
+
         /// <summary>
         /// Simple mapping of ActiveAttribType to VertexAttribPointerType
         /// </summary>
@@ -634,7 +747,6 @@ namespace KirosEngine3.Shaders
         /// <returns></returns>
         private static VertexAttribPointerType FromActiveAttribType(ActiveAttribType at, out int size)
         {
-            //todo: return a size based on input
             switch (at)
             {
                 case ActiveAttribType.UnsignedIntVec2:
@@ -717,6 +829,70 @@ namespace KirosEngine3.Shaders
             }
         }
 
+        private static ShaderAttribValueType FromActiveAttribType(ActiveAttribType at)
+        {
+            //todo: incomplete implementation
+            switch (at)
+            {
+                case ActiveAttribType.UnsignedIntVec2:
+                    return ShaderAttribValueType.Vec2;
+                case ActiveAttribType.UnsignedIntVec3:
+                    return ShaderAttribValueType.Vec3;
+                case ActiveAttribType.UnsignedIntVec4:
+                    return ShaderAttribValueType.Vec4;
+                case ActiveAttribType.UnsignedInt:
+                    return ShaderAttribValueType.Float;
+
+                case ActiveAttribType.FloatVec2:
+                    return ShaderAttribValueType.Vec2;
+                case ActiveAttribType.FloatVec3:
+                    return ShaderAttribValueType.Vec3;
+                case ActiveAttribType.FloatVec4:
+                    return ShaderAttribValueType.Vec4;
+                case ActiveAttribType.Float:
+                    return ShaderAttribValueType.Float;
+
+                case ActiveAttribType.DoubleMat3:
+                case ActiveAttribType.DoubleMat4:
+                case ActiveAttribType.DoubleVec2:
+                    return ShaderAttribValueType.Vec2;
+                case ActiveAttribType.DoubleVec3:
+                    return ShaderAttribValueType.Vec3;
+                case ActiveAttribType.DoubleMat2:
+                case ActiveAttribType.DoubleVec4:
+                    return ShaderAttribValueType.Vec4;
+                case ActiveAttribType.Double:
+                    return ShaderAttribValueType.Float;
+
+                case ActiveAttribType.IntVec2:
+                    return ShaderAttribValueType.Vec2;
+                case ActiveAttribType.IntVec3:
+                    return ShaderAttribValueType.Vec3;
+                case ActiveAttribType.IntVec4:
+                    return ShaderAttribValueType.Vec4;
+                case ActiveAttribType.Int:
+                    return ShaderAttribValueType.Float;
+
+                case ActiveAttribType.FloatMat2:
+                case ActiveAttribType.FloatMat3:
+                case ActiveAttribType.FloatMat4:
+                case ActiveAttribType.FloatMat2x3:
+                case ActiveAttribType.FloatMat2x4:
+                case ActiveAttribType.FloatMat3x2:
+                case ActiveAttribType.FloatMat3x4:
+                case ActiveAttribType.FloatMat4x2:
+                case ActiveAttribType.FloatMat4x3:
+                case ActiveAttribType.DoubleMat2x3:
+                case ActiveAttribType.DoubleMat2x4:
+                case ActiveAttribType.DoubleMat3x2:
+                case ActiveAttribType.DoubleMat3x4:
+                case ActiveAttribType.DoubleMat4x2:
+                case ActiveAttribType.DoubleMat4x3:
+                default:
+                    return ShaderAttribValueType.Float;
+            }
+        }
+
         #region Dispose
         /// <summary>
         /// Disposes of the shader program and marks the shader as disposed (OpenGL)
@@ -781,5 +957,26 @@ namespace KirosEngine3.Shaders
             UV = "";
             Normal = "";
         }
+    }
+
+    [Serializable]
+    public enum ShaderAttribValueType
+    {
+        [XmlEnum(Name = "unknown")]
+        Unknown,
+        [XmlEnum (Name = "float")]
+        Float,
+        [XmlEnum (Name = "vec2")]
+        Vec2,
+        [XmlEnum (Name = "vec3")]
+        Vec3,
+        [XmlEnum (Name = "vec4")]
+        Vec4,
+        [XmlEnum (Name = "mat2")]
+        Mat2,
+        [XmlEnum (Name = "mat3")]
+        Mat3,
+        [XmlEnum (Name = "mat4")]
+        Mat4
     }
 }
