@@ -106,6 +106,10 @@ namespace KirosEngine3.Textures
                     fontText.Load();
                 }
             }
+            else
+            {
+                Console.WriteLine("Font texture: {0} is not added to the Manager.", _fontTexture);
+            }
         }
 
         /// <summary>
@@ -194,47 +198,49 @@ namespace KirosEngine3.Textures
                     //OpenGL uv 0,0 is bottom left
                     //tri 1
                     //top left -4
-                    textVerts[counterV].Position = pos;
-                    textVerts[counterV].UV = new Vec2(ci.X, ci.Y);
+                    textVerts[counterV].Position = pos + new Vec3(ci.XOffset, ci.YOffset, 0.0f);
+                    textVerts[counterV].UV = new Vec2(ci.X, 1 - ci.Y);
+                    textIndices[counterI] = counterV;
                     counterV++;
+                    counterI++;
 
-                    //bottom right -3
-                    textVerts[counterV].Position = pos + new Vec3(ci.Width, -ci.Height, 0.0f);
-                    textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), ci.Y + (float)(ci.Height / _bitmapScale.Y));
+                    //top right -3
+                    textVerts[counterV].Position = pos + new Vec3(ci.Width, 0.0f, 0.0f) + new Vec3(ci.XOffset, ci.YOffset, 0.0f);
+                    textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), 1 - ci.Y);
+                    textIndices[counterI] = counterV;
                     counterV++;
+                    counterI++;
 
-                    //bottom left -2
-                    textVerts[counterV].Position = pos + new Vec3(0.0f, -ci.Height, 0.0f);
-                    textVerts[counterV].UV = new Vec2(ci.X, ci.Y + (float)(ci.Height / _bitmapScale.Y));
+                    //bottom right -2
+                    textVerts[counterV].Position = pos + new Vec3(ci.Width, ci.Height, 0.0f) + new Vec3(ci.XOffset, ci.YOffset, 0.0f);
+                    textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), 1 - ci.Y - (float)(ci.Height / _bitmapScale.Y));
+                    textIndices[counterI] = counterV;
                     counterV++;
+                    counterI++;
 
                     //tri 2
-                    //top left
-
-                    //top right -1
-                    textVerts[counterV].Position = pos + new Vec3(ci.Width, 0.0f, 0.0f);
-                    textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), ci.Y);
-                    counterV++; //increment for the next char
-
                     //bottom right
+                    textIndices[counterI] = counterV - 1;
+                    counterI++;
 
-                    //indices
-                    //tri 1
+                    //bottom left -1
+                    textVerts[counterV].Position = pos + new Vec3(0.0f, ci.Height, 0.0f) + new Vec3(ci.XOffset, ci.YOffset, 0.0f);
+                    textVerts[counterV].UV = new Vec2(ci.X, 1 - ci.Y - (float)(ci.Height / _bitmapScale.Y));
+                    textIndices[counterI] = counterV;
+                    counterV++;//increment for the next char
+                    counterI++;
+
+                    //top left
                     textIndices[counterI] = counterV - 4;
-                    textIndices[counterI + 1] = counterV - 3;
-                    textIndices[counterI + 2] = counterV - 2;
-                    //tri 2
-                    textIndices[counterI + 3] = counterV - 4;
-                    textIndices[counterI + 4] = counterV - 1;
-                    textIndices[counterI + 5] = counterV - 3;
-                    counterI += 6; //increment for the next char
+                    counterI++;//increment for the next char
+
 
                     //shift start pos for next letter
                     pos.X += ci.Width + _charPaddingSize;
                 }
             }
 
-            result.Vertexes = textVerts;
+            result.Vertices = textVerts;
             result.Indexes = textIndices;
 
             return result;

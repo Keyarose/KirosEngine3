@@ -32,6 +32,7 @@ namespace KirosEngine3
         Triangle? testTriangle;
         Quad? testQuad;
         Cube? testCube;
+        TexturedQuad? testTexQ;
         CoordinateGrid? testGrid;
         CoordinateGrid? testGridXZ;
         CoordinateGrid? testGridYZ;
@@ -46,11 +47,11 @@ namespace KirosEngine3
             {
                 //failed to load general config perform fallback
             }
-            
 
+            TextureManager.TryAddTexture("defaultFont", ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + "_0.png");//todo: move font texture loading into font
             FontManager.AddFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], new Font(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY],
             ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + ".xml",
-            ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + "_0.png"));//todo: cleanup method call once config system is implemented
+            "defaultFont"));//todo: cleanup method call once config system is implemented
         }
 
         protected override void OnLoad()
@@ -58,12 +59,13 @@ namespace KirosEngine3
             base.OnLoad();
 
             //test stuff zone
-
+            TextureManager.TryAddTexture("wall", "Resources/Textures/wall.jpg");//debug texture
             //end test stuff
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);
             GL.Enable(EnableCap.DepthTest);
             //GL.Enable(EnableCap.DebugOutput);
+            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);//wireframe drawing
 
             //system control setup
             KeyboardEventManager.CurrentContext = "system";
@@ -80,7 +82,10 @@ namespace KirosEngine3
 
             _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
 
-            testText = new Text(new Vec2(0.0f), df!, "t");
+            testText = new Text(new Vec2(0.0f), df!, "test");
+            //testText.Color = Color4.Red;
+            testText.Init();
+
             testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
             testPoint.Init();
 
@@ -112,6 +117,10 @@ namespace KirosEngine3
             testSButton = new ScreenButton(new Vec2(100.0f, 0.0f), Color4.Yellow, new Vec2(200f, 300f), "color");
             testSButton.Init();
 
+            //testTexQ = new TexturedQuad(Quad.UnitQuad, "wall");
+            testTexQ = new TexturedQuad([new(0f, 0f, 0f), new(200f, 0f, 0f), new(200f, 200f, 0f), new(0f, 200f, 0f)], [0, 1, 2, 2, 3, 0], "defaultFont");
+            testTexQ.Init();
+
             //kem testing
             KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B,
                 KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
@@ -142,7 +151,7 @@ namespace KirosEngine3
                 View = (camera != null) ? camera.View : Matrix4.Identity,
                 Orthographic = (camera != null) ? camera.Orthographic : Matrix4.Identity
             };
-                        
+
             //testTriangle?.DrawGL(viewMatrixes);
             //testPoint?.DrawGL(viewMatrixes);
             //testLine?.DrawGL(viewMatrixes);
@@ -152,9 +161,10 @@ namespace KirosEngine3
             //testGridXZ?.DrawGL(viewMatrixes);
             //testGridYZ?.DrawGL(viewMatrixes);
 
-            testSButton?.DrawGL(viewMatrixes);
-
-            //testText?.Draw(viewMatrixes, TextureUnit.Texture0);
+            //testSButton?.DrawGL(viewMatrixes);
+            //testTexQ?.Draw(viewMatrixes, TextureUnit.Texture1);
+            
+            testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
 
             SwapBuffers();
         }

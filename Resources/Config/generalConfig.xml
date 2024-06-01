@@ -6,14 +6,18 @@
       <directory name="Textures">Resources/Textures</directory>
       <directory name="Shaders">Resources/Shaders</directory>
     </directories>
-    <font name="default" file="Resources/Fonts/latin_sas_math_16pt" fType=".xml"/>
+    <font name="default" file="Resources/Fonts/latin_sas_math_24pt" fType=".xml"/>
     <shaders>
       <shader name="color" vertShader="ColorShader.vert" fragShader="ColorShader.frag">
         <shaderAttribute name="aColor" type="color" value="vec4"/>
         <shaderAttribute name="aPosition" type="position" value="vec3"/>
       </shader>
       <shader name="text" vertShader="FontShader_default.vert" fragShader="FontShader_default.frag">
-        <shaderAttribute name="aColor" type="color" value="vec4"/>
+        <shaderAttribute name="aUV" type="uv" value="vec2"/>
+        <shaderAttribute name="aPosition" type="position" value="vec3"/>
+      </shader>
+      <shader name="texture" vertShader="TextureShader.vert" fragShader="TextureShader.frag">
+        <shaderAttribute name="aUV" type="uv" value="vec2"/>
         <shaderAttribute name="aPosition" type="position" value="vec3"/>
       </shader>
     </shaders>
