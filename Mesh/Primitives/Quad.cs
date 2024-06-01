@@ -193,6 +193,8 @@ namespace KirosEngine3.Mesh.Primitives
             return _verts;
         }
 
+        public uint[] GetIndices() { return _indices; }
+
         /// <inheritdoc/>
         public PrimitiveType GetDrawMode()
         {

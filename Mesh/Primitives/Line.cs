@@ -260,6 +260,7 @@ namespace KirosEngine3.Mesh.Primitives
             }
 
             _verts[vIndex].Color = color;
+            ReloadVerts();
         }
 
         /// <summary>

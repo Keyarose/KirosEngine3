@@ -76,7 +76,7 @@ namespace KirosEngine3
         }
 
         /// <summary>
-        /// Draw the visible lines only if the console is open, and thus visible
+        /// DrawGL the visible lines only if the console is open, and thus visible
         /// </summary>
         public void Draw()
         {

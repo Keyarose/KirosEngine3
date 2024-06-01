@@ -21,6 +21,7 @@ namespace KirosEngine3.Mesh
 
     public static class VertexHelpers
     {
+        #region FromVertex
         /// <summary>
         /// Convert an array of Vertex to ColorVertex with the given color
         /// </summary>
@@ -131,6 +132,23 @@ namespace KirosEngine3.Mesh
                 result[i].Position = v[i].Position;
                 result[i].UV = uv[i];
                 result[i].Color = c[i];
+            }
+
+            return result;
+        }
+        #endregion
+
+        public static TexturedVertex[] TextureVertFromColorVert(ColorVertex[] v, Vec2[] uv)
+        {
+            if (uv.Length != v.Length)
+                throw new ArgumentException("The Vertex array, and UV array need to be the same length.");
+
+            TexturedVertex[] result = new TexturedVertex[v.Length];
+
+            for (int i =0; i < v.Length; ++i)
+            {
+                result[i].Position = v[i].Position;
+                result[i].UV = uv[i];
             }
 
             return result;

@@ -1259,6 +1259,11 @@ namespace KirosEngine3.Math.Vector
         }
         #endregion
 
+        public static explicit operator Vec4(Data.Color4 color)
+        {
+            return new Vec4(color.R, color.G, color.B, color.A);
+        }
+
 #if OPENTK
         #region OpenTKCompat
         /// <summary>

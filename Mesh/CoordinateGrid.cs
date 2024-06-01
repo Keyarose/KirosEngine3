@@ -205,7 +205,7 @@ namespace KirosEngine3.Mesh
 
         #region Draw
         /// <summary>
-        /// Draw the lines together as a single unit
+        /// DrawGL the lines together as a single unit
         /// </summary>
         /// <param name="vm"></param>
         public void DrawGL(ViewMatrixes vm)
@@ -236,7 +236,7 @@ namespace KirosEngine3.Mesh
         }
 
         /// <summary>
-        /// Draw each line of the grid independently
+        /// DrawGL each line of the grid independently
         /// </summary>
         /// <param name="vm"></param>
         public void DrawLinesGL(ViewMatrixes vm)
