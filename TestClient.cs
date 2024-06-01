@@ -82,7 +82,7 @@ namespace KirosEngine3
 
             _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
 
-            testText = new Text(new Vec2(0.0f), df!, "test");
+            testText = new Text(new Vec2(200.0f, 0.0f), df!, "test");
             //testText.Color = Color4.Red;
             testText.Init();
 

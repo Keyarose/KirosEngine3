@@ -14,7 +14,7 @@ namespace KirosEngine3.Textures
         protected string _shaderName;//todo: set as default text shader
         protected string _text;
         protected Vec2 _pos;
-        protected Matrix4 _scale;
+        protected Matrix4 _scale = Matrix4.CreateScale(1.0f);
         protected Matrix4 _rotation;
 
         protected SentenceData _sentence;
@@ -141,17 +141,6 @@ namespace KirosEngine3.Textures
 
             UpdateSentence();
 
-            //debug
-            foreach (var v in _sentence.Vertices)
-            {
-                Console.WriteLine(v.ToString());
-            }
-
-            foreach (var v in _sentence.Indexes)
-            {
-                Console.WriteLine(v.ToString());
-            }
-
             _loaded = true;
             return true;
         }
@@ -195,10 +184,12 @@ namespace KirosEngine3.Textures
             {
                 return;
             }
+
             sh.UseGL();
+            //set the shader uniforms
             sh.SetUniformIntGL("texture0", (int)tu);
 
-            sh.SetUniformMat4GL("model", vm.Model * Matrix4.CreateScale(1f));
+            sh.SetUniformMat4GL("model", vm.Model * _scale * Matrix4.CreateTranslation(_pos.AsVec3()));
             sh.SetUniformMat4GL("view", vm.View);
             sh.SetUniformMat4GL("proj", vm.Orthographic);
 
@@ -223,7 +214,7 @@ namespace KirosEngine3.Textures
         {
             if (_font != null)
             {
-                SentenceData ns = _font.TextForString(_text, _pos.AsVec3());
+                SentenceData ns = _font.TextForString(_text, Vec3.Zero);
 
                 _sentence.Vertices = ns.Vertices;
                 _sentence.Indexes = ns.Indexes;
