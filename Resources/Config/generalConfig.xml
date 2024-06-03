@@ -20,6 +20,9 @@
         <shaderAttribute name="aUV" type="uv" value="vec2"/>
         <shaderAttribute name="aPosition" type="position" value="vec3"/>
       </shader>
+      <shader name="pos" vertShader="PosShader.vert" fragShader="PosShader.frag">
+        <shaderAttribute name="aPosition" type="position" value="vec3"/>
+      </shader>
     </shaders>
   </defaults>
 </config>

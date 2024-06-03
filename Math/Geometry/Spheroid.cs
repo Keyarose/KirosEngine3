@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Geometry
 {
-    public struct Sphere : IEquatable<Sphere>, IFormattable
+    public struct Spheroid : IEquatable<Spheroid>, IFormattable
     {
         /// <summary>
         /// The center of the sphere
@@ -36,21 +36,21 @@ namespace KirosEngine3.Math.Geometry
         public readonly float Volume { get { return SurfaceArea * Radius / 3; } }
 
         /// <summary>
-        /// Basic constructor for a Sphere
+        /// Basic constructor for a Spheroid
         /// </summary>
         /// <param name="center">The center of the sphere</param>
         /// <param name="radius">The radius of the sphere</param>
-        public Sphere(Vec3 center, float radius)
+        public Spheroid(Vec3 center, float radius)
         {
             Center = center;
             Radius = radius;
         }
 
         /// <summary>
-        /// Construct a Sphere from a circle
+        /// Construct a Spheroid from a circle
         /// </summary>
         /// <param name="circle">The circle to build the sphere from</param>
-        public Sphere(Circle3D circle)
+        public Spheroid(Circle3D circle)
         {
             Center = circle.Center;
             Radius = circle.Radius;
@@ -81,7 +81,7 @@ namespace KirosEngine3.Math.Geometry
         }
 
         /// <inheritdoc/>
-        public readonly bool Equals(Sphere other)
+        public readonly bool Equals(Spheroid other)
         {
             return Center == other.Center && Radius == other.Radius;
         }
@@ -89,7 +89,7 @@ namespace KirosEngine3.Math.Geometry
         /// <inheritdoc/>
         public readonly override bool Equals([NotNullWhen(true)] object? obj)
         {
-            return obj is Sphere sp && Equals(sp);
+            return obj is Spheroid sp && Equals(sp);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace KirosEngine3.Math.Geometry
         /// <param name="lhs">The left value</param>
         /// <param name="rhs">The right value</param>
         /// <returns>True if the spheres are equivalent, false otherwise</returns>
-        public static bool operator ==(Sphere lhs, Sphere rhs)
+        public static bool operator ==(Spheroid lhs, Spheroid rhs)
         {
             return lhs.Equals(rhs);
         }
@@ -109,7 +109,7 @@ namespace KirosEngine3.Math.Geometry
         /// <param name="lhs">The left value</param>
         /// <param name="rhs">The right value</param>
         /// <returns>True if the spheres are not equivalent, false otherwise</returns>
-        public static bool operator !=(Sphere lhs, Sphere rhs)
+        public static bool operator !=(Spheroid lhs, Spheroid rhs)
         {
             return !lhs.Equals(rhs);
         }
@@ -142,7 +142,7 @@ namespace KirosEngine3.Math.Geometry
         /// <inheritdoc/>
         public readonly string ToString(string? format, IFormatProvider? formatProvider) 
         {
-            return string.Format("Sphere \n\t Center: {0}\n\t Radius: {1}", Center.ToString(format, formatProvider), Radius.ToString(format, formatProvider));
+            return string.Format("Spheroid \n\t Center: {0}\n\t Radius: {1}", Center.ToString(format, formatProvider), Radius.ToString(format, formatProvider));
         }
         #endregion
     }
