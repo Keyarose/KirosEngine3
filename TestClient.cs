@@ -32,6 +32,8 @@ namespace KirosEngine3
         Triangle? testTriangle;
         Quad? testQuad;
         Cube? testCube;
+        Sphere? testSphere;
+
         TexturedQuad? testTexQ;
         CoordinateGrid? testGrid;
         CoordinateGrid? testGridXZ;
@@ -82,12 +84,18 @@ namespace KirosEngine3
 
             _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
 
-            testText = new Text(new Vec2(200.0f, 0.0f), df!, "test");
-            //testText.Color = Color4.Red;
-            testText.Init();
+            //load test text
+            {
+                testText = new Text(new Vec2(200.0f, 0.0f), df!, "test");
+                //testText.Color = Color4.Red;
+                testText.Init();
+            }
 
-            testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
-            testPoint.Init();
+            //load test point
+            {
+                testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
+                testPoint.Init();
+            }
 
 
             testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), Color4.Red);
@@ -102,6 +110,10 @@ namespace KirosEngine3
             testCube = Cube.UnitCube;
             testCube.SetColors([Color4.Red, Color4.Blue, Color4.Green, Color4.Yellow]);
             testCube.Init();
+
+            testSphere = new Sphere(Vec3.Zero, 1.0f, SphereType.UVSphere, 12, 22, "pos");
+            testSphere.Init("pos");
+            testSphere.Color = Color4.Blue;
 
             testGrid = CoordinateGrid.UnitGridXY;
             testGrid.Init();
@@ -157,6 +169,8 @@ namespace KirosEngine3
             //testLine?.DrawGL(viewMatrixes);
             //testQuad?.DrawGL(viewMatrixes);
             //testCube?.DrawGL(viewMatrixes);
+            testSphere?.Draw(viewMatrixes);
+
             //testGrid?.DrawGL(viewMatrixes);
             //testGridXZ?.DrawGL(viewMatrixes);
             //testGridYZ?.DrawGL(viewMatrixes);
@@ -164,7 +178,7 @@ namespace KirosEngine3
             //testSButton?.DrawGL(viewMatrixes);
             //testTexQ?.Draw(viewMatrixes, TextureUnit.Texture1);
             
-            testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            //testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
 
             SwapBuffers();
         }
