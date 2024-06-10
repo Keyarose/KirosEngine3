@@ -29,6 +29,7 @@ namespace KirosEngine3.Shaders
         protected string _fragPath = null!;
 
         protected ShaderAttribNames _attribNames;
+        protected ShaderUniformNames _uniformNames;
 
         protected readonly Dictionary<string, int> _uniformLocations = [];
         protected Dictionary<string, Tuple<int, ActiveAttribType>> _attribList = [];
@@ -39,6 +40,7 @@ namespace KirosEngine3.Shaders
         public string Name
         { get { return _name; } }
 
+        #region AttributeNames
         /// <summary>
         /// The name of the attrib used in the shader for position data, empty string if unused.
         /// </summary>
@@ -62,6 +64,7 @@ namespace KirosEngine3.Shaders
         /// </summary>
         public string NormalAttribName
         { get { return _attribNames.Normal; } }
+        #endregion
 
         public Shader()
         { }
@@ -829,49 +832,49 @@ namespace KirosEngine3.Shaders
             }
         }
 
-        private static ShaderAttribValueType FromActiveAttribType(ActiveAttribType at)
+        private static ShaderValueType FromActiveAttribType(ActiveAttribType at)
         {
             //todo: incomplete implementation
             switch (at)
             {
                 case ActiveAttribType.UnsignedIntVec2:
-                    return ShaderAttribValueType.Vec2;
+                    return ShaderValueType.Vec2;
                 case ActiveAttribType.UnsignedIntVec3:
-                    return ShaderAttribValueType.Vec3;
+                    return ShaderValueType.Vec3;
                 case ActiveAttribType.UnsignedIntVec4:
-                    return ShaderAttribValueType.Vec4;
+                    return ShaderValueType.Vec4;
                 case ActiveAttribType.UnsignedInt:
-                    return ShaderAttribValueType.Float;
+                    return ShaderValueType.Float;
 
                 case ActiveAttribType.FloatVec2:
-                    return ShaderAttribValueType.Vec2;
+                    return ShaderValueType.Vec2;
                 case ActiveAttribType.FloatVec3:
-                    return ShaderAttribValueType.Vec3;
+                    return ShaderValueType.Vec3;
                 case ActiveAttribType.FloatVec4:
-                    return ShaderAttribValueType.Vec4;
+                    return ShaderValueType.Vec4;
                 case ActiveAttribType.Float:
-                    return ShaderAttribValueType.Float;
+                    return ShaderValueType.Float;
 
                 case ActiveAttribType.DoubleMat3:
                 case ActiveAttribType.DoubleMat4:
                 case ActiveAttribType.DoubleVec2:
-                    return ShaderAttribValueType.Vec2;
+                    return ShaderValueType.Vec2;
                 case ActiveAttribType.DoubleVec3:
-                    return ShaderAttribValueType.Vec3;
+                    return ShaderValueType.Vec3;
                 case ActiveAttribType.DoubleMat2:
                 case ActiveAttribType.DoubleVec4:
-                    return ShaderAttribValueType.Vec4;
+                    return ShaderValueType.Vec4;
                 case ActiveAttribType.Double:
-                    return ShaderAttribValueType.Float;
+                    return ShaderValueType.Float;
 
                 case ActiveAttribType.IntVec2:
-                    return ShaderAttribValueType.Vec2;
+                    return ShaderValueType.Vec2;
                 case ActiveAttribType.IntVec3:
-                    return ShaderAttribValueType.Vec3;
+                    return ShaderValueType.Vec3;
                 case ActiveAttribType.IntVec4:
-                    return ShaderAttribValueType.Vec4;
+                    return ShaderValueType.Vec4;
                 case ActiveAttribType.Int:
-                    return ShaderAttribValueType.Float;
+                    return ShaderValueType.Float;
 
                 case ActiveAttribType.FloatMat2:
                 case ActiveAttribType.FloatMat3:
@@ -889,7 +892,7 @@ namespace KirosEngine3.Shaders
                 case ActiveAttribType.DoubleMat4x2:
                 case ActiveAttribType.DoubleMat4x3:
                 default:
-                    return ShaderAttribValueType.Float;
+                    return ShaderValueType.Float;
             }
         }
 
@@ -946,9 +949,16 @@ namespace KirosEngine3.Shaders
     public struct ShaderAttribNames
     {
         public string Position { get; set; }
+        public ShaderValueType PositionType { get; set; }
+
         public string Color { get; set; }
+        public ShaderValueType ColorType { get; set; }
+
         public string UV { get; set; }
+        public ShaderValueType UVType { get; set; }
+
         public string Normal { get; set; }
+        public ShaderValueType NormalType { get; set; }
 
         public ShaderAttribNames()
         {
@@ -959,24 +969,34 @@ namespace KirosEngine3.Shaders
         }
     }
 
-    [Serializable]
-    public enum ShaderAttribValueType
+    /// <summary>
+    /// Names for common shader uniforms. Each field defaults to empty string or unknown
+    /// and should only be assigned to if the shader makes use of the field type.
+    /// </summary>
+    public struct ShaderUniformNames
     {
-        [XmlEnum(Name = "unknown")]
-        Unknown,
-        [XmlEnum (Name = "float")]
-        Float,
-        [XmlEnum (Name = "vec2")]
-        Vec2,
-        [XmlEnum (Name = "vec3")]
-        Vec3,
-        [XmlEnum (Name = "vec4")]
-        Vec4,
-        [XmlEnum (Name = "mat2")]
-        Mat2,
-        [XmlEnum (Name = "mat3")]
-        Mat3,
-        [XmlEnum (Name = "mat4")]
-        Mat4
+        public string Model { get; set; }
+        public ShaderValueType ModelType { get; set; }
+
+        public string View { get; set; }
+        public ShaderValueType ViewType { get; set; }
+
+        public string Projection { get; set; }
+        public ShaderValueType ProjectionType { get; set; }
+
+        public string Ortho { get; set; }
+        public ShaderValueType OrthoType { get; set; }
+
+        public string Color { get; set; }
+        public ShaderValueType ColorType { get; set; }
+
+        public ShaderUniformNames()
+        {
+            Model = "";
+            View = "";
+            Projection = "";
+            Ortho = "";
+            Color = "";
+        }
     }
 }

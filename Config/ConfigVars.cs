@@ -325,7 +325,7 @@ namespace KirosEngine3.Config
         public string AttribType { get; set; }//position, color, uv, etc.
 
         /*[XmlAttribute ("value")]
-        public ShaderAttribValueType Value { get; set; }*/
+        public ShaderValueType Value { get; set; }*/
     }
     #endregion
 }

@@ -13,38 +13,38 @@ namespace KirosEngine3.Camera
 {
     public class BaseCamera
     {
-        private Vec3 _position;
-        private Vec3 _lookAt;
+        protected Vec3 _position;
+        protected Vec3 _lookAt;
 
         //camera coordinate space
-        private Vec3 _forward = -Vec3.UnitZ;
-        private Vec3 _up = Vec3.UnitY;
-        private Vec3 _right = Vec3.UnitX;
+        protected Vec3 _forward = -Vec3.UnitZ;
+        protected Vec3 _up = Vec3.UnitY;
+        protected Vec3 _right = Vec3.UnitX;
 
         //rotations
-        private float _pitch;
-        private float _yaw = -MathHelpers.PiOver2;
+        protected float _pitch;
+        protected float _yaw = -MathHelpers.PiOver2;
 
-        private float _fov = MathHelpers.PiOver2;
-        private float _nearClip = 0.01f;
-        private float _farClip = 100.0f;
+        protected float _fov = MathHelpers.PiOver2;
+        protected float _nearClip = 0.01f;
+        protected float _farClip = 100.0f;
 
-        private float _width;
-        private float _height;
-        private float _aspectRatio;
+        protected float _width;
+        protected float _height;
+        protected float _aspectRatio;
 
         //camera move speed
-        private float _speed;
+        protected float _speed;
 
         //mouse control variables
-        private bool _firstMove = true;
-        private Vec2 _lastPos;
-        private float _sensitivity;
+        protected bool _firstMove = true;
+        protected Vec2 _lastPos;
+        protected float _sensitivity;
 
         //view matrices
-        private Matrix4 _view;
-        private Matrix4 _projection;
-        private Matrix4 _orthographic;
+        protected Matrix4 _view;
+        protected Matrix4 _projection;
+        protected Matrix4 _orthographic;
 
         /// <summary>
         /// The position of the camera in world space
@@ -319,7 +319,7 @@ namespace KirosEngine3.Camera
         /// <summary>
         /// Update the projection matrix based on changes to camera data
         /// </summary>
-        private void UpdateProjMatrix()
+        protected virtual void UpdateProjMatrix()
         {
             _projection = Matrix4.CreatePerspectiveFOV(_fov, _aspectRatio, _nearClip, _farClip);
         }
@@ -327,7 +327,7 @@ namespace KirosEngine3.Camera
         /// <summary>
         /// Update the view matrix based on changes to camera data
         /// </summary>
-        private void UpdateViewMatrix()
+        protected virtual void UpdateViewMatrix()
         {
             _view = Matrix4.LookAt(Position, Position + Forward, Up);
         }
@@ -335,9 +335,8 @@ namespace KirosEngine3.Camera
         /// <summary>
         /// Update the orthographic matrix based on changes to camera data
         /// </summary>
-        private void UpdateOrthoMatrix()
+        protected virtual void UpdateOrthoMatrix()
         {
-            //_orthographic = Matrix4.CreateOrthographic(_width, _height, _nearClip, _farClip);
             //height as bottom sets 0,0 at upper left
             _orthographic = Matrix4.CreateOrthographicOffCenter(0f, _width, _height, 0f, _nearClip, _farClip);
         }
@@ -345,13 +344,59 @@ namespace KirosEngine3.Camera
         /// <summary>
         /// Sets the view matrix so that the camera looks at the point _lookAt
         /// </summary>
-        private void LookAtSet()
+        protected virtual void LookAtSet()
         {
+            //calc the new forward vector and the rotations
+            Vec3 nForward = Vec3.Normalize(_lookAt - _position);
+
+            float nPitch = MathF.Asin(nForward.Y);
+            float nYaw = MathF.Acos(nForward.X / MathF.Cos(nPitch));
+
+            _forward = nForward;
+            _pitch = nPitch;
+            _yaw = nYaw;
+
+            //if forward is parallel to the Y axis use the negative Z axis to find right
+            if (Vec3.Dot(nForward, Vec3.UnitY).Abs().CloseTo(1f))
+            {
+                _right = Vec3.Normalize(Vec3.Cross(_forward, -Vec3.UnitZ));
+            }
+            else
+            {
+                _right = Vec3.Normalize(Vec3.Cross(_forward, Vec3.UnitY));
+            }
+
+            _up = Vec3.Normalize(Vec3.Cross(_right, _forward));
+
             _view = Matrix4.LookAt(_position, _lookAt, _up);
-            //todo: update camera data based on normalize(lookat - position)
         }
 
-        private void UpdateVectors()
+        /// <summary>
+        /// Sets the view matrix so that the camera looks at the point _lookAt,
+        /// with the provided up vector.
+        /// </summary>
+        /// <param name="up">The vector to be used as the up direction.</param>
+        protected virtual void LookAtSet(Vec3 up)
+        {
+            _view = Matrix4.LookAt(_position, _lookAt, up);
+        }
+
+        /// <summary>
+        /// Set both pitch and yaw.
+        /// </summary>
+        /// <param name="pitch">The pitch in degrees.</param>
+        /// <param name="yaw">The yaw in degrees.</param>
+        public void SetPitchAndYaw(float pitch, float yaw)
+        {
+            var angle = MathHelpers.Clamp(pitch, -89.0f, 89.0f);
+            _pitch = MathHelpers.DegToRad(angle);
+
+            _yaw = MathHelpers.DegToRad(yaw);
+
+            UpdateVectors();
+        }
+
+        protected virtual void UpdateVectors()
         {
             //update the forward vector for rotations
             _forward.X = MathF.Cos(_pitch) * MathF.Cos(_yaw);
@@ -371,5 +416,12 @@ namespace KirosEngine3.Camera
         {
             //todo: camera update method
         }
+
+        public override string ToString()
+        {
+            return string.Format("Camera: \n Position: {0} \t LookAt: {1} \n Forward: {2} \t Right: {3} \t Up: {4}", Position, LookAt, Forward, Right, Up);
+        }
+
+        
     }
 }
