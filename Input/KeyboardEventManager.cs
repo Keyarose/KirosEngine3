@@ -98,6 +98,25 @@ namespace KirosEngine3.Input
         }
 
         /// <summary>
+        /// Subscribe to the keyboard event manager in the given context for the given keys and event type.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="keys"></param>
+        /// <param name="keyMode"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public static bool SubscribeKeyboardEvents(string context, Keys[] keys, KeyboardEventType keyMode, KeyboardEventHandler callback)
+        {
+            foreach (var key in keys)
+            {
+                if (!SubscribeKeyboardEvent(context, key, keyMode, callback))
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Unsubscribe from the keyboard event manager in the given context for the given key mode
         /// </summary>
         /// <param name="context">The program context in which the subscriber no longer wants to receive events</param>
@@ -134,9 +153,10 @@ namespace KirosEngine3.Input
         /// Intended to be called from Client.OnUpdateFrame
         /// </summary>
         /// <param name="keyState">The current keyboard state</param>
+        /// <param name="time">Number of seconds since the previous call.</param>
         /// <exception cref="InvalidOperationException">Thrown when the KeyboardEventType for an unpacked
         /// event handler is an invalid value</exception>
-        public static void Update(KeyboardState keyState)
+        public static void Update(KeyboardState keyState, double time)
         {
             //check special key states like caps-lock
             if (keyState.IsKeyPressed(Keys.CapsLock)) { _capsLockState = !_capsLockState; }
@@ -148,7 +168,7 @@ namespace KirosEngine3.Input
             {
                 try
                 {
-                    ProcessContextList(keyState, contextList);
+                    ProcessContextList(keyState, contextList, time);
                 }
                 catch
                 {
@@ -161,7 +181,7 @@ namespace KirosEngine3.Input
             {
                 try
                 {
-                    ProcessContextList(keyState, contextList);
+                    ProcessContextList(keyState, contextList, time);
                 }
                 catch
                 {
@@ -179,9 +199,10 @@ namespace KirosEngine3.Input
         /// </summary>
         /// <param name="keyState">The current key state</param>
         /// <param name="contextList">The list of watchers to process</param>
+        /// <param name="time">Seconds since the last call.</param>
         /// <exception cref="InvalidOperationException">Thrown when the KeyboardEventType for an unpacked 
         /// event handler is an invalid value</exception>
-        private static void ProcessContextList(KeyboardState keyState, Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>? contextList)
+        private static void ProcessContextList(KeyboardState keyState, Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>? contextList, double time)
         {
             if (contextList != null)
             {
@@ -211,7 +232,7 @@ namespace KirosEngine3.Input
                                     KeyboardEventHandler temp = kE.Value;
                                     if (temp != null)
                                     {
-                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk);
+                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk, time);
                                         temp.Invoke(Instance, args);
                                     }
                                 }
@@ -224,7 +245,7 @@ namespace KirosEngine3.Input
                                     KeyboardEventHandler temp = kE.Value;
                                     if (temp != null)
                                     {
-                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk);
+                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk, time);
                                         temp.Invoke(Instance, args);
                                     }
                                 }
@@ -238,7 +259,7 @@ namespace KirosEngine3.Input
                                     KeyboardEventHandler temp = kE.Value;
                                     if (temp != null)
                                     {
-                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk);
+                                        KeyboardEventArgs args = new KeyboardEventArgs(kE.Key.Item1, kE.Key.Item2, amk, time);
                                         temp.Invoke(Instance, args);
                                     }
                                 }
@@ -285,11 +306,14 @@ namespace KirosEngine3.Input
 
         public ActiveModifierKeys ModifierKeys { get; private set; }
 
-        public KeyboardEventArgs(Keys key, KeyboardEventType type, ActiveModifierKeys modKeys)
+        public double Time { get; private set; }
+
+        public KeyboardEventArgs(Keys key, KeyboardEventType type, ActiveModifierKeys modKeys, double time)
         {
             Key = key;
             Type = type;
             ModifierKeys = modKeys;
+            Time = time;
         }
     }
 

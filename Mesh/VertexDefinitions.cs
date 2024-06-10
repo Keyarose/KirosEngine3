@@ -176,6 +176,12 @@ namespace KirosEngine3.Mesh
         public Vec3 Position { get; set; }
 
         /// <summary>
+        /// The vertex's normal.
+        /// </summary>
+        public Vec3 Normal { get; set; }
+        public static readonly int NormalOffset = Vec3.SizeInBytesU;
+
+        /// <summary>
         /// The size of the vertex in bytes (Unsafe)
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<Vertex>();
@@ -224,7 +230,7 @@ namespace KirosEngine3.Mesh
 
         public override readonly string ToString()
         {
-            return string.Format("Position: {0}", Position);
+            return string.Format("Position: {0}, Normal: {1}", Position, Normal);
         }
     }
 
@@ -241,10 +247,16 @@ namespace KirosEngine3.Mesh
         public Vec3 Position { get; set; }
 
         /// <summary>
+        /// The vertex's normal.
+        /// </summary>
+        public Vec3 Normal { get; set; }
+        public static readonly int NormalOffset = Vec3.SizeInBytesU;
+
+        /// <summary>
         /// The vertex's color with alpha
         /// </summary>
         public Color4 Color { get; set; }
-        public static readonly int ColorOffset = Vec3.SizeInBytesU;
+        public static readonly int ColorOffset = Vec3.SizeInBytesU * 2;
 
         /// <summary>
         /// The size of the vertex in bytes (Unsafe)
@@ -320,7 +332,7 @@ namespace KirosEngine3.Mesh
 
         public override readonly string ToString()
         {
-            return string.Format("Position: {0} \t Color: {1}", Position, Color);
+            return string.Format("Position: {0}, Normal: {1}, Color: {2}", Position, Normal, Color);
         }
     }
 
@@ -337,10 +349,16 @@ namespace KirosEngine3.Mesh
         public Vec3 Position { get; set; }
 
         /// <summary>
+        /// The vertex's normal.
+        /// </summary>
+        public Vec3 Normal { get; set; }
+        public static readonly int NormalOffset = Vec3.SizeInBytesU;
+
+        /// <summary>
         /// The vertex's uv coordinates
         /// </summary>
         public Vec2 UV { get; set; }
-        public static readonly int UVOffset = Vec3.SizeInBytesU;
+        public static readonly int UVOffset = Vec3.SizeInBytesU * 2;
 
         /// <summary>
         /// The size of the vertex in bytes (Unsafe)
@@ -416,7 +434,7 @@ namespace KirosEngine3.Mesh
 
         public override readonly string ToString()
         {
-            return string.Format("Position: {0} \t UV: {1}", Position, UV);
+            return string.Format("Position: {0}, Normal: {1}, UV: {2}", Position, Normal, UV);
         }
     }
 
@@ -433,16 +451,22 @@ namespace KirosEngine3.Mesh
         public Vec3 Position { get; set; }
 
         /// <summary>
+        /// The vertex's normal.
+        /// </summary>
+        public Vec3 Normal { get; set; }
+        public static readonly int NormalOffset = Vec3.SizeInBytesU;
+
+        /// <summary>
         /// The vertex's color
         /// </summary>
         public Color4 Color { get; set; }
-        public static readonly int ColorOffset = Vec3.SizeInBytesU;
+        public static readonly int ColorOffset = Vec3.SizeInBytesU * 2;
 
         /// <summary>
         /// The vertex's texture coordinates
         /// </summary>
         public Vec2 UV { get; set; }
-        public static readonly int UVOffset = Vec3.SizeInBytesU + Color4.SizeInBytesU;
+        public static readonly int UVOffset = Vec3.SizeInBytesU * 2 + Color4.SizeInBytesU;
 
         /// <summary>
         /// The size of the vertex in bytes (Unsafe)
@@ -544,7 +568,7 @@ namespace KirosEngine3.Mesh
 
         public override readonly string ToString()
         {
-            return string.Format("Position: {0} \t Color: {1} \t UV: {2}", Position, Color, UV);
+            return string.Format("Position: {0}, Normal: {1} Color: {2}, UV: {3}", Position, Normal, Color, UV);
         }
     }
 }

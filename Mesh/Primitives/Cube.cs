@@ -170,7 +170,7 @@ namespace KirosEngine3.Mesh.Primitives
         /// <summary>
         /// Initialize the renderable object if it is not being drawn as part of a group
         /// </summary>
-        public void Init()
+        public void Init(string? shaderName)
         {
             _VAO = GL.GenVertexArray();
             GL.BindVertexArray(_VAO);
@@ -183,12 +183,19 @@ namespace KirosEngine3.Mesh.Primitives
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
             GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _indices.Length, _indices, BufferUsageHint.StaticDraw);
 
-            Shader sh = ShaderManager.Instance[_shaderName];
+            if (shaderName != null && shaderName != string.Empty)
+                _shaderName = shaderName;
 
-            //sh.SetPositionAttribGL(3, ColorVertex.SizeInBytesU, 0);
-            //sh.SetColorAttribGL(4, ColorVertex.SizeInBytesU, ColorVertex.ColorOffset);
+            //shader is not found return
+            if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
+            {
+                return;
+            }
 
-            sh.SetAttribsGL<ColorVertex>();
+            sh.SetPositionAttribGL(3, ColorVertex.SizeInBytesU, 0);
+            sh.SetColorAttribGL(4, ColorVertex.SizeInBytesU, ColorVertex.ColorOffset);
+
+            //sh.SetAttribsGL<ColorVertex>();
 
             GL.BindVertexArray(0);
 
