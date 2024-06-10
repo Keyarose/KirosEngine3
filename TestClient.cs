@@ -74,13 +74,9 @@ namespace KirosEngine3
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
                 KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { Close(); });
 
-            Vec3 moveC = new Vec3(0.0f, 0.0f, 0.0f);//todo: manual camera movement remove later
-            camera = new BaseCamera(2.0f * Vec3.UnitZ + moveC, ClientSize.X, ClientSize.Y);
+            Vec3 moveC = new Vec3(1.0f, 1.0f, 0.0f);//todo: manual camera movement remove later
+            camera = new BaseCamera(2.0f * Vec3.UnitZ + moveC, ClientSize.X, ClientSize.Y, .5f);
             camera.LookAt = Vec3.Zero;
-
-            //shaders now loaded by config
-            //ShaderManager.CreateShader("color", "Resources/Shaders/ColorShader.vert", "Resources/Shaders/ColorShader.frag", new ShaderAttribNames { Color = "aColor", Position = "aPosition" });
-            //ShaderManager.CreateShader("text", "Resources/Shaders/FontShader_default.vert", "Resources/Shaders/FontShader_default.frag");
 
             _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
 
@@ -109,7 +105,7 @@ namespace KirosEngine3
 
             testCube = Cube.UnitCube;
             testCube.SetColors([Color4.Red, Color4.Blue, Color4.Green, Color4.Yellow]);
-            testCube.Init();
+            testCube.Init("color");
 
             testSphere = new Sphere(Vec3.Zero, 1.0f, SphereType.UVSphere, 12, 22, "pos");
             testSphere.Init("pos");
@@ -147,7 +143,7 @@ namespace KirosEngine3
 
             if(!IsFocused) { return; }
             //check keyboard state and notify subscribers
-            KeyboardEventManager.Update(KeyboardState);
+            KeyboardEventManager.Update(KeyboardState, args.Time);
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -168,8 +164,8 @@ namespace KirosEngine3
             //testPoint?.DrawGL(viewMatrixes);
             //testLine?.DrawGL(viewMatrixes);
             //testQuad?.DrawGL(viewMatrixes);
-            //testCube?.DrawGL(viewMatrixes);
-            testSphere?.Draw(viewMatrixes);
+            testCube?.DrawGL(viewMatrixes);
+            //testSphere?.Draw(viewMatrixes);
 
             //testGrid?.DrawGL(viewMatrixes);
             //testGridXZ?.DrawGL(viewMatrixes);

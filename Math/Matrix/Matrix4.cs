@@ -1610,6 +1610,66 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="lhs"></param>
         /// <param name="rhs"></param>
         /// <returns></returns>
+        public static Vec4 Multiply(Matrix4 lhs, Vec4 rhs)
+        {
+            var r = new Vec4
+            {
+                X = Vec4.Dot(lhs.Row0, rhs),
+                Y = Vec4.Dot(lhs.Row1, rhs),
+                Z = Vec4.Dot(lhs.Row2, rhs),
+                W = Vec4.Dot(lhs.Row3, rhs)
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="result"></param>
+        public static void Multiply(Matrix4 lhs, Vec4 rhs, out Vec4 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Vec4 Multiply(Vec4 lhs, Matrix4 rhs)
+        {
+            var r = new Vec4
+            {
+                X = Vec4.Dot(lhs, rhs.Column0),
+                Y = Vec4.Dot(lhs, rhs.Column1),
+                Z = Vec4.Dot(lhs, rhs.Column2),
+                W = Vec4.Dot(lhs, rhs.Column3)
+            };
+
+            return r;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <param name="result"></param>
+        public static void Multiply(Vec4 lhs, Matrix4 rhs, out Vec4 result)
+        {
+            result = Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static Matrix4x2 Multiply(Matrix4 lhs, Matrix4x2 rhs)
         {
             var r = new Matrix4x2
@@ -1742,6 +1802,28 @@ namespace KirosEngine3.Math.Matrix
         public static Matrix4 operator *(float lhs, Matrix4 rhs)
         {
             return Multiply(rhs, lhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Vec4 operator *(Matrix4 lhs, Vec4 rhs)
+        {
+            return Multiply(lhs, rhs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
+        public static Vec4 operator *(Vec4 lhs, Matrix4 rhs)
+        {
+            return Multiply(lhs, rhs);
         }
 
         /// <summary>

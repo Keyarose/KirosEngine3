@@ -171,7 +171,7 @@ namespace KirosEngine3.Math.Vector
         /// </summary>
         /// <param name="v">The 3D vector to use</param>
         /// <param name="w">The W component</param>
-        public Vec4(Vec3 v, float w) 
+        public Vec4(Vec3 v, float w = 0.0f) 
         {
             X = v.X;
             Y = v.Y;
