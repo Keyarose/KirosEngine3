@@ -14,6 +14,10 @@ namespace KirosEngine3.Config
     {
         private string _configFile;
 
+        /// <summary>
+        /// Basic constructor requiring the file to be loaded from.
+        /// </summary>
+        /// <param name="configFile">The file path to the config file.</param>
         public ConfigXmlLoader(string configFile) 
         {
             _configFile = configFile;

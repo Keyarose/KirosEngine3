@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Textures
 {
+    /// <summary>
+    /// A texture object.
+    /// </summary>
     public class Texture : IDisposable
     {
         private readonly int _handle;
@@ -19,15 +22,29 @@ namespace KirosEngine3.Textures
         private bool _loaded = false;
         private bool _disposed = false;
 
+        /// <summary>
+        /// The texture handle for the graphics API.
+        /// </summary>
         public int Handle
         { get { return _handle; } }
 
+        /// <summary>
+        /// The name of the texture.
+        /// </summary>
         public string Name
         { get { return _name; } }
 
+        /// <summary>
+        /// Flag to mark if the texture is loaded.
+        /// </summary>
         public bool IsLoaded
         { get { return _loaded; } }
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="name">The name of the texture.</param>
+        /// <param name="path">The path to the texture file.</param>
         public Texture(string name, string path)
         {
             if(ConfigVars.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
@@ -146,6 +163,9 @@ namespace KirosEngine3.Textures
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
         ~Texture()
         {
             if (_disposed == false)

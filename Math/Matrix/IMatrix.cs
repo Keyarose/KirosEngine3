@@ -46,6 +46,11 @@ namespace KirosEngine3.Math.Matrix
         /// <returns>The resulting matrix.</returns>
         MatType Add(MatType rhs);
 
+        /// <summary>
+        /// Indicates whether the current Matrix is equal to another.
+        /// </summary>
+        /// <param name="other">The matrix to compare.</param>
+        /// <returns>True if the matrix is equal to the other.</returns>
         bool Equals(MatType other);
 
         /// <summary>

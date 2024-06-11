@@ -165,14 +165,14 @@ namespace KirosEngine3
             //testLine?.DrawGL(viewMatrixes);
             //testQuad?.DrawGL(viewMatrixes);
             testCube?.DrawGL(viewMatrixes);
-            //testSphere?.Draw(viewMatrixes);
+            //testSphere?.DrawGL(viewMatrixes);
 
             //testGrid?.DrawGL(viewMatrixes);
             //testGridXZ?.DrawGL(viewMatrixes);
             //testGridYZ?.DrawGL(viewMatrixes);
 
             //testSButton?.DrawGL(viewMatrixes);
-            //testTexQ?.Draw(viewMatrixes, TextureUnit.Texture1);
+            //testTexQ?.DrawGL(viewMatrixes, TextureUnit.Texture1);
             
             //testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
 

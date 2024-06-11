@@ -57,6 +57,9 @@ namespace KirosEngine3.Math.Data
             set { Axis.Z = value; }
         }
 
+        /// <summary>
+        /// Predefined identity Quaternion.
+        /// </summary>
         public static readonly Quaternion Identity = new Quaternion(1, 0, 0, 0);
 
         /// <summary>
@@ -557,6 +560,12 @@ namespace KirosEngine3.Math.Data
             return Axis == other.Axis && W == other.W;
         }
 
+        /// <summary>
+        /// Indicates whether the current Quaternion is equal to another.
+        /// </summary>
+        /// <param name="other">The quaternion to compare.</param>
+        /// <param name="tolerance">The allowed difference between the values.</param>
+        /// <returns>True if the difference between the two Quaternions is less than the tolerance.</returns>
         public readonly bool Equals(Quaternion other, float tolerance)
         {
             return Axis.Equals(other.Axis, tolerance) && W.CloseTo(other.W, tolerance);

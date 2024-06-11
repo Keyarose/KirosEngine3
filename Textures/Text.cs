@@ -8,26 +8,81 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace KirosEngine3.Textures
 {
+    /// <summary>
+    /// A renderable Text object that uses a bitmap font.
+    /// </summary>
     public class Text : IDisposable
     {
+        /// <summary>
+        /// The font to be used to generate the text.
+        /// </summary>
         protected Font? _font;
+
+        /// <summary>
+        /// The name of the shader to be used in rendering.
+        /// </summary>
         protected string _shaderName;//todo: set as default text shader
+
+        /// <summary>
+        /// The text to be rendered to the screen.
+        /// </summary>
         protected string _text;
+
+        /// <summary>
+        /// The screen position of the text's origin.
+        /// </summary>
         protected Vec2 _pos;
+
+        /// <summary>
+        /// The scale of the text.
+        /// </summary>
         protected Matrix4 _scale = Matrix4.CreateScale(1.0f);
+
+        /// <summary>
+        /// The rotation of the text.
+        /// </summary>
         protected Matrix4 _rotation;
 
+        /// <summary>
+        /// The render data for the text.
+        /// </summary>
         protected SentenceData _sentence;
+
+        /// <summary>
+        /// The vertex array object.
+        /// </summary>
         protected int _VAO;
+
+        /// <summary>
+        /// The vertex buffer object.
+        /// </summary>
         protected int _VBO;
+
+        /// <summary>
+        /// The element/index buffer object.
+        /// </summary>
         protected int _EBO;
 
+        /// <summary>
+        /// Flag that shows if the Text has been loaded.
+        /// </summary>
         protected bool _loaded = false;
+
+        /// <summary>
+        /// Flag that shows if the Text has been unloaded.
+        /// </summary>
         protected bool _disposed = false;
+
+        /// <summary>
+        /// Flag that shows if the text has been changed the data needs to be updated.
+        /// </summary>
         protected bool _textChanged = false;
 
-        protected bool _warnOnce = false;//flag to ensure that not loaded is logged only once instead of every frame
+        private bool _warnOnce = false;//flag to ensure that not loaded is logged only once instead of every frame
 
+        /// <summary>
+        /// The draw mode to be used in rendering.
+        /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
         /// <summary>
@@ -80,6 +135,11 @@ namespace KirosEngine3.Textures
         {
         }
 
+        /// <summary>
+        /// Constructor for a Text object.
+        /// </summary>
+        /// <param name="pos">The screen origin position of the text.</param>
+        /// <param name="text">The text to be rendered.</param>
         public Text(Vec2 pos, string text)
         {
             if (!FontManager.TryGetFont(ConfigKeys.D_FONT_NAME_KEY, out _font))
@@ -99,6 +159,12 @@ namespace KirosEngine3.Textures
             };
         }
 
+        /// <summary>
+        /// Constructor for a Text object.
+        /// </summary>
+        /// <param name="pos">The screen origin position of the text.</param>
+        /// <param name="font">The font for the text to be rendered in.</param>
+        /// <param name="text">The text to be rendered.</param>
         public Text(Vec2 pos, Font font, string text)
         {
             _font = font;
@@ -156,6 +222,11 @@ namespace KirosEngine3.Textures
         }
 
         #region Draw
+        /// <summary>
+        /// DrawGL the text using the OpenGL API.
+        /// </summary>
+        /// <param name="vm">The view matrices to be used in rendering.</param>
+        /// <param name="tu">The texture unit to be used in rendering.</param>
         public void DrawGL(ViewMatrixes vm, TextureUnit tu)
         {
             if (!_loaded || _disposed)
@@ -229,6 +300,9 @@ namespace KirosEngine3.Textures
             }
         }
 
+        /// <summary>
+        /// Update Text for changes in the last frame.
+        /// </summary>
         public void Update()
         {
             if (_textChanged)
@@ -239,6 +313,10 @@ namespace KirosEngine3.Textures
         }
         #endregion
 
+        /// <summary>
+        /// Dispose of unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">If true program is calling dispose, if false GC is.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -264,16 +342,33 @@ namespace KirosEngine3.Textures
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
         ~Text()
         {
             Dispose(false);
         }
     }
 
+    /// <summary>
+    /// The collection of data that defines a piece of text.
+    /// </summary>
     public struct SentenceData
     {
+        /// <summary>
+        /// The vertices of the text.
+        /// </summary>
         public TexturedVertex[] Vertices;
+
+        /// <summary>
+        /// Vertex indices of the text.
+        /// </summary>
         public uint[] Indexes;
+
+        /// <summary>
+        /// The color of the text.
+        /// </summary>
         public Color4 Color;
     }
 }

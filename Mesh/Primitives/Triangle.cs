@@ -16,17 +16,39 @@ namespace KirosEngine3.Mesh.Primitives
     /// </summary>
     public class Triangle : IDisposable, IRenderable, IFormattable
     {
+        /// <summary>
+        /// The vertices of the triangle.
+        /// </summary>
         protected ColorVertex[] _verts = new ColorVertex[3];
 
+        /// <summary>
+        /// The vertex array object.
+        /// </summary>
         protected int _VAO;
 
+        /// <summary>
+        /// The vertex buffer object.
+        /// </summary>
         protected int _VBO;
 
+        /// <summary>
+        /// The name of the shader to be used in rendering.
+        /// </summary>
         protected string _shaderName;
 
+        /// <summary>
+        /// Flag indicating if the triangle has been loaded.
+        /// </summary>
         protected bool _loaded = false;
+
+        /// <summary>
+        /// Flag indicating if the triangle has been unloaded.
+        /// </summary>
         protected bool _disposed = false;
 
+        /// <summary>
+        /// The draw mode to be used during rendering.
+        /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
         /// <summary>
@@ -52,6 +74,14 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="points">The corners of the triangle.</param>
+        /// <param name="color">The color of the triangle.</param>
+        /// <param name="shaderName">Optional, the name of the shader to use in rendering.
+        /// Defaults to color.</param>
+        /// <exception cref="ArgumentException">Thrown if there are less than 3 corners provided, or shaderName is empty.</exception>
         public Triangle(Vec3[] points, Color4 color, string shaderName = "color")
         {
             if (points.Length < 3)
@@ -246,6 +276,9 @@ namespace KirosEngine3.Mesh.Primitives
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
         ~Triangle()
         {
             Dispose(false);

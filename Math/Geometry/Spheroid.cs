@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Geometry
 {
+    /// <summary>
+    /// A mathematical representation of a spherical object.
+    /// </summary>
     public struct Spheroid : IEquatable<Spheroid>, IFormattable
     {
         /// <summary>

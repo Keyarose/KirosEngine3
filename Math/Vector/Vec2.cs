@@ -15,10 +15,12 @@ namespace KirosEngine3.Math.Vector
     /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vec2 : IEquatable<Vec2>, IFormattable
+    public struct Vec2 : IEquatable<Vec2>, IFormattable, IVector<Vec2>
     {
-        public float X;
-        public float Y;
+        /// <summary>
+        /// A component of the vector.
+        /// </summary>
+        public float X, Y;
 
         /// <summary>
         /// The Length of the vector
@@ -546,12 +548,12 @@ namespace KirosEngine3.Math.Vector
         {
             result = Divide(v1, v2);
         }
-        
+
         /// <summary>
         /// Define the division of a vector by a scalar
         /// </summary>
-        /// <param name="left">The vector to divide</param>
-        /// <param name="right">The scalar to divide by</param>
+        /// <param name="lhs">The vector to divide</param>
+        /// <param name="rhs">The scalar to divide by</param>
         /// <returns>The resulting vector</returns>
         public static Vec2 operator /(Vec2 lhs, float rhs)
         {
@@ -561,8 +563,8 @@ namespace KirosEngine3.Math.Vector
         /// <summary>
         /// Define the division of a vector component wise by another vector
         /// </summary>
-        /// <param name="left">The vector to divide</param>
-        /// <param name="right">The vector to divide by</param>
+        /// <param name="lhs">The vector to divide</param>
+        /// <param name="rhs">The vector to divide by</param>
         /// <returns>The resulting vector</returns>
         public static Vec2 operator /(Vec2 lhs, Vec2 rhs)
         {

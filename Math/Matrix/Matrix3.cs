@@ -1216,9 +1216,9 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="lhs">The left operand.</param>
         /// <param name="rhs">The right operand.</param>
         /// <param name="result">The resulting matrix.</param>
-        public static void Multiply(Matrix3 m1, Matrix3 m2, out Matrix3 result)
+        public static void Multiply(Matrix3 lhs, Matrix3 rhs, out Matrix3 result)
         {
-            result = Multiply(m1, m2);
+            result = Multiply(lhs, rhs);
         }
 
         /// <summary>

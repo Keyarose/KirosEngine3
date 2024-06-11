@@ -31,12 +31,18 @@ namespace KirosEngine3
         /// </summary>
         public const string GRAPHICSMODE_DX_VAL = "DIRECTX";
 
+        /// <summary>
+        /// Flag to allow or disallow the output of OpenGL debug messages that are only notifications.
+        /// </summary>
         protected static bool _showGLDebugNotify = false;
 
-        public Client(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
-        {
-
-        }
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="width">The width of the client window.</param>
+        /// <param name="height">The height of the client window.</param>
+        /// <param name="title">The title for the window.</param>
+        public Client(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title }) { }
 
         /// <summary>
         /// OpenGL debug delegate method
@@ -66,11 +72,17 @@ namespace KirosEngine3
         /// </summary>
         private static DebugProc DebugDelegate = new DebugProc(OnDebugMessage);
 
+        /// <summary>
+        /// Enable the output of notification level OpenGL debug messages.
+        /// </summary>
         public static void EnableGLDebugNotify()
         {
             _showGLDebugNotify = true;
         }
 
+        /// <summary>
+        /// Disable the output of notification level OpenGL debug messages.
+        /// </summary>
         public static void DisableGLDebugNotify()
         {
             _showGLDebugNotify = false;
@@ -125,11 +137,29 @@ namespace KirosEngine3
         }
     }
 
+    /// <summary>
+    /// Container struct for the view matrices.
+    /// </summary>
     public struct ViewMatrixes
     {
+        /// <summary>
+        /// The Model matrix, commonly the identity matrix and modified inside each renderable.
+        /// </summary>
         public Matrix4 Model { get; set; }
+
+        /// <summary>
+        /// The View matrix, constructed by the active camera object.
+        /// </summary>
         public Matrix4 View { get; set; }
+
+        /// <summary>
+        /// The Projection matrix, constructed by the active camera object.
+        /// </summary>
         public Matrix4 Projection { get; set; }
+
+        /// <summary>
+        /// The Orthographic matrix, constructed by the active camera object and used mainly for UI/HUD.
+        /// </summary>
         public Matrix4 Orthographic { get; set; }
     }
 }

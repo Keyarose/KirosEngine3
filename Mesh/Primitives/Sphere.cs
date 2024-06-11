@@ -16,31 +16,71 @@ namespace KirosEngine3.Mesh.Primitives
     /// </summary>
     public class Sphere
     {
+        /// <summary>
+        /// The center point/position of the sphere.
+        /// </summary>
         protected Vec3 _center;
 
+        /// <summary>
+        /// The radius of the sphere.
+        /// </summary>
         protected float _radius;
 
+        /// <summary>
+        /// The type of sphere.
+        /// </summary>
         protected SphereType _type;
 
+        /// <summary>
+        /// The vertex data of the sphere.
+        /// </summary>
         protected Vertex[] _verts;
 
+        /// <summary>
+        /// The color of the sphere.
+        /// </summary>
         protected Color4 _color = Color4.Yellow;
 
+        /// <summary>
+        /// The index data of the sphere.
+        /// </summary>
         protected uint[] _indices;
-        protected uint[] _testIndices = [0,1,24,46, 47];
 
+        /// <summary>
+        /// The vertex array object.
+        /// </summary>
         protected int _VAO;
 
+        /// <summary>
+        /// The vertex buffer object.
+        /// </summary>
         protected int _VBO;
 
+        /// <summary>
+        /// The element/index buffer object.
+        /// </summary>
         protected int _EBO;
 
+        /// <summary>
+        /// The name of the shader to use in rendering.
+        /// </summary>
         protected string _shaderName;
 
+        /// <summary>
+        /// Flag to show that the sphere has been loaded.
+        /// </summary>
         protected bool _loaded = false;
-        protected bool _disposed = false;
-        protected bool _warnOnce = false;
 
+        /// <summary>
+        /// Flag to show that the sphere has been unloaded.
+        /// </summary>
+        protected bool _disposed = false;
+
+        private bool _warnOnce = false;
+
+        /// <summary>
+        /// The draw mode to be used in rendering.
+        /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
         /// <summary>
@@ -96,6 +136,16 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
 
+        /// <summary>
+        /// Basic constructor for a renderable sphere.
+        /// </summary>
+        /// <param name="center">The center of the sphere.</param>
+        /// <param name="radius">The radius of the sphere.</param>
+        /// <param name="type">The type of sphere.</param>
+        /// <param name="latLines">The number of latitude lines, if applicable to the sphere type.</param>
+        /// <param name="longLines">The number of longitude lines, if applicable to the sphere type.</param>
+        /// <param name="shaderName">The name of the shader to be used in rendering.</param>
+        /// <exception cref="NotImplementedException"></exception>
         public Sphere(Vec3 center, float radius, SphereType type, int latLines, int longLines, string shaderName)
         {
             _center = center;
@@ -118,6 +168,12 @@ namespace KirosEngine3.Mesh.Primitives
             }
         }
 
+        /// <summary>
+        /// Generate the data for a UV Sphere with the given number of latitude lines and longitude lines.
+        /// </summary>
+        /// <param name="latLines">The number of latitude lines.</param>
+        /// <param name="longLines">The number of longitude lines.</param>
+        /// <returns>A tuple containing the vertex and index data.</returns>
         protected static Tuple<Vertex[], uint[]> GenerateUVSphere(int latLines, int longLines)
         {
             float radius = 1.0f;
@@ -198,6 +254,11 @@ namespace KirosEngine3.Mesh.Primitives
             return new Tuple<Vertex[], uint[]>(verts, indices);
         }
 
+        /// <summary>
+        /// Load the sphere to use the stored shader name, or the provided shader name.
+        /// </summary>
+        /// <param name="shaderName">Optional, the name of the shader to use in rendering. 
+        /// Defaults to the shader name provided in the constructor.</param>
         public void Init(string? shaderName)
         {
             _VAO = GL.GenVertexArray();
@@ -229,7 +290,11 @@ namespace KirosEngine3.Mesh.Primitives
             _loaded = true;
         }
 
-        public void Draw(ViewMatrixes vm)
+        /// <summary>
+        /// Draw the sphere using the OpenGL API.
+        /// </summary>
+        /// <param name="vm">The view matrices to be used in rendering.</param>
+        public void DrawGL(ViewMatrixes vm)
         {
             if (_disposed || !_loaded)
             {
@@ -265,9 +330,24 @@ namespace KirosEngine3.Mesh.Primitives
     /// </summary>
     public enum SphereType
     {
+        /// <summary>
+        /// A UV Sphere.
+        /// </summary>
         UVSphere,
+
+        /// <summary>
+        /// A IcoSphere.
+        /// </summary>
         IcoSphere,
+
+        /// <summary>
+        /// A QuadSphere.
+        /// </summary>
         QuadSphere,
+
+        /// <summary>
+        /// A Goldberg Poly sphere.
+        /// </summary>
         GoldbergPoly
     }
 }

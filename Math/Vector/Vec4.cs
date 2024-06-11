@@ -12,15 +12,19 @@ using System.Xml.Serialization;
 
 namespace KirosEngine3.Math.Vector
 {
+    /// <summary>
+    /// A 4D vector.
+    /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vec4 : IEquatable<Vec4>, IFormattable
+    public struct Vec4 : IEquatable<Vec4>, IFormattable, IVector<Vec4>
     {
+        /// <summary>
+        /// A component of the vector.
+        /// </summary>
         public float X, Y, Z, W;
 
-        /// <summary>
-        /// The length of the vector
-        /// </summary>
+        /// <inheritdoc/>
         public readonly float Length
         {
             get 
@@ -29,9 +33,7 @@ namespace KirosEngine3.Math.Vector
             }
         }
 
-        /// <summary>
-        /// The length of the vector squared, slightly faster than getting the length directly
-        /// </summary>
+        /// <inheritdoc/>
         public readonly float LengthSqr
         {
             get 
@@ -272,6 +274,7 @@ namespace KirosEngine3.Math.Vector
             return X == other.X && Y == other.Y && Z == other.Z && W == other.W;
         }
 
+        /// <inheritdoc/>
         public readonly bool Equals(Vec4 other, float tolerance)
         {
             return X.CloseTo(other.X, tolerance) && Y.CloseTo(other.Y, tolerance) && Z.CloseTo(other.Z, tolerance) && W.CloseTo(other.W, tolerance);
@@ -1259,6 +1262,10 @@ namespace KirosEngine3.Math.Vector
         }
         #endregion
 
+        /// <summary>
+        /// Define conversion from a Color4 to a Vec4.
+        /// </summary>
+        /// <param name="color">The color to convert.</param>
         public static explicit operator Vec4(Data.Color4 color)
         {
             return new Vec4(color.R, color.G, color.B, color.A);

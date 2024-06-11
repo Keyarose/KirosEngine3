@@ -13,6 +13,9 @@ namespace KirosEngine3.Math.Geometry
     /// </summary>
     public struct Triangle2D : IEquatable<Triangle2D>, IFormattable
     {
+        /// <summary>
+        /// The vertices of the triangle.
+        /// </summary>
         public Vec2[] Vertices = new Vec2[3];
         
         /// <summary>

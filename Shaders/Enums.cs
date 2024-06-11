@@ -13,20 +13,44 @@ namespace KirosEngine3.Shaders
     [Serializable]
     public enum ShaderValueType
     {
+        /// <summary>
+        /// Value is unknown type.
+        /// </summary>
         [XmlEnum(Name = "unknown")]
         Unknown,
+        /// <summary>
+        /// Value is float.
+        /// </summary>
         [XmlEnum(Name = "float")]
         Float,
+        /// <summary>
+        /// Value is vector2.
+        /// </summary>
         [XmlEnum(Name = "vec2")]
         Vec2,
+        /// <summary>
+        /// Value is vector3.
+        /// </summary>
         [XmlEnum(Name = "vec3")]
         Vec3,
+        /// <summary>
+        /// Value is vector4.
+        /// </summary>
         [XmlEnum(Name = "vec4")]
         Vec4,
+        /// <summary>
+        /// Value is matrix2.
+        /// </summary>
         [XmlEnum(Name = "mat2")]
         Mat2,
+        /// <summary>
+        /// Value is matrix3.
+        /// </summary>
         [XmlEnum(Name = "mat3")]
         Mat3,
+        /// <summary>
+        /// Value is matrix4
+        /// </summary>
         [XmlEnum(Name = "mat4")]
         Mat4
     }

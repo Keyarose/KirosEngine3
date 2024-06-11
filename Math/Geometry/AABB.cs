@@ -12,7 +12,14 @@ namespace KirosEngine3.Math.Geometry
     /// </summary>
     public struct AABB
     {
+        /// <summary>
+        /// The origin of the AABB.
+        /// </summary>
         public Vec3 Origin;
+
+        /// <summary>
+        /// The far point of the AABB.
+        /// </summary>
         public Vec3 Extent;
 
         /// <summary>

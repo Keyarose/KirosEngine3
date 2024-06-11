@@ -18,8 +18,12 @@ namespace KirosEngine3.Math.Geometry
         /// </summary>
         public Vec2[] Vertices = new Vec2[4];
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="verts">The vertices that define the rectangle.</param>
         public Rect2D(Vec2[] verts)
-        {
+        {//todo: array size check.
             Vertices = verts;
         }
 

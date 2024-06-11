@@ -60,18 +60,30 @@ namespace KirosEngine3.Math.Vector
             }
         }
 
+        /// <summary>
+        /// Constructor defining only the size of the vector.
+        /// </summary>
+        /// <param name="size">The size of the vector to construct.</param>
         public VecG(int size)
         {
             Size = size;
             Comp = new T[Size];
         }
 
+        /// <summary>
+        /// Constructor from a single value.
+        /// </summary>
+        /// <param name="val">The value to construct from.</param>
         public VecG(T val)
         {
             Comp = [.. Comp, val];
             Size = Comp.Length;
         }
 
+        /// <summary>
+        /// Constructor from an array of T.
+        /// </summary>
+        /// <param name="vals">The array to construct from.</param>
         public VecG(T[] vals)
         {
             Size = vals.Length;

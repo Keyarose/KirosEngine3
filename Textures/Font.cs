@@ -163,6 +163,7 @@ namespace KirosEngine3.Textures
         /// Construct a Text object for the given string
         /// </summary>
         /// <param name="text">the string text to be turned into a Text object</param>
+        /// <param name="pos">The starting position for the text vertices.</param>
         /// <returns>The equivalent Text object for the string</returns>
         public SentenceData TextForString(string text, Vec3 pos)
         {
@@ -173,6 +174,7 @@ namespace KirosEngine3.Textures
         /// Construct a Text object for the given string
         /// </summary>
         /// <param name="text">The string text to be turned into a Text object</param>
+        /// <param name="pos">The starting position for the text vertices.</param>
         /// <param name="kerning">Whether or not to use kerning</param>
         /// <returns>The equivalent Text object for the string</returns>
         public SentenceData TextForString(string text, Vec3 pos, bool kerning)

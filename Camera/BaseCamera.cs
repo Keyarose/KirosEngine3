@@ -11,39 +11,103 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Camera
 {
+    /// <summary>
+    /// A basic camera object.
+    /// </summary>
     public class BaseCamera
     {
+        /// <summary>
+        /// The camera's position.
+        /// </summary>
         protected Vec3 _position;
+
+        /// <summary>
+        /// The point in space the camera is directed to look at.
+        /// </summary>
         protected Vec3 _lookAt;
 
         //camera coordinate space
+        /// <summary>
+        /// The forward vector of the camera space.
+        /// </summary>
         protected Vec3 _forward = -Vec3.UnitZ;
+        /// <summary>
+        /// The up vector of the camera space.
+        /// </summary>
         protected Vec3 _up = Vec3.UnitY;
+        /// <summary>
+        /// The right vector of the camera space.
+        /// </summary>
         protected Vec3 _right = Vec3.UnitX;
 
         //rotations
+        /// <summary>
+        /// The camera's pitch (radians).
+        /// </summary>
         protected float _pitch;
+        /// <summary>
+        /// The camera's yaw (radians).
+        /// </summary>
         protected float _yaw = -MathHelpers.PiOver2;
 
+        /// <summary>
+        /// The camera's field of view angle (radians).
+        /// </summary>
         protected float _fov = MathHelpers.PiOver2;
+        /// <summary>
+        /// The near clip plane distance.
+        /// </summary>
         protected float _nearClip = 0.01f;
+        /// <summary>
+        /// The far clip plane distance.
+        /// </summary>
         protected float _farClip = 100.0f;
 
+        /// <summary>
+        /// The width of the view, commonly the client width.
+        /// </summary>
         protected float _width;
+        /// <summary>
+        /// The height of the view, commonly the client height.
+        /// </summary>
         protected float _height;
+        /// <summary>
+        /// The ratio between the width and height of the view.
+        /// </summary>
         protected float _aspectRatio;
 
         //camera move speed
+        /// <summary>
+        /// The speed at which the camera will move.
+        /// </summary>
         protected float _speed;
 
         //mouse control variables
+        /// <summary>
+        /// Flag to indicate if a movement frame has happened yet.
+        /// </summary>
         protected bool _firstMove = true;
+        /// <summary>
+        /// The previous position of the mouse in screen coordinates.
+        /// </summary>
         protected Vec2 _lastPos;
+        /// <summary>
+        /// The sensitivity to mouse movements in changing the camera's orientation.
+        /// </summary>
         protected float _sensitivity;
 
         //view matrices
+        /// <summary>
+        /// The view matrix calculated from the camera data.
+        /// </summary>
         protected Matrix4 _view;
+        /// <summary>
+        /// The projection matrix calculated from the camera data.
+        /// </summary>
         protected Matrix4 _projection;
+        /// <summary>
+        /// The orthographic matrix calculated from the camera data.
+        /// </summary>
         protected Matrix4 _orthographic;
 
         /// <summary>
@@ -262,6 +326,12 @@ namespace KirosEngine3.Camera
             get { return _orthographic; }
         }
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="position">The camera's position.</param>
+        /// <param name="width">The width of the view.</param>
+        /// <param name="height">The height of the view.</param>
         public BaseCamera(Vec3 position, float width, float height)
         {
             _position = position;
@@ -277,9 +347,21 @@ namespace KirosEngine3.Camera
             UpdateOrthoMatrix();
         }
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="position">The camera's position.</param>
+        /// <param name="windowSize">The size of the view.</param>
         public BaseCamera(Vec3 position, Vec2 windowSize) :
             this(position, windowSize.X, windowSize.Y) { }
 
+        /// <summary>
+        /// Constructor with speed setting.
+        /// </summary>
+        /// <param name="position">The camera's position.</param>
+        /// <param name="width">The width of the view.</param>
+        /// <param name="height">The height of the view.</param>
+        /// <param name="speed">The speed at which the camera moves.</param>
         public BaseCamera(Vec3 position, float width, float height, float speed)
         {
             _position = position;
@@ -295,9 +377,23 @@ namespace KirosEngine3.Camera
             UpdateOrthoMatrix();
         }
 
+        /// <summary>
+        /// Constructor with speed setting.
+        /// </summary>
+        /// <param name="position">The camera's position.</param>
+        /// <param name="windowSize">The size of the view.</param>
+        /// <param name="speed">The speed at which the camera moves.</param>
         public BaseCamera(Vec3 position, Vec2 windowSize, float speed) :
             this(position, windowSize.X, windowSize.Y, speed) { }
 
+        /// <summary>
+        /// Constructor with speed, and sensitivity setting.
+        /// </summary>
+        /// <param name="position">The camera's position.</param>
+        /// <param name="width">The width of the view.</param>
+        /// <param name="height">The height of the view.</param>
+        /// <param name="speed">The speed at which the camera moves.</param>
+        /// <param name="sensitivity">The mouse sensitivity to movement.</param>
         public BaseCamera(Vec3 position, float width, float height, float speed, float sensitivity)
         {
             _position = position;
@@ -313,6 +409,13 @@ namespace KirosEngine3.Camera
             UpdateOrthoMatrix();
         }
 
+        /// <summary>
+        /// Constructor with speed, and sensitivity setting.
+        /// </summary>
+        /// <param name="position">The camera's position.</param>
+        /// <param name="windowSize">The size of the view.</param>
+        /// <param name="speed">The speed at which the camera moves.</param>
+        /// <param name="sensitivity">The mouse sensitivity to movement.</param>
         public BaseCamera(Vec3 position, Vec2 windowSize, float speed, float sensitivity) :
             this(position, windowSize.X, windowSize.Y, speed, sensitivity) { }
 
@@ -396,6 +499,9 @@ namespace KirosEngine3.Camera
             UpdateVectors();
         }
 
+        /// <summary>
+        /// Update the values of the camera space vectors based on changes to the pitch and yaw.
+        /// </summary>
         protected virtual void UpdateVectors()
         {
             //update the forward vector for rotations
@@ -412,11 +518,14 @@ namespace KirosEngine3.Camera
             UpdateViewMatrix();
         }
 
+        /// <inheritdoc/>
         public void OnUpdateFrame(FrameEventArgs e, MouseState mouse)
         {
-            //todo: camera update method
+            //todo: camera update method needs to use an in library event args and mouse state to 
+            //uncouple from OpenTK
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return string.Format("Camera: \n Position: {0} \t LookAt: {1} \n Forward: {2} \t Right: {3} \t Up: {4}", Position, LookAt, Forward, Right, Up);

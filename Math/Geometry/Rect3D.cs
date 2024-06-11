@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Geometry
 {
+    /// <summary>
+    /// A mathematical representation of a rectangle in 3D space.
+    /// </summary>
     public struct Rect3D : IEquatable<Rect3D>, IFormattable, IGeometrical
     {
         /// <summary>

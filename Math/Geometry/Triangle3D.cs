@@ -7,9 +7,19 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Geometry
 {
+    /// <summary>
+    /// A mathematical representation of a triangle in 3D space.
+    /// </summary>
     public struct Triangle3D : IFormattable
     {
+        /// <summary>
+        /// The vertices of the triangle.
+        /// </summary>
         public Vec3[] Vertices = new Vec3[3];
+
+        /// <summary>
+        /// The normal of the triangle's face.
+        /// </summary>
         public Vec3 Normal;
 
         /// <summary>

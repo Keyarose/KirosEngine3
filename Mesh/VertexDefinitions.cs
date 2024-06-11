@@ -7,18 +7,31 @@ using KirosEngine3.Math.Data;
 
 namespace KirosEngine3.Mesh
 {
+    /// <summary>
+    /// 3D vertex interface.
+    /// </summary>
     public interface IVertex
     {
+        /// <summary>
+        /// Position vector of the vertex.
+        /// </summary>
         public Vec3 Position { get; set; }
-
-        public static readonly int SizeInBytesU;
     }
 
+    /// <summary>
+    /// 2D vertex interface.
+    /// </summary>
     public interface IVertex2D
     {
+        /// <summary>
+        /// Position vector of the vertex.
+        /// </summary>
         public Vec2 Position { get; set; }
     }
 
+    /// <summary>
+    /// Helper methods for vertex operations.
+    /// </summary>
     public static class VertexHelpers
     {
         #region FromVertex
@@ -113,13 +126,13 @@ namespace KirosEngine3.Mesh
         }
 
         /// <summary>
-        /// Convert an array of Vertex to ColorTexVertex with the given UV coordinates and colors
+        /// Convert an array of Vertex to ColorTexVertex with the given UV coordinates and colors.
         /// </summary>
-        /// <param name="v">The array of Vertex to convert</param>
-        /// <param name="uv">The UV coordinates</param>
-        /// <param name="c">The colors to set to the vertices</param>
-        /// <returns>The resulting ColorTexVertex array</returns>
-        /// <exception cref="ArgumentException">Thrown if the Vertex, UV, and Color arrays are different sizes</exception>
+        /// <param name="v">The array of Vertex to convert.</param>
+        /// <param name="uv">The UV coordinates.</param>
+        /// <param name="c">The colors to set to the vertices.</param>
+        /// <returns>The resulting ColorTexVertex array.</returns>
+        /// <exception cref="ArgumentException">Thrown if the Vertex, UV, and Color arrays are different sizes.</exception>
         public static ColorTexVertex[] ColorTexVertFromVertex(Vertex[] v, Vec2[] uv, Color4[] c)
         {
             if (uv.Length != v.Length && v.Length != c.Length)
@@ -138,6 +151,13 @@ namespace KirosEngine3.Mesh
         }
         #endregion
 
+        /// <summary>
+        /// Convert an array of ColorVertex to TexturedVertex with the given UV coordinates.
+        /// </summary>
+        /// <param name="v">The array of ColorVertex to convert.</param>
+        /// <param name="uv">The UV coordinates.</param>
+        /// <returns>The resulting TexturedVertex array.</returns>
+        /// <exception cref="ArgumentException">Thrown if the ColorVertex, and UV arrays are different sizes.</exception>
         public static TexturedVertex[] TextureVertFromColorVert(ColorVertex[] v, Vec2[] uv)
         {
             if (uv.Length != v.Length)
@@ -155,17 +175,35 @@ namespace KirosEngine3.Mesh
         }
     }
 
+    /// <summary>
+    /// A 2D colored vertex.
+    /// </summary>
     public struct ColorVertex2D : IVertex2D
     {
+        /// <summary>
+        /// The vertex's position.
+        /// </summary>
         public Vec2 Position { get; set; }
 
+        /// <summary>
+        /// The vertex's color.
+        /// </summary>
         public Color4 Color { get; set; }
+        /// <summary>
+        /// The offset of the vertex's color.
+        /// </summary>
         public static readonly int ColorOffset = Vec2.SizeInBytesU;
 
+        /// <summary>
+        /// The size of the vertex in bytes.
+        /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<ColorVertex2D>();
     }
 
     //todo: vertex type checking against shader signature
+    /// <summary>
+    /// A 3D colored vertex.
+    /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct Vertex : IVertex
@@ -179,6 +217,9 @@ namespace KirosEngine3.Mesh
         /// The vertex's normal.
         /// </summary>
         public Vec3 Normal { get; set; }
+        /// <summary>
+        /// The offset of the vertex's normal.
+        /// </summary>
         public static readonly int NormalOffset = Vec3.SizeInBytesU;
 
         /// <summary>
@@ -187,13 +228,13 @@ namespace KirosEngine3.Mesh
         public static readonly int SizeInBytesU = Unsafe.SizeOf<Vertex>();
                 
         #region SetAttribs
-        [Obsolete("SetVertexAttribs is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0601")]
         /// <summary>
         /// Defines the vertex attribute pointers for both position and color data at the named locations in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the locations from</param>
         /// <param name="attribNames">The names of the attributes in the shader, ordered by position then color</param>
         /// <exception cref="InvalidOperationException">Thrown if no names are supplied for the attributes</exception>
+        [Obsolete("SetVertexAttribs is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0601")]
         public static void SetVertexAttribs(Shader sh, string[] attribNames)
         {
             if (attribNames.Length == 0)
@@ -207,13 +248,13 @@ namespace KirosEngine3.Mesh
             }
         }
 
-        [Obsolete("SetVertexPositionAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0602")]
         /// <summary>
         /// Defines the vertex attribute pointer for position data at the named location in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the location from</param>
         /// <param name="attribName">The attribute's name in the shader</param>
         /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
+        [Obsolete("SetVertexPositionAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0602")]
         public static void SetVertexPositionAttrib(Shader sh, string attribName)
         {
             int posAtt = sh.GetAttribLocationGL(attribName);
@@ -228,6 +269,7 @@ namespace KirosEngine3.Mesh
         }
         #endregion
 
+        /// <inheritdoc/>
         public override readonly string ToString()
         {
             return string.Format("Position: {0}, Normal: {1}", Position, Normal);
@@ -250,12 +292,18 @@ namespace KirosEngine3.Mesh
         /// The vertex's normal.
         /// </summary>
         public Vec3 Normal { get; set; }
+        /// <summary>
+        /// The offset of the vertex's normal.
+        /// </summary>
         public static readonly int NormalOffset = Vec3.SizeInBytesU;
 
         /// <summary>
         /// The vertex's color with alpha
         /// </summary>
         public Color4 Color { get; set; }
+        /// <summary>
+        /// The offset of the vertex's color.
+        /// </summary>
         public static readonly int ColorOffset = Vec3.SizeInBytesU * 2;
 
         /// <summary>
@@ -264,13 +312,13 @@ namespace KirosEngine3.Mesh
         public static readonly int SizeInBytesU = Unsafe.SizeOf<ColorVertex>();
 
         #region SetAttribs
-        [Obsolete("SetVertexAttribs is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0601")]
         /// <summary>
         /// Defines the vertex attribute pointers for both position and color data at the named locations in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the locations from</param>
         /// <param name="attribNames">The names of the attributes in the shader, ordered by position then color</param>
         /// <exception cref="InvalidOperationException">Thrown if no names are supplied for the attributes</exception>
+        [Obsolete("SetVertexAttribs is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0601")]
         public static void SetVertexAttribs(Shader sh, string[] attribNames)
         {
             if (attribNames.Length == 0)
@@ -289,13 +337,13 @@ namespace KirosEngine3.Mesh
             }
         }
 
-        [Obsolete("SetVertexPositionAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0602")]
         /// <summary>
         /// Defines the vertex attribute pointer for position data at the named location in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the location from</param>
         /// <param name="attribName">The attribute's name in the shader</param>
         /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
+        [Obsolete("SetVertexPositionAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0602")]
         public static void SetVertexPositionAttrib(Shader sh, string attribName)
         {
             int posAtt = sh.GetAttribLocationGL(attribName);
@@ -309,13 +357,13 @@ namespace KirosEngine3.Mesh
             GL.EnableVertexAttribArray(posAtt);
         }
 
-        [Obsolete("SetVertexColorAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0603")]
         /// <summary>
         /// Defines the vertex attribute pointer for color data at the named location in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the location from</param>
         /// <param name="attribName">The attribute's name in the shader</param>
         /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
+        [Obsolete("SetVertexColorAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0603")]
         public static void SetVertexColorAttrib(Shader sh, string attribName)
         {
             int colAtt = sh.GetAttribLocationGL(attribName);
@@ -330,6 +378,7 @@ namespace KirosEngine3.Mesh
         }
         #endregion
 
+        /// <inheritdoc/>
         public override readonly string ToString()
         {
             return string.Format("Position: {0}, Normal: {1}, Color: {2}", Position, Normal, Color);
@@ -352,12 +401,18 @@ namespace KirosEngine3.Mesh
         /// The vertex's normal.
         /// </summary>
         public Vec3 Normal { get; set; }
+        /// <summary>
+        /// The offset of the vertex's normal.
+        /// </summary>
         public static readonly int NormalOffset = Vec3.SizeInBytesU;
 
         /// <summary>
         /// The vertex's uv coordinates
         /// </summary>
         public Vec2 UV { get; set; }
+        /// <summary>
+        /// The offset of the vertex's UV.
+        /// </summary>
         public static readonly int UVOffset = Vec3.SizeInBytesU * 2;
 
         /// <summary>
@@ -366,13 +421,13 @@ namespace KirosEngine3.Mesh
         public static readonly int SizeInBytesU = Unsafe.SizeOf<TexturedVertex>();
 
         #region SetAttribs
-        [Obsolete("SetVertexAttribs is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0601")]
         /// <summary>
         /// Sets the given shader's Vertex Attributes to match Vertex's format
         /// </summary>
         /// <param name="sh">The shader to set the Attributes</param>
         /// <param name="attribNames">The names of the Attributes in the shader in the order of Position, then UV</param>
         /// <exception cref="InvalidOperationException">Thrown if no names are supplied for the attributes</exception>
+        [Obsolete("SetVertexAttribs is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0601")]
         public static void SetVertexAttribs(Shader sh, string[] attribNames)
         {
             if (attribNames.Length == 0)
@@ -391,13 +446,13 @@ namespace KirosEngine3.Mesh
             }
         }
 
-        [Obsolete("SetVertexPositionAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0602")]
         /// <summary>
         /// Defines the vertex attribute pointer for position data at the named location in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the location from</param>
-        /// <param name="attribName">The attribute's name in the shader</param>
+        /// <param name="name">The attribute's name in the shader</param>
         /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
+        [Obsolete("SetVertexPositionAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0602")]
         public static void SetVertexPositionAttrib(Shader sh, string name)
         {
             int posAttrib = sh.GetAttribLocationGL(name);
@@ -411,13 +466,13 @@ namespace KirosEngine3.Mesh
             GL.EnableVertexAttribArray(posAttrib);
         }
 
-        [Obsolete("SetVertexUVAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0604")]
         /// <summary>
         /// Defines the vertex attribute pointer for uv data at the named location in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the location from</param>
         /// <param name="name">The attribute's name in the shader</param>
         /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
+        [Obsolete("SetVertexUVAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0604")]
         public static void SetVertexUVAttrib(Shader sh, string name)
         {
             int uvAttrib = sh.GetAttribLocationGL(name);
@@ -432,6 +487,7 @@ namespace KirosEngine3.Mesh
         }
         #endregion
 
+        /// <inheritdoc/>
         public override readonly string ToString()
         {
             return string.Format("Position: {0}, Normal: {1}, UV: {2}", Position, Normal, UV);
@@ -454,18 +510,27 @@ namespace KirosEngine3.Mesh
         /// The vertex's normal.
         /// </summary>
         public Vec3 Normal { get; set; }
+        /// <summary>
+        /// The offset of the vertex's normal.
+        /// </summary>
         public static readonly int NormalOffset = Vec3.SizeInBytesU;
 
         /// <summary>
         /// The vertex's color
         /// </summary>
         public Color4 Color { get; set; }
+        /// <summary>
+        /// The offset of the vertex's color.
+        /// </summary>
         public static readonly int ColorOffset = Vec3.SizeInBytesU * 2;
 
         /// <summary>
         /// The vertex's texture coordinates
         /// </summary>
         public Vec2 UV { get; set; }
+        /// <summary>
+        /// The offset of the vertex's UV.
+        /// </summary>
         public static readonly int UVOffset = Vec3.SizeInBytesU * 2 + Color4.SizeInBytesU;
 
         /// <summary>
@@ -474,13 +539,13 @@ namespace KirosEngine3.Mesh
         public static readonly int SizeInBytesU = Unsafe.SizeOf<ColorTexVertex>();
 
         #region SetAttribs
-        [Obsolete("SetVertexAttribs is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0601")]
         /// <summary>
         /// Defines the vertex attribute pointers for position, color, and uv data at the named locations in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the locations from</param>
         /// <param name="attribNames">The names of the attributes in the shader, ordered by position, color, then uv</param>
         /// <exception cref="InvalidOperationException">Thrown if no names are supplied for the attributes</exception>
+        [Obsolete("SetVertexAttribs is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0601")]
         public static void SetVertexAttribs(Shader sh, string[] attribNames)
         {
             if (attribNames.Length == 0)
@@ -505,13 +570,13 @@ namespace KirosEngine3.Mesh
             }
         }
 
-        [Obsolete("SetVertexPositionAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0602")]
         /// <summary>
         /// Defines the vertex attribute pointer for position data at the named location in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the location from</param>
-        /// <param name="attribName">The attribute's name in the shader</param>
+        /// <param name="name">The attribute's name in the shader</param>
         /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
+        [Obsolete("SetVertexPositionAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0602")]
         public static void SetVertexPositionAttrib(Shader sh, string name)
         {
             int posAttrib = sh.GetAttribLocationGL(name);
@@ -525,33 +590,33 @@ namespace KirosEngine3.Mesh
             GL.EnableVertexAttribArray(posAttrib);
         }
 
-        [Obsolete("SetVertexColorAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0603")]
         /// <summary>
         /// Defines the vertex attribute pointer for color data at the named location in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the location from</param>
-        /// <param name="attribName">The attribute's name in the shader</param>
+        /// <param name="name">The attribute's name in the shader</param>
         /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
-        public static void SetVertexColorAttrib(Shader sh, string attribName)
+        [Obsolete("SetVertexColorAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0603")]
+        public static void SetVertexColorAttrib(Shader sh, string name)
         {
-            int colAtt = sh.GetAttribLocationGL(attribName);
+            int colAtt = sh.GetAttribLocationGL(name);
 
             if (colAtt == -1)
             {
-                throw new ArgumentException(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", attribName, sh));
+                throw new ArgumentException(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, sh));
             }
 
             GL.VertexAttribPointer(colAtt, 4, VertexAttribPointerType.Float, false, SizeInBytesU, Vec3.SizeInBytesU);
             GL.EnableVertexAttribArray(colAtt);
         }
 
-        [Obsolete("SetVertexUVAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0604")]
         /// <summary>
         /// Defines the vertex attribute pointer for uv data at the named location in the given shader
         /// </summary>
         /// <param name="sh">The shader to get the location from</param>
         /// <param name="name">The attribute's name in the shader</param>
         /// <exception cref="ArgumentException">Thrown if the attribute location cannot be found in the shader</exception>
+        [Obsolete("SetVertexUVAttrib is deprecated, use the SetAttrib family of methods in Shader", DiagnosticId = "KE0604")]
         public static void SetVertexUVAttrib(Shader sh, string name)
         {
             int uvAttrib = sh.GetAttribLocationGL(name);
@@ -566,6 +631,7 @@ namespace KirosEngine3.Mesh
         }
         #endregion
 
+        /// <inheritdoc/>
         public override readonly string ToString()
         {
             return string.Format("Position: {0}, Normal: {1} Color: {2}, UV: {3}", Position, Normal, Color, UV);

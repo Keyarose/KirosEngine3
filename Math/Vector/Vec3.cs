@@ -11,13 +11,17 @@ using System.Xml.Serialization;
 
 namespace KirosEngine3.Math.Vector
 {
+    /// <summary>
+    /// A 3D vector.
+    /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vec3 : IEquatable<Vec3>, IFormattable
+    public struct Vec3 : IEquatable<Vec3>, IFormattable, IVector<Vec3>
     {
-        public float X;
-        public float Y; 
-        public float Z;
+        /// <summary>
+        /// A component of the vector.
+        /// </summary>
+        public float X, Y, Z;
         
         /// <summary>
         /// The length of the vector

@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Data
 {
+    /// <summary>
+    /// A four channel color object made up of red, green, blue and alpha.
+    /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct Color4 : IEquatable<Color4>
@@ -102,6 +105,9 @@ namespace KirosEngine3.Math.Data
             }
         }
 
+        /// <summary>
+        /// The size of a Color4 in bytes.
+        /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<Color4>();
 
         #region Constructors
@@ -152,22 +158,49 @@ namespace KirosEngine3.Math.Data
         #endregion
 
         #region Color Definitions
+        /// <summary>
+        /// A predefined color: Transparent.
+        /// </summary>
         public static readonly Color4 Transparent = new Color4(255, 255, 255, 0);
 
+        /// <summary>
+        /// A predefined color: Aqua.
+        /// </summary>
         public static readonly Color4 Aqua = new Color4(0, 255, 255, 255);
 
+        /// <summary>
+        /// A predefined color: Black.
+        /// </summary>
         public static readonly Color4 Black = new Color4(0, 0, 0, 255);
 
+        /// <summary>
+        /// A predefined color: Blue.
+        /// </summary>
         public static readonly Color4 Blue = new Color4(0, 0, 255, 255);
 
+        /// <summary>
+        /// A predefined color: Gray.
+        /// </summary>
         public static readonly Color4 Gray = new Color4(192, 192, 192, 255);
 
+        /// <summary>
+        /// A predefined color: Green.
+        /// </summary>
         public static readonly Color4 Green = new Color4(0, 255, 0, 255);
 
+        /// <summary>
+        /// A predefined color: Red.
+        /// </summary>
         public static readonly Color4 Red = new Color4(255, 0, 0, 255);
 
+        /// <summary>
+        /// A predefined color: White.
+        /// </summary>
         public static readonly Color4 White = new Color4(255, 255, 255, 255);
 
+        /// <summary>
+        /// A predefined color: Yellow.
+        /// </summary>
         public static readonly Color4 Yellow = new Color4(255, 255, 0, 255);
         #endregion
 

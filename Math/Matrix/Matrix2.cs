@@ -342,9 +342,10 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Perform the row multiplication operation on row 1
+        /// Perform the row multiplication operation.
         /// </summary>
-        /// <param name="scalar">The scalar to multiply the row by</param>
+        /// <param name="row">The row to apply the operation on.</param>
+        /// <param name="scalar">The scalar to multiply the row by.</param>
         /// <returns>The resulting matrix.</returns>
         public readonly Matrix2 RowMultiplication(int row, float scalar)
         {
