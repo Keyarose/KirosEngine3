@@ -60,6 +60,11 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="tolerance">The allowed difference between the values.</param>
         /// <returns>True if the difference between the two matrices is less than the tolerance, false otherwise.</returns>
         bool Equals(MatType other, float tolerance);
+        /// <summary>
+        /// Indicates whether the current Matrix is equal to the provided object.
+        /// </summary>
+        /// <param name="obj">The object to compare.</param>
+        /// <returns>True if they are equal, false otherwise.</returns>
         bool Equals([NotNullWhen(true)] object? obj);
 
         /// <summary>
@@ -67,6 +72,10 @@ namespace KirosEngine3.Math.Matrix
         /// </summary>
         /// <returns>The columns of the matrix as an array.</returns>
         ColumnType[] GetColumns();
+        /// <summary>
+        /// Get a hash code representation of the Matrix.
+        /// </summary>
+        /// <returns>The hash code of the matrix.</returns>
         int GetHashCode();
 
         /// <summary>
@@ -82,9 +91,13 @@ namespace KirosEngine3.Math.Matrix
         /// <returns>The resulting matrix.</returns>
         MatType Subtract(MatType rhs);
 
+        /// <inheritdoc cref="object.ToString"/>
         string ToString();
+        /// <inheritdoc cref="IFormattable.ToString(string?, IFormatProvider?)"/>
         string ToString(IFormatProvider? formatProvider);
+        /// <inheritdoc cref="IFormattable.ToString(string?, IFormatProvider?)"/>
         string ToString(string? format);
+        /// <inheritdoc cref="IFormattable.ToString(string?, IFormatProvider?)"/>
         string ToString(string? format, IFormatProvider? formatProvider);
 
         /// <summary>

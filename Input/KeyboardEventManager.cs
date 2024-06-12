@@ -24,9 +24,15 @@ namespace KirosEngine3.Input
         private static bool _capsLockState = false;
         private static bool _numLockState = false;
 
+        /// <summary>
+        /// The current program context, which decides what key notifications to send out.
+        /// </summary>
         public static string CurrentContext
         { get { return Instance._context; } set { Instance._context = value; } }
 
+        /// <summary>
+        /// The global program context for key events that always need to be sent regardless of the current context.
+        /// </summary>
         public const string GLOBAL_CONTEXT = "global";
 
         /// <summary>
@@ -36,6 +42,20 @@ namespace KirosEngine3.Input
         /// <param name="e">The keyboard event arguments</param>
         public delegate void KeyboardEventHandler(object sender, KeyboardEventArgs e);
         private Dictionary<string, Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>> _eventRegistry = [];
+
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        private KeyboardEventManager()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                _capsLockState = Console.CapsLock;
+                _numLockState = Console.NumberLock;
+            }
+
+            //todo: other platform support.
+        }
 
         #region Add/Remove
         /// <summary>
@@ -301,13 +321,32 @@ namespace KirosEngine3.Input
     /// </summary>
     public class KeyboardEventArgs : EventArgs
     {
+        /// <summary>
+        /// The key that triggered the event.
+        /// </summary>
         public Keys Key { get; private set; }
+        /// <summary>
+        /// The type of event: pressed, held, released.
+        /// </summary>
         public KeyboardEventType Type { get; private set; }
 
+        /// <summary>
+        /// Modifier keys active at the time of the event: Ctrl, Alt, Shift, etc.
+        /// </summary>
         public ActiveModifierKeys ModifierKeys { get; private set; }
 
+        /// <summary>
+        /// The amount of time since the previous frame.
+        /// </summary>
         public double Time { get; private set; }
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="key">The key involved in the event.</param>
+        /// <param name="type">The type of event.</param>
+        /// <param name="modKeys">Modifier keys active during the event.</param>
+        /// <param name="time">The time since the previous frame.</param>
         public KeyboardEventArgs(Keys key, KeyboardEventType type, ActiveModifierKeys modKeys, double time)
         {
             Key = key;
@@ -323,11 +362,29 @@ namespace KirosEngine3.Input
     [Flags]
     public enum ActiveModifierKeys
     {
+        /// <summary>
+        /// No active keys.
+        /// </summary>
         None = 0,
+        /// <summary>
+        /// Ether Ctrl key.
+        /// </summary>
         Ctrl = 1,
+        /// <summary>
+        /// Ether Shift key.
+        /// </summary>
         Shift = 2,
+        /// <summary>
+        /// Ether Alt key.
+        /// </summary>
         Alt = 4,
+        /// <summary>
+        /// The Caps Lock key.
+        /// </summary>
         CapsLock = 8,
+        /// <summary>
+        /// The Num Lock key.
+        /// </summary>
         NumLock = 16,
     }
 
@@ -336,8 +393,17 @@ namespace KirosEngine3.Input
     /// </summary>
     public enum KeyboardEventType
     {
+        /// <summary>
+        /// The Key was Pressed.
+        /// </summary>
         KeyPressed,
+        /// <summary>
+        /// The Key was Released.
+        /// </summary>
         KeyReleased,
+        /// <summary>
+        /// The Key was Held.
+        /// </summary>
         KeyHeld
     }
 }

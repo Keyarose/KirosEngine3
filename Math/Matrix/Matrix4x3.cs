@@ -7,11 +7,26 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Matrix
 {
+    /// <summary>
+    /// Four by three matrix definition.
+    /// </summary>
     public struct Matrix4x3
     {
+        /// <summary>
+        /// The first row of the matrix.
+        /// </summary>
         public Vec3 Row0;
-        public Vec3 Row1; 
+        /// <summary>
+        /// The second row of the matrix.
+        /// </summary>
+        public Vec3 Row1;
+        /// <summary>
+        /// The third row of the matrix.
+        /// </summary>
         public Vec3 Row2;
+        /// <summary>
+        /// The fourth row of the matrix.
+        /// </summary>
         public Vec3 Row3;
 
         /// <summary>
@@ -66,11 +81,13 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        /// <inheritdoc/>
         public readonly Vec4[] GetColumns()
         {
             return [Column0, Column1, Column2];
         }
 
+        /// <inheritdoc/>
         public readonly Vec3[] GetRows()
         {
             return [Row0, Row1, Row2, Row3];
@@ -126,6 +143,7 @@ namespace KirosEngine3.Math.Matrix
             return Row0 == other.Row0 && Row1 == other.Row1 && Row2 == other.Row2 && Row3 == other.Row3;
         }
 
+        /// <inheritdoc/>
         public readonly bool Equals(Matrix4x3 other, float tolerance)
         {
             return Row0.Equals(other.Row0, tolerance) && Row1.Equals(other.Row1, tolerance) && Row2.Equals(other.Row2, tolerance) && Row3.Equals(other.Row3, tolerance);

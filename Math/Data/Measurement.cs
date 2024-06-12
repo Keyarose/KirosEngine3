@@ -7,12 +7,29 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Data
 {
+    /// <summary>
+    /// A measurement with units and specified significant digits.
+    /// </summary>
     public struct Measurement
     {
+        /// <summary>
+        /// The value of the measurement.
+        /// </summary>
         public double Value;
+        /// <summary>
+        /// The units of the measurement.
+        /// </summary>
         public Unit Units;
+        /// <summary>
+        /// The number of significant digits in the measurement.
+        /// </summary>
         public int SigDigits;
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="value">The value of the measurement.</param>
+        /// <param name="unit">The units of the measurement.</param>
         public Measurement(double value, Unit unit)
         {
             Value = value;

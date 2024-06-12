@@ -16,23 +16,56 @@ namespace KirosEngine3.Mesh
 
         private Vec3 _origin;
 
+        /// <summary>
+        /// The vertex array object.
+        /// </summary>
         protected int _VAO;
 
+        /// <summary>
+        /// The vertex buffer object.
+        /// </summary>
         protected int _VBO;
 
+        /// <summary>
+        /// Flag denoting if the object has been loaded.
+        /// </summary>
         protected bool _loaded = false;
+        /// <summary>
+        /// Flag denoting if the lines are to be drawn separately or as one group.
+        /// </summary>
         protected bool _grouped = false;//flag for if the grid has been loaded in group draw mode or not
+        /// <summary>
+        /// Flag denoting if the object has been unloaded.
+        /// </summary>
         protected bool _disposed = false;
 
+        /// <summary>
+        /// Rotation matrix for the grid.
+        /// </summary>
         protected Matrix4 _rotation = Matrix4.Identity;
+        /// <summary>
+        /// Scale matrix for the grid.
+        /// </summary>
         protected Matrix4 _scale = Matrix4.Identity;
 
+        /// <summary>
+        /// The origin point of the grid.
+        /// </summary>
         public Vec3 Origin { get { return _origin; } set { _origin = value; } }
 
+        /// <summary>
+        /// The grid's rotation.
+        /// </summary>
         public Matrix4 Rotation { get { return _rotation; } set { _rotation = value; } }
 
+        /// <summary>
+        /// The scale of the grid.
+        /// </summary>
         public Matrix4 Scale { get { return _scale; } set { _scale = value; } }
 
+        /// <summary>
+        /// The draw mode to be used in rendering.
+        /// </summary>
         public PrimitiveType DrawMode
         {
             get { return _lines.FirstOrDefault()?.DrawMode ?? PrimitiveType.Lines; }
@@ -152,6 +185,11 @@ namespace KirosEngine3.Mesh
         /// </summary>
         public static CoordinateGrid UnitGridYZ => new CoordinateGrid(_unitGridDataYZ, Vec3.Zero);
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="lines">The lines that make up the grid.</param>
+        /// <param name="origin">The origin point for the grid.</param>
         public CoordinateGrid(Line[] lines, Vec3 origin)
         {
             _lines.AddRange(lines);
@@ -159,6 +197,9 @@ namespace KirosEngine3.Mesh
         }
 
         #region Loading
+        /// <summary>
+        /// Load the Grid to draw each line independently.
+        /// </summary>
         public void Init()
         {
             ColorVertex[] verts = new ColorVertex[_lines.Count * 2];
@@ -257,6 +298,10 @@ namespace KirosEngine3.Mesh
             }
         }
 
+        /// <summary>
+        /// Get the vertex data of the grid.
+        /// </summary>
+        /// <returns>The vertex data as an array of ColorVertex.</returns>
         public ColorVertex[] GetVertexData()
         {
             ColorVertex[] verts = new ColorVertex[_lines.Count * 2];
@@ -272,11 +317,19 @@ namespace KirosEngine3.Mesh
             return verts;
         }
 
+        /// <summary>
+        /// Get the draw mode of the grid.
+        /// </summary>
+        /// <returns>The draw mode.</returns>
         public PrimitiveType GetDrawMode()
         {
             return DrawMode;
         }
 
+        /// <summary>
+        /// DirectX drawing.
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
         public void DrawDX()
         {
             throw new NotImplementedException();
@@ -315,6 +368,9 @@ namespace KirosEngine3.Mesh
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
         ~CoordinateGrid()
         {
             Dispose(false);

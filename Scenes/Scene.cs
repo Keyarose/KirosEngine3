@@ -14,29 +14,56 @@ namespace KirosEngine3.Scenes
     /// </summary>
     public class Scene
     {
+        /// <summary>
+        /// The name of the scene.
+        /// </summary>
         protected string _name = string.Empty;
 
+        /// <summary>
+        /// The collection of objects in the scene.
+        /// </summary>
         protected List<SceneObject> _objects = new List<SceneObject>();
 
+        /// <summary>
+        /// The name of the scene.
+        /// </summary>
         public string Name { get { return _name; } set { _name = value; } }
         //todo: fill stub
 
+        /// <summary>
+        /// Basic constructor for loading from a scene file.
+        /// </summary>
+        /// <param name="file">The file path for the scene.</param>
         public Scene(string file)
         {
             //todo: implement
         }
 
+        /// <summary>
+        /// Basic constructor for loading from a XML Doc.
+        /// </summary>
+        /// <param name="sceneXml">The XML document.</param>
         public Scene(XDocument sceneXml)
         {
             //todo: implement
         }
 
+        /// <summary>
+        /// Constructor with the scene name.
+        /// </summary>
+        /// <param name="name">The name of the scene.</param>
+        /// <param name="file">The file path for the scene.</param>
         public Scene(string name, string file)
         {
             _name = name;
             //todo: implement
         }
 
+        /// <summary>
+        /// Constructor with the scene name.
+        /// </summary>
+        /// <param name="name">The name of the scene.</param>
+        /// <param name="sceneXml">The XML document.</param>
         public Scene(string name, XDocument sceneXml)
         {
             _name = name;

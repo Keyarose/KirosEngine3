@@ -10,19 +10,37 @@ namespace KirosEngine3.Mesh.Primitives
     /// </summary>
     public class Point : IDisposable, IRenderable
     {
-        //vertex data
+        /// <summary>
+        /// The vertex data.
+        /// </summary>
         protected ColorVertex[] _point = new ColorVertex[1];
 
-        //vertex array object
+        /// <summary>
+        /// The vertex array object
+        /// </summary>
         protected int _VAO;
-        //vertex buffer object
+        /// <summary>
+        /// The vertex buffer object
+        /// </summary>
         protected int _VBO;
 
+        /// <summary>
+        /// The name of the shader to use in rendering.
+        /// </summary>
         protected string _shaderName;
 
+        /// <summary>
+        /// Flag denoting if the point has been loaded.
+        /// </summary>
         protected bool _loaded = false;
+        /// <summary>
+        /// Flag denoting if the point has been unloaded.
+        /// </summary>
         protected bool _disposed = false;
 
+        /// <summary>
+        /// The draw mode to use in rendering.
+        /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.Points;
 
         /// <summary>

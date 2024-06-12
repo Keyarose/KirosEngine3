@@ -11,7 +11,13 @@ namespace KirosEngine3.Math.Matrix
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix2x4 : IEquatable<Matrix2x4>, IFormattable, IMatrix<Matrix2x4, Vec4, Vec2, Vec2, Matrix4x2>
     {
+        /// <summary>
+        /// The first row of the matrix.
+        /// </summary>
         public Vec4 Row0;
+        /// <summary>
+        /// The second row of the matrix.
+        /// </summary>
         public Vec4 Row1;
 
         /// <summary>

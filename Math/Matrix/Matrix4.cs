@@ -10,13 +10,28 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Matrix
 {
+    /// <summary>
+    /// Four by four matrix definition.
+    /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix4 : IEquatable<Matrix4>, IFormattable, IMatrix<Matrix4, Vec4, Vec4, Vec4, Matrix4>
     {
+        /// <summary>
+        /// The first row of the matrix.
+        /// </summary>
         public Vec4 Row0;
-        public Vec4 Row1; 
-        public Vec4 Row2; 
+        /// <summary>
+        /// The second row of the matrix.
+        /// </summary>
+        public Vec4 Row1;
+        /// <summary>
+        /// The third row of the matrix.
+        /// </summary>
+        public Vec4 Row2;
+        /// <summary>
+        /// The fourth row of the matrix.
+        /// </summary>
         public Vec4 Row3;
 
         /// <summary>
@@ -1264,6 +1279,10 @@ namespace KirosEngine3.Math.Matrix
         #endregion
 
         #region Rotation
+        /// <summary>
+        /// Clear the rotation from a copy of the matrix.
+        /// </summary>
+        /// <returns>The copy without rotation.</returns>
         public readonly Matrix4 ClearRotation()
         {
             var c = this;

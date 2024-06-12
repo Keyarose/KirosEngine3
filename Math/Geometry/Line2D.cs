@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Geometry
 {
+    /// <summary>
+    /// The mathematical representation of a line in 2D.
+    /// </summary>
     public struct Line2D : IEquatable<Line2D>, IFormattable
     {
         /// <summary>

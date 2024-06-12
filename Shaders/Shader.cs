@@ -8,7 +8,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
 using KirosEngine3.Mesh;
 using System.Xml.Serialization;
@@ -19,24 +18,65 @@ using KirosEngine3.Exceptions;
 
 namespace KirosEngine3.Shaders
 {
+    /// <summary>
+    /// A shader object that handles interfacing with shader micro programs.
+    /// </summary>
     public class Shader : IDisposable, IXmlSerializable
     {
+        /// <summary>
+        /// The graphics API identifier for the shader program.
+        /// </summary>
         protected int _handle;
-        protected bool _disposed;
-        protected string _name = null!;
+        /// <summary>
+        /// The name of the shader.
+        /// </summary>
+        protected string _name = "";
 
-        protected string _vertPath = null!;
-        protected string _fragPath = null!;
+        /// <summary>
+        /// The path of the vertex shader file.
+        /// </summary>
+        protected string _vertPath = "";
+        /// <summary>
+        /// The path of the fragment shader file.
+        /// </summary>
+        protected string _fragPath = "";
 
+        /// <summary>
+        /// The names for the attributes of common types. i.e. position, normal, uv, color
+        /// </summary>
         protected ShaderAttribNames _attribNames;
+        /// <summary>
+        /// The names for common uniform types. i.e. view matrix, projection matrix, color
+        /// </summary>
         protected ShaderUniformNames _uniformNames;
 
+        /// <summary>
+        /// The uniform locations for the shader, keyed by their names.
+        /// </summary>
         protected readonly Dictionary<string, int> _uniformLocations = [];
+        /// <summary>
+        /// The shader's attributes, keyed by names and organized into Tuples containing the location and value type.
+        /// </summary>
         protected Dictionary<string, Tuple<int, ActiveAttribType>> _attribList = [];
 
+        /// <summary>
+        /// Flag to denote when the shader has been loaded.
+        /// </summary>
+        protected bool _loaded;
+        /// <summary>
+        /// Flag to denote when the shader has been unloaded.
+        /// </summary>
+        protected bool _disposed;
+
+        /// <summary>
+        /// The graphics API identifier for the shader program.
+        /// </summary>
         public int Handle
         { get { return _handle; } }
 
+        /// <summary>
+        /// The name of the shader.
+        /// </summary>
         public string Name
         { get { return _name; } }
 
@@ -66,6 +106,9 @@ namespace KirosEngine3.Shaders
         { get { return _attribNames.Normal; } }
         #endregion
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
         public Shader()
         { }
 
@@ -107,7 +150,7 @@ namespace KirosEngine3.Shaders
 
             _attribNames = attribNames;
 
-            LoadShaderGL();
+            LoadShaderGL();//todo: move loading to be called externally
         }
 
         /// <summary>
@@ -228,6 +271,8 @@ namespace KirosEngine3.Shaders
 
                 _attribList.Add(key, new Tuple<int, ActiveAttribType>(location, type));
             }
+
+            _loaded = true;
         }
 
         /// <summary>
@@ -408,7 +453,11 @@ namespace KirosEngine3.Shaders
             }
         }
 
-        //todo: parameter checking
+        //todo: parameter checking and clean up/consolidation of SetAttrib
+        /// <summary>
+        /// Set the shader attributes with the given settings
+        /// </summary>
+        /// <param name="settings">An array of attribute settings to apply.</param>
         public void SetAttribsGL(ShaderAttribSettings[] settings)
         {
             foreach (var attrib in settings)
@@ -573,6 +622,11 @@ namespace KirosEngine3.Shaders
             }
         }
 
+        /// <summary>
+        /// Set a uniform in the shader program to the given 3D vector value. (OpenGL)
+        /// </summary>
+        /// <param name="name">The name of the uniform.</param>
+        /// <param name="value">The value to set it to.</param>
         public void SetUniformVec3GL(string name, Vec3 value)
         {
             if (_uniformLocations.TryGetValue(name, out int loc))
@@ -588,6 +642,11 @@ namespace KirosEngine3.Shaders
             }
         }
 
+        /// <summary>
+        /// Set a uniform in the shader program to the given 4D vector value. (OpenGL)
+        /// </summary>
+        /// <param name="name">The name of the uniform.</param>
+        /// <param name="value">The value to set it to.</param>
         public void SetUniformVec4GL(string name, Vec4 value)
         {
             if (_uniformLocations.TryGetValue(name, out int loc))
@@ -627,6 +686,11 @@ namespace KirosEngine3.Shaders
 
         #region ProgramUniformsGL
         //todo: more uniform types
+        /// <summary>
+        /// Set a uniform in the shader program to the given 4D vector value. (OpenGL)
+        /// </summary>
+        /// <param name="name">The name of the uniform.</param>
+        /// <param name="value">The value to set it to.</param>
         public void ProgramUniformVec4GL(string name, Vec4 value)
         {
             if (_uniformLocations.TryGetValue(name, out int loc))
@@ -919,6 +983,9 @@ namespace KirosEngine3.Shaders
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
         ~Shader()
         {
             if (_disposed == false)
@@ -936,9 +1003,21 @@ namespace KirosEngine3.Shaders
     /// </summary>
     public struct ShaderAttribSettings
     {
+        /// <summary>
+        /// The name of the attribute in the shader program.
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// The size of the attribute as a count of the value types. i.e: vec4 is 4 floats
+        /// </summary>
         public int Size { get; set; }
+        /// <summary>
+        /// The stride of the data loaded into the buffer.
+        /// </summary>
         public int Stride { get; set; }
+        /// <summary>
+        /// The offset of the attribute within the buffered data.
+        /// </summary>
         public int Offset { get; set; }
     }
 
@@ -948,18 +1027,45 @@ namespace KirosEngine3.Shaders
     /// </summary>
     public struct ShaderAttribNames
     {
+        /// <summary>
+        /// The name of the position attribute in the shader program if there is one.
+        /// </summary>
         public string Position { get; set; }
+        /// <summary>
+        /// The type of the position attribute if there is one.
+        /// </summary>
         public ShaderValueType PositionType { get; set; }
 
+        /// <summary>
+        /// The name of the color attribute in the shader program if there is one.
+        /// </summary>
         public string Color { get; set; }
+        /// <summary>
+        /// The type of the color attribute if there is one.
+        /// </summary>
         public ShaderValueType ColorType { get; set; }
 
+        /// <summary>
+        /// The name of the uv attribute in the shader program if there is one.
+        /// </summary>
         public string UV { get; set; }
+        /// <summary>
+        /// The type of the uv attribute if there is one.
+        /// </summary>
         public ShaderValueType UVType { get; set; }
 
+        /// <summary>
+        /// The name of the normal attribute in the shader program if there is one.
+        /// </summary>
         public string Normal { get; set; }
+        /// <summary>
+        /// The type of the normal attribute if there is one.
+        /// </summary>
         public ShaderValueType NormalType { get; set; }
 
+        /// <summary>
+        /// Basic constructor
+        /// </summary>
         public ShaderAttribNames()
         {
             Position = "";
@@ -975,21 +1081,54 @@ namespace KirosEngine3.Shaders
     /// </summary>
     public struct ShaderUniformNames
     {
+        /// <summary>
+        /// The name of the model matrix uniform in the shader program if there is one.
+        /// </summary>
         public string Model { get; set; }
+        /// <summary>
+        /// The type of the model matrix uniform if there is one.
+        /// </summary>
         public ShaderValueType ModelType { get; set; }
 
+        /// <summary>
+        /// The name of the view matrix uniform in the shader program if there is one.
+        /// </summary>
         public string View { get; set; }
+        /// <summary>
+        /// The type of the view matrix uniform if there is one.
+        /// </summary>
         public ShaderValueType ViewType { get; set; }
 
+        /// <summary>
+        /// The name of the projection matrix uniform in the shader program if there is one.
+        /// </summary>
         public string Projection { get; set; }
+        /// <summary>
+        /// The type of the projection matrix uniform if there is one.
+        /// </summary>
         public ShaderValueType ProjectionType { get; set; }
 
+        /// <summary>
+        /// The name of the orthographic matrix uniform in the shader program if there is one.
+        /// </summary>
         public string Ortho { get; set; }
+        /// <summary>
+        /// The type of the orthographic matrix uniform if there is one.
+        /// </summary>
         public ShaderValueType OrthoType { get; set; }
 
+        /// <summary>
+        /// The name of the color uniform in the shader program if there is one.
+        /// </summary>
         public string Color { get; set; }
+        /// <summary>
+        /// The type of the color uniform if there is one.
+        /// </summary>
         public ShaderValueType ColorType { get; set; }
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
         public ShaderUniformNames()
         {
             Model = "";

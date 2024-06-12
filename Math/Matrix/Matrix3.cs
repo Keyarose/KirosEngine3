@@ -13,8 +13,17 @@ namespace KirosEngine3.Math.Matrix
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix3 : IEquatable<Matrix3>, IFormattable, IMatrix<Matrix3, Vec3, Vec3, Vec3, Matrix3>
     {
+        /// <summary>
+        /// The first row of the matrix.
+        /// </summary>
         public Vec3 Row0;
+        /// <summary>
+        /// The second row of the matrix.
+        /// </summary>
         public Vec3 Row1;
+        /// <summary>
+        /// The third row of the matrix.
+        /// </summary>
         public Vec3 Row2;
 
         /// <summary>
@@ -76,7 +85,7 @@ namespace KirosEngine3.Math.Matrix
         {
             return [Column0, Column1, Column2];
         }
-
+        /// <inheritdoc/>
         public readonly Vec3[] GetRows()
         {
             return [Row0, Row1, Row2];

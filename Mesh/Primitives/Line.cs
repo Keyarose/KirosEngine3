@@ -17,18 +17,36 @@ namespace KirosEngine3.Mesh.Primitives
     /// </summary>
     public class Line : IDisposable, IRenderable, IFormattable
     {
-        //the vertex data
+        /// <summary>
+        /// The vertex data.
+        /// </summary>
         protected ColorVertex[] _verts = new ColorVertex[2];
-        //vertex array object
+        /// <summary>
+        /// The Vertex array object.
+        /// </summary>
         protected int _VAO;
-        //vertex buffer object
+        /// <summary>
+        /// The Vertex buffer object.
+        /// </summary>
         protected int _VBO;
-        //name of the shader used in rendering
+
+        /// <summary>
+        /// The name of the shader to be used in rendering.
+        /// </summary>
         protected string _shaderName;
 
+        /// <summary>
+        /// Flag denoting if the Line has been loaded.
+        /// </summary>
         protected bool _loaded = false;
+        /// <summary>
+        /// Flag denoting if the Line has been unloaded.
+        /// </summary>
         protected bool _disposed = false;
 
+        /// <summary>
+        /// The draw mode to be used in rendering.
+        /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.Lines;
 
         /// <summary>

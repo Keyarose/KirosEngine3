@@ -11,7 +11,13 @@ namespace KirosEngine3.Math.Matrix
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix2 : IEquatable<Matrix2>, IFormattable, IMatrix<Matrix2, Vec2, Vec2, Vec2, Matrix2>
     {
+        /// <summary>
+        /// The first row of the matrix.
+        /// </summary>
         public Vec2 Row0;
+        /// <summary>
+        /// The second row of the matrix.
+        /// </summary>
         public Vec2 Row1;
 
         /// <summary>
@@ -994,19 +1000,19 @@ namespace KirosEngine3.Math.Matrix
         #endregion
 
         #region ToString
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString"/>
         public override readonly string ToString()
         {
             return ToString(null, null);
         }
 
-        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        /// <inheritdoc/>
         public readonly string ToString(string? format)
         {
             return ToString(format, null);
         }
 
-        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        /// <inheritdoc/>
         public readonly string ToString(IFormatProvider? formatProvider)
         {
             return ToString(null, formatProvider);

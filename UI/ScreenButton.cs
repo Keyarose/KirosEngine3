@@ -11,32 +11,84 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.UI
 {
+    /// <summary>
+    /// a UI object that defines a renderable button.
+    /// </summary>
     public class ScreenButton
     {
+        /// <summary>
+        /// The position of the button in screen coordinates.
+        /// </summary>
         protected Vec2 _position;
 
+        /// <summary>
+        /// The background color of the button.
+        /// </summary>
         protected Color4 _backColor;
 
+        /// <summary>
+        /// The size of the button in screen coordinates.
+        /// </summary>
         protected Vec2 _size;
 
+        /// <summary>
+        /// The vertex data.
+        /// </summary>
         protected ColorVertex[] _verts = new ColorVertex[4];
+        /// <summary>
+        /// The index list.
+        /// </summary>
         protected uint[] _indices = new uint[6];
 
+        /// <summary>
+        /// The name of the shader to be used in rendering.
+        /// </summary>
         protected string _shaderName;
 
+        /// <summary>
+        /// The vertex array object.
+        /// </summary>
         protected int _VAO;
+        /// <summary>
+        /// The vertex buffer object.
+        /// </summary>
         protected int _VBO;
+        /// <summary>
+        /// The index buffer object.
+        /// </summary>
         protected int _EBO;
 
+        /// <summary>
+        /// Flag to denote if the button has been unloaded.
+        /// </summary>
         protected bool _disposed = false;
+        /// <summary>
+        /// Flag to denote if the button has been loaded.
+        /// </summary>
         protected bool _loaded = false;
 
+        /// <summary>
+        /// The position of the Button in screen coordinates.
+        /// </summary>
         public Vec2 Position { get { return _position; } set {  _position = value; } }
 
+        /// <summary>
+        /// The background color of the Button.
+        /// </summary>
         public Color4 BackgroundColor { get { return _backColor; } set { _backColor = value; } }
 
+        /// <summary>
+        /// The size of the Button in screen coordinates.
+        /// </summary>
         public Vec2 Size { get { return _size; } set { _size = value; } }//todo: resize event?
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="pos">The position in screen coordinates.</param>
+        /// <param name="color">The background color.</param>
+        /// <param name="size">The size in screen coordinates.</param>
+        /// <param name="shader">Optional. The name of the shader to use in rendering. Defaults to color.</param>
         public ScreenButton(Vec2 pos, Color4 color, Vec2 size, string shader = "color") 
         {
             _position = pos;
@@ -69,6 +121,9 @@ namespace KirosEngine3.UI
         }
 
         #region Loading
+        /// <summary>
+        /// Load the Button for rendering.
+        /// </summary>
         public void Init()
         {
             _VAO = GL.GenVertexArray();
@@ -92,6 +147,10 @@ namespace KirosEngine3.UI
         #endregion
 
         #region Draw
+        /// <summary>
+        /// Draw the button using the OpenGL API.
+        /// </summary>
+        /// <param name="vm">The view matrices to use.</param>
         public void DrawGL(ViewMatrixes vm)
         {
             if (_disposed || !_loaded)
@@ -153,6 +212,9 @@ namespace KirosEngine3.UI
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
         ~ScreenButton()
         {
             Dispose(false);

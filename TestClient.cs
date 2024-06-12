@@ -50,7 +50,7 @@ namespace KirosEngine3
                 //failed to load general config perform fallback
             }
 
-            TextureManager.TryAddTexture("defaultFont", ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + "_0.png");//todo: move font texture loading into font
+            TextureManager.TryAddTexture("defaultFont", ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + "_0.png");//todo: move font texture loading into font and get file name from font xml
             FontManager.AddFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], new Font(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY],
             ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + ".xml",
             "defaultFont"));//todo: cleanup method call once config system is implemented

@@ -4,6 +4,9 @@ using System.Numerics;
 
 namespace KirosEngine3.Math.Geometry
 {
+    /// <summary>
+    /// The mathematical representation of a line in 3D
+    /// </summary>
     public struct Line3D : IEquatable<Line3D>, IFormattable
     {
         /// <summary>
@@ -60,6 +63,12 @@ namespace KirosEngine3.Math.Geometry
             Finite = finite;
         }
 
+        /// <summary>
+        /// Constructor for defining a line that can be finite or infinite.
+        /// </summary>
+        /// <param name="verts">Two points on the line.</param>
+        /// <param name="finite">True marks the line as finite, false an infinite line.</param>
+        /// <exception cref="ArgumentException">Thrown if fewer than two points are provided.</exception>
         public Line3D(Vec3[] verts, bool finite)
         {
             if (verts.Length < 2)

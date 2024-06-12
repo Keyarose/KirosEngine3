@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Materials
 {
-    internal class MaterialManager
+    /// <summary>
+    /// Management system for all materials to be used in the program.
+    /// </summary>
+    public class MaterialManager
     {
     }
 }

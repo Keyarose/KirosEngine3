@@ -11,10 +11,13 @@ namespace KirosEngine3.Exceptions
     /// </summary>
     public class MissingConfigException : Exception
     {
+        /// <inheritdoc/>
         public MissingConfigException() { }
 
+        /// <inheritdoc/>
         public MissingConfigException(string message) : base(message) { }
 
+        /// <inheritdoc/>
         public MissingConfigException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

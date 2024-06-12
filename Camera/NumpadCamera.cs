@@ -16,15 +16,29 @@ namespace KirosEngine3.Camera
     /// </summary>
     public class NumpadCamera : BaseCamera
     {
+        /// <summary>
+        /// The distance from the look at point the camera should be set to when aligning to an axis.
+        /// </summary>
         protected float _offsetFromLookAt = 5.0f;
 
+        /// <summary>
+        /// The minimum distance the camera can have from the look at point when moving closer.
+        /// </summary>
         protected float _minDistance = 0.9f;
+        /// <summary>
+        /// The maximum distance the camera can have from the look at point when moving further.
+        /// </summary>
         protected float _maxDistance = 15.0f;
 
+        /// <summary>
+        /// The speed of rotation in degrees when rotating the camera around the look at point.
+        /// </summary>
         protected float _rotationSpeed = 20.0f;//degrees
 
+        /// <inheritdoc/>
         public NumpadCamera(Vec3 position, float width, float height) : this(position, width, height, 1.5f) { }
 
+        /// <inheritdoc/>
         public NumpadCamera(Vec3 position, float width, float height, float speed) : base(position, width, height, speed)
         {
             //register keysPressed
@@ -35,8 +49,10 @@ namespace KirosEngine3.Camera
             KeyboardEventManager.SubscribeKeyboardEvents("system", keysHeld, KeyboardEventType.KeyHeld, OnKeyPress);
         }
 
+        /// <inheritdoc/>
         public NumpadCamera(Vec3 position, Vec2 windowSize) : this(position, windowSize.X, windowSize.Y) { }
 
+        /// <inheritdoc/>
         public NumpadCamera(Vec3 position, Vec2 windowSize, float speed) : base(position, windowSize, speed) { }
 
         /// <summary>

@@ -18,8 +18,17 @@ namespace KirosEngine3.Math.Matrix
     [StructLayout(LayoutKind.Sequential)]
     public struct Matrix3x4 : IEquatable<Matrix3x4>, IFormattable, IMatrix<Matrix3x4, Vec4, Vec3, Vec3, Matrix4x3>
     {
+        /// <summary>
+        /// The first row of the matrix.
+        /// </summary>
         public Vec4 Row0;
+        /// <summary>
+        /// The second row of the matrix.
+        /// </summary>
         public Vec4 Row1;
+        /// <summary>
+        /// The third row of the matrix.
+        /// </summary>
         public Vec4 Row2;
 
         /// <summary>
@@ -401,6 +410,10 @@ namespace KirosEngine3.Math.Matrix
             result = Transpose(m);
         }
 
+        /// <summary>
+        /// Create a transposed copy of the matrix.
+        /// </summary>
+        /// <returns>The transposed copy.</returns>
         public readonly Matrix4x3 TransposedCopy()
         {
             return Transpose(this);

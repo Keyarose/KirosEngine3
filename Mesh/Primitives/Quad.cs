@@ -16,21 +16,48 @@ namespace KirosEngine3.Mesh.Primitives
     /// </summary>
     public class Quad : IDisposable, IRenderable, IFormattable
     {
+        /// <summary>
+        /// The vertex data.
+        /// </summary>
         protected ColorVertex[] _verts = new ColorVertex[4];
 
+        /// <summary>
+        /// The vertex index array.
+        /// </summary>
         protected uint[] _indices = new uint[6];
 
+        /// <summary>
+        /// The vertex array object.
+        /// </summary>
         protected int _VAO;
 
+        /// <summary>
+        /// The vertex buffer object.
+        /// </summary>
         protected int _VBO;
 
+        /// <summary>
+        /// The index buffer object.
+        /// </summary>
         protected int _EBO;
 
+        /// <summary>
+        /// The name of the shader to be used in rendering.
+        /// </summary>
         protected string _shaderName;
 
+        /// <summary>
+        /// Flag denoting if the Quad has been loaded.
+        /// </summary>
         protected bool _loaded = false;
+        /// <summary>
+        /// Flag denoting if the Quad has been unloaded.
+        /// </summary>
         protected bool _disposed = false;
 
+        /// <summary>
+        /// The draw mode to be used in rendering.
+        /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.TriangleStrip;//todo: replace with custom type that can be converted to PrimitiveType
 
         /// <summary>
@@ -71,6 +98,14 @@ namespace KirosEngine3.Mesh.Primitives
         /// </summary>
         public static Quad UnitQuad => new Quad(qPoints, [0, 1, 2, 2, 3, 0], Color4.Red);
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="points">The points that make up the quad.</param>
+        /// <param name="indices">The indices for the points.</param>
+        /// <param name="colors">The color of each point.</param>
+        /// <param name="shaderName">Optional, the name of the shader to use. Defaults to color.</param>
+        /// <exception cref="ArgumentException">Thrown if the points array, indices array, and color array are not the same length; or if the shader name is empty.</exception>
         public Quad(Vec3[] points, uint[] indices, Color4[] colors, string shaderName = "color")
         {
             if (points.Length != _verts.Length || indices.Length != _indices.Length || colors.Length != _verts.Length)
@@ -90,10 +125,24 @@ namespace KirosEngine3.Mesh.Primitives
             _indices = indices;
         }
 
+        /// <summary>
+        /// Construct a Quad using point data from a 3D rectangle.
+        /// </summary>
+        /// <param name="rec">The 3D rectangle to get the points from.</param>
+        /// <param name="indices">The indices for the points.</param>
+        /// <param name="colors">The color of each point.</param>
+        /// <param name="shaderName">Optional, the name of the shader to use. Defaults to color.</param>
         public Quad(Rect3D rec, uint[] indices, Color4[] colors, string shaderName = "color") :
-            this(rec.Vertices, indices, colors, shaderName)
+            this(rec.Vertices, indices, colors, shaderName)//todo: indices hard coded to be the chosen winding direction since Rect3D has predefined vert order
         { }
 
+        /// <summary>
+        /// Basic constructor using the same color for all points.
+        /// </summary>
+        /// <param name="points">The points that makeup the quad.</param>
+        /// <param name="indices">The indices for the points.</param>
+        /// <param name="color">The color to use for the points.</param>
+        /// <param name="shaderName">Optional, the name of the shader to use. Defaults to color.</param>
         public Quad(Vec3[] points, uint[] indices, Color4 color, string shaderName = "color") :
             this(points, indices, [color, color, color, color], shaderName)
         { }
@@ -193,6 +242,7 @@ namespace KirosEngine3.Mesh.Primitives
             return _verts;
         }
 
+        /// <inheritdoc/>
         public uint[] GetIndices() { return _indices; }
 
         /// <inheritdoc/>
@@ -277,6 +327,9 @@ namespace KirosEngine3.Mesh.Primitives
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
         ~Quad()
         {
             Dispose(false);

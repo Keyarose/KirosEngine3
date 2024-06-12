@@ -11,21 +11,48 @@ namespace KirosEngine3.Mesh.Primitives
     /// </summary>
     public class Cube : IDisposable, IRenderable, IFormattable
     {
+        /// <summary>
+        /// The vertices of the cube.
+        /// </summary>
         protected ColorVertex[] _verts = new ColorVertex[8];
 
+        /// <summary>
+        /// The vertex indices.
+        /// </summary>
         protected uint[] _indices = new uint[36];
 
+        /// <summary>
+        /// The vertex array object.
+        /// </summary>
         protected int _VAO;
 
+        /// <summary>
+        /// The vertex buffer object.
+        /// </summary>
         protected int _VBO;
 
+        /// <summary>
+        /// The index buffer object.
+        /// </summary>
         protected int _EBO;
 
+        /// <summary>
+        /// The name of the shader to be used in rendering.
+        /// </summary>
         protected string _shaderName;
 
+        /// <summary>
+        /// Flag denoting if the cube has been loaded.
+        /// </summary>
         protected bool _loaded = false;
+        /// <summary>
+        /// Flag denoting if the cube has been unloaded.
+        /// </summary>
         protected bool _disposed = false;
 
+        /// <summary>
+        /// The draw mode to be used in rendering.
+        /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
         /// <summary>
@@ -322,6 +349,9 @@ namespace KirosEngine3.Mesh.Primitives
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
         ~Cube()
         {
             Dispose(false);

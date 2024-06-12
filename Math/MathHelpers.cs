@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math
 {
+    /// <summary>
+    /// Helper functions for various bits of math.
+    /// </summary>
     public static class MathHelpers
     {
         internal static readonly float PiOver2 = MathF.PI / 2;

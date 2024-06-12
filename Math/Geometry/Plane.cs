@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Geometry
 {
+    /// <summary>
+    /// A mathematical definition of a plane in 3D.
+    /// </summary>
     public struct Plane : IEquatable<Plane>, IFormattable
     {
         /// <summary>

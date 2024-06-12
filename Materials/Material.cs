@@ -12,16 +12,40 @@ namespace KirosEngine3.Materials
     /// </summary>
     public class Material : IXmlSerializable
     {
+        /// <summary>
+        /// The name of the material.
+        /// </summary>
         protected string _name = "";
+        /// <summary>
+        /// A description of the material.
+        /// </summary>
         protected string _description = "";
 
+        /// <summary>
+        /// The ambient color of the material.
+        /// </summary>
         protected Color4 _ambientColor;
+        /// <summary>
+        /// The diffuse color of the material.
+        /// </summary>
         protected Color4 _diffuseColor;
+        /// <summary>
+        /// The specular color of the material.
+        /// </summary>
         protected Color4 _specularColor;
+        /// <summary>
+        /// The shininess of the material.
+        /// </summary>
         protected float _shininess;
 
+        /// <summary>
+        /// The names of the textures used by the material.
+        /// </summary>
         protected string[] _textures = [];
 
+        /// <summary>
+        /// The name of the shader used by the material.
+        /// </summary>
         protected string _shaderName = "";
 
         /// <summary>
@@ -59,9 +83,18 @@ namespace KirosEngine3.Materials
         /// </summary>
         public string ShaderName { get { return _shaderName; } set { _shaderName = value; } }
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
         public Material() { }
 
         #region Load
+        /// <summary>
+        /// Set a shader attribute for the shader being used by the material.
+        /// </summary>
+        /// <param name="attribFlag">The attribute to set.</param>
+        /// <param name="settings">The attribute settings.</param>
+        /// <returns>True if successful, false otherwise.</returns>
         public bool SetShaderAttrib(ShaderAttribFlags attribFlag, ShaderAttribSettings settings)
         {
             if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
@@ -92,6 +125,11 @@ namespace KirosEngine3.Materials
             return true;
         }
 
+        /// <summary>
+        /// Set a shader attribute on the shader being used by the material that isn't one of the common attribute types.
+        /// </summary>
+        /// <param name="settings">The settings for the attribute.</param>
+        /// <returns>True if successful, false otherwise.</returns>
         public bool SetCustomShaderAttrib(ShaderAttribSettings settings)
         {
             if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
