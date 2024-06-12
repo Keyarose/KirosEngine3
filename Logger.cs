@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KirosEngine3.Config;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,14 +13,31 @@ namespace KirosEngine3
     public class Logger
     {
         private static Logger? _instance;
+        /// <summary>
+        /// Flag to denote if logging is enabled or disabled.
+        /// </summary>
         protected bool _enabled = true;
 
-        //todo: configurable file path
-        protected string _filePath = "log/"; //default file path
+        /// <summary>
+        /// The file path for the active log file.
+        /// </summary>
+        protected string _filePath;
+        /// <summary>
+        /// The information of the active log file.
+        /// </summary>
         protected FileInfo? _fileInfo;
-        protected int _maxLogSizeMB = 512; //default log size in mb
-        protected int _maxLogSizeL = 10000; //max log size in lines
+        /// <summary>
+        /// The maximum allowed log size in MB.
+        /// </summary>
+        protected int _maxLogSizeMB = 512;
+        /// <summary>
+        /// The maximum allowed log size in lines.
+        /// </summary>
+        protected int _maxLogSizeL = 10000;
 
+        /// <summary>
+        /// The line count of the active log file.
+        /// </summary>
         protected int _currentLineCount = 0;
 
         /// <summary>
@@ -66,7 +84,7 @@ namespace KirosEngine3
             DateTime now = DateTime.Now;
 
             //default file path and name
-            _filePath += string.Format("eventlog_{0}.log", now.ToString("MM/dd/yyyy-HH-mm-ss-fff"));
+            _filePath = ConfigVars.Instance[ConfigKeys.D_DIR_LOG_KEY] + string.Format("/eventlog_{0}.log", now.ToString("MM/dd/yyyy-HH-mm-ss-fff"));
 
             //todo: load max log sizes from config file
 
@@ -78,6 +96,7 @@ namespace KirosEngine3
             {
                 Console.WriteLine(ex.Message);
                 //todo: write to in game console
+                return;
             }
 
             //if file info is not null continue log setup else write an error to the consoles
@@ -182,16 +201,28 @@ namespace KirosEngine3
             WriteToLog(string.Format(message, args));
         }
 
+        /// <summary>
+        /// Write an int to the log file.
+        /// </summary>
+        /// <param name="i">The int to write.</param>
         public static void WriteToLog(int i)
         {
             WriteToLog(i.ToString());
         }
 
+        /// <summary>
+        /// Write a float to the log file.
+        /// </summary>
+        /// <param name="f">The float to write.</param>
         public static void WriteToLog(float f)
         {
             WriteToLog(f.ToString());
         }
 
+        /// <summary>
+        /// Write an exception to the log file.
+        /// </summary>
+        /// <param name="ex">The exception to write.</param>
         public static void WriteToLog(Exception ex)
         {
             WriteToLog(ex.ToString());
