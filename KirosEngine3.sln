@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KirosEngine3Tests", "..\KirosEngine3Tests\KirosEngine3Tests.csproj", "{1BB32D00-8906-4795-A80F-52AE39D20426}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KirosEngine3Tests", "..\KirosEngine3Tests\KirosEngine3Tests.csproj", "{1BB32D00-8906-4795-A80F-52AE39D20426}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

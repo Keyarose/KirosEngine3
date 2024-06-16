@@ -149,5 +149,37 @@ namespace KirosEngine3.Math.Matrix
             return Row0.Equals(other.Row0, tolerance) && Row1.Equals(other.Row1, tolerance) && Row2.Equals(other.Row2, tolerance) && Row3.Equals(other.Row3, tolerance);
         }
         #endregion
+
+
+        #region ToString
+        /// <inheritdoc/>
+        public override readonly string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
+        public readonly string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            var r0 = Row0.ToString(format, formatProvider);
+            var r1 = Row1.ToString(format, formatProvider);
+            var r2 = Row2.ToString(format, formatProvider);
+            var r3 = Row3.ToString(format, formatProvider);
+
+            return string.Format("{0}\n\t{1}\n\t{2}\n\t{3}", r0, r1, r2, r3);
+        }
+        #endregion
     }
 }

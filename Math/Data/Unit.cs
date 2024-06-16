@@ -12,9 +12,21 @@ namespace KirosEngine3.Math.Data
     /// </summary>
     public struct Unit : IEquatable<Unit>
     {
+        /// <summary>
+        /// The name of the unit.
+        /// </summary>
         public string Name;
+        /// <summary>
+        /// The symbol of the unit.
+        /// </summary>
         public string Symbol;
+        /// <summary>
+        /// The unit multiplier.
+        /// </summary>
         public Prefix Prefix;
+        /// <summary>
+        /// Conversion definitions between different units.
+        /// </summary>
         public Dictionary<string, Func<Measurement, Measurement>> Conversions;
 
         //todo: singleton index for defined units
@@ -53,6 +65,7 @@ namespace KirosEngine3.Math.Data
         /// </summary>
         /// <param name="name">The name of the unit</param>
         /// <param name="sym">The symbol of the unit</param>
+        /// <param name="pre">The unit's multiplier prefix.</param>
         /// <param name="con">A list of conversion methods to other units</param>
         public Unit(string name, string sym, Prefix pre, Dictionary<string, Func<Measurement, Measurement>> con) 
         {
@@ -237,7 +250,8 @@ namespace KirosEngine3.Math.Data
             return HashCode.Combine(Name, HashCode.Combine(Symbol, Prefix));
         }
 
-        //todo: implement iformattable
+        //todo: implement IFormattable
+        /// <inheritdoc/>
         public override readonly string ToString()
         {
             return string.Format("Unit Name: {1}{0}\n\t Symbol: {1}{2}", Name, Prefix, Symbol);
@@ -249,30 +263,105 @@ namespace KirosEngine3.Math.Data
     /// </summary>
     public enum Prefix
     {
-        Deca, //10^1
-        Hecto, //10^2
-        Kilo, //10^3
-        Mega, //10^6
-        Giga, //10^9
-        Tera, //10^12
-        Peta, //10^15
-        Exa, //10^18
-        Zetta, //10^21
-        Yotta, //10^24
-        Ronna, //10^27
-        Quetta, //10^30
-        None, //10^0
-        Deci, //10^-1
-        Centi, //10^-2
-        Milli, //10^-3
-        Micro, //10^-6
-        Nano, //10^-9
-        Pico, //10^-12
-        Femto, //10^-15
-        Atto, //10^-18
-        Zepto, //10^-21
-        Yocto, //10^-24
-        Ronto, //10^-27
-        Quecto //10^-30
+        /// <summary>
+        /// 10 to the 1st power.
+        /// </summary>
+        Deca,
+        /// <summary>
+        /// 10 to the 2nd power.
+        /// </summary>
+        Hecto,
+        /// <summary>
+        /// 10 to the 3rd power.
+        /// </summary>
+        Kilo,
+        /// <summary>
+        /// 10 to the 6th power.
+        /// </summary>
+        Mega,
+        /// <summary>
+        /// 10 to the 9th power.
+        /// </summary>
+        Giga,
+        /// <summary>
+        /// 10 to the 12th power.
+        /// </summary>
+        Tera,
+        /// <summary>
+        /// 10 to the 15th power.
+        /// </summary>
+        Peta,
+        /// <summary>
+        /// 10 to the 18th power.
+        /// </summary>
+        Exa,
+        /// <summary>
+        /// 10 to the 21st power.
+        /// </summary>
+        Zetta,
+        /// <summary>
+        /// 10 to the 24th power.
+        /// </summary>
+        Yotta,
+        /// <summary>
+        /// 10 to the 27th power.
+        /// </summary>
+        Ronna,
+        /// <summary>
+        /// 10 to the 30th power.
+        /// </summary>
+        Quetta,
+        /// <summary>
+        /// 10 to the 0th power.
+        /// </summary>
+        None,
+        /// <summary>
+        /// 10 to the -1st power.
+        /// </summary>
+        Deci,
+        /// <summary>
+        /// 10 to the -2nd power.
+        /// </summary>
+        Centi,
+        /// <summary>
+        /// 10 to the -3rd power.
+        /// </summary>
+        Milli,
+        /// <summary>
+        /// 10 to the -6th power.
+        /// </summary>
+        Micro,
+        /// <summary>
+        /// 10 to the -9th power.
+        /// </summary>
+        Nano,
+        /// <summary>
+        /// 10 to the -12th power.
+        /// </summary>
+        Pico,
+        /// <summary>
+        /// 10 to the -15th power.
+        /// </summary>
+        Femto,
+        /// <summary>
+        /// 10 to the -18th power.
+        /// </summary>
+        Atto,
+        /// <summary>
+        /// 10 to the -21st power.
+        /// </summary>
+        Zepto,
+        /// <summary>
+        /// 10 to the -24th power.
+        /// </summary>
+        Yocto,
+        /// <summary>
+        /// 10 to the -27th power.
+        /// </summary>
+        Ronto,
+        /// <summary>
+        /// 10 to the -30th power.
+        /// </summary>
+        Quecto
     }
 }
