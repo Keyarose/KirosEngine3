@@ -781,7 +781,7 @@ namespace KirosEngine3.Math.Matrix
             };
 
             return result;
-        }
+        }//todo: deal with nan cases
 
         /// <summary>
         /// Construct a perspective projection matrix (row major)
@@ -824,7 +824,7 @@ namespace KirosEngine3.Math.Matrix
         }
 
         /// <summary>
-        /// Construct an orthographic projection matrix
+        /// Construct an orthographic projection matrix (row major)
         /// </summary>
         /// <param name="width">The width of the projection volume</param>
         /// <param name="height">The height of the projection volume</param>
@@ -916,73 +916,73 @@ namespace KirosEngine3.Math.Matrix
         /// <exception cref="InvalidOperationException">Thrown if the matrix is singular.</exception>
         public static Matrix4 Invert(Matrix4 m)
         {
-            float n00 = m.Row0.X, n01 = m.Row0.Y, n02 = m.Row0.Z, n03 = m.Row0.W;
-            float n10 = m.Row1.X, n11 = m.Row1.Y, n12 = m.Row1.Z, n13 = m.Row1.W;
-            float n20 = m.Row2.X, n21 = m.Row2.Y, n22 = m.Row2.Z, n23 = m.Row2.W;
-            float n30 = m.Row3.X, n31 = m.Row3.Y, n32 = m.Row3.Z, n33 = m.Row3.W;
+            float n00 = m.M00, n01 = m.M01, n02 = m.M02, n03 = m.M03;
+            float n10 = m.M10, n11 = m.M11, n12 = m.M12, n13 = m.M13;
+            float n20 = m.M20, n21 = m.M21, n22 = m.M22, n23 = m.M23;
+            float n30 = m.M30, n31 = m.M31, n32 = m.M32, n33 = m.M33;
 
             //2x2 sub matrix determinants
-            float m22x33_23x32 = Matrix2.CalcDeterminant(n22, n33, n23, n32);
-            float m21x33_31x23 = Matrix2.CalcDeterminant(n21, n33, n31, n23);
-            float m21x32_31x22 = Matrix2.CalcDeterminant(n21, n32, n31, n22);
-            float m20x33_23x30 = Matrix2.CalcDeterminant(n20, n33, n23, n30);
-            float m20x32_30x22 = Matrix2.CalcDeterminant(n20, n32, n30, n22);
-            float m20x31_30x21 = Matrix2.CalcDeterminant(n20, n31, n30, n21);
+            float detM22_23_32_33 = Matrix2.CalcDeterminant(n22, n23, n32, n33);
+            float detM21_23_31_33 = Matrix2.CalcDeterminant(n21, n23, n31, n33);
+            float detM21_22_31_32 = Matrix2.CalcDeterminant(n21, n22, n31, n32);
+            float detM20_23_30_33 = Matrix2.CalcDeterminant(n20, n23, n30, n33);
+            float detM20_22_30_32 = Matrix2.CalcDeterminant(n20, n22, n30, n32);
+            float detM20_21_30_31 = Matrix2.CalcDeterminant(n20, n21, n30, n31);
 
-            //first row, determinants of 3x3 sub matrixes
-            float a0 = +(n11 * m22x33_23x32 - n12 * m21x33_31x23 + n13 * m21x32_31x22);
-            float a1 = -(n10 * m22x33_23x32 - n12 * m20x33_23x30 + n13 * m20x32_30x22);
-            float a2 = +(n10 * m21x33_31x23 - n11 * m20x33_23x30 + n13 * m20x31_30x21);
-            float a3 = -(n10 * m21x32_31x22 - n11 * m20x32_30x22 + n12 * m20x31_30x21);
+            //first row, determinants of 3x3 sub matrixes, first column result
+            float detM00 = +(n11 * detM22_23_32_33 - n12 * detM21_23_31_33 + n13 * detM21_22_31_32);
+            float detM01 = -(n10 * detM22_23_32_33 - n12 * detM20_23_30_33 + n13 * detM20_22_30_32);
+            float detM02 = +(n10 * detM21_23_31_33 - n11 * detM20_23_30_33 + n13 * detM20_21_30_31);
+            float detM03 = -(n10 * detM21_22_31_32 - n11 * detM20_22_30_32 + n12 * detM20_21_30_31);
 
             //calc the determ here since we have to do some work anyway
-            float determ = n00 * a0 + n01 * a1 + n02 * a2 + n03 * a3;
+            float determ = n00 * detM00 + n01 * detM01 + n02 * detM02 + n03 * detM03;
 
             if (determ.IsZero())
                 throw new InvalidOperationException("Matrix cannot be inverted as it is singular.");
 
             float invertDet = 1.0f / determ;
 
-            //second row
-            float b0 = -(n01 * m22x33_23x32 - n02 * m21x33_31x23 + n03 * m21x32_31x22);
-            float b1 = +(n00 * m22x33_23x32 - n02 * m20x33_23x30 + n03 * m20x32_30x22);
-            float b2 = -(n00 * m21x33_31x23 - n01 * m20x33_23x30 + n03 * m20x31_30x21);
-            float b3 = +(n00 * m21x32_31x22 - n01 * m20x32_30x22 + n02 * m20x31_30x21);
+            //second row, second column result
+            float detM10 = -(n01 * detM22_23_32_33 - n02 * detM21_23_31_33 + n03 * detM21_22_31_32);
+            float detM11 = +(n00 * detM22_23_32_33 - n02 * detM20_23_30_33 + n03 * detM20_22_30_32);
+            float detM12 = -(n00 * detM21_23_31_33 - n01 * detM20_23_30_33 + n03 * detM20_21_30_31);
+            float detM13 = +(n00 * detM21_22_31_32 - n01 * detM20_22_30_32 + n02 * detM20_21_30_31);
 
             //2x2 sub matrix determinants
-            float m12x33_13x32 = Matrix2.CalcDeterminant(n12, n13, n32, n33);
-            float m11x33_13x31 = Matrix2.CalcDeterminant(n11, n13, n31, n33);
-            float m11x32_12x31 = Matrix2.CalcDeterminant(n11, n12, n31, n32);
-            float m10x33_13x30 = Matrix2.CalcDeterminant(n10, n13, n30, n33);
-            float m10x32_12x30 = Matrix2.CalcDeterminant(n10, n12, n30, n32);
-            float m10x31_11x30 = Matrix2.CalcDeterminant(n10, n11, n30, n31);
+            float detM12_13_32_33 = Matrix2.CalcDeterminant(n12, n13, n32, n33);
+            float detM11_13_31_33 = Matrix2.CalcDeterminant(n11, n13, n31, n33);
+            float detM11_12_31_32 = Matrix2.CalcDeterminant(n11, n12, n31, n32);
+            float detM10_13_30_33 = Matrix2.CalcDeterminant(n10, n13, n30, n33);
+            float detM10_12_30_32 = Matrix2.CalcDeterminant(n10, n12, n30, n32);
+            float detM10_11_30_31 = Matrix2.CalcDeterminant(n10, n11, n30, n31);
 
-            //third row
-            float c0 = +(n01 * m12x33_13x32 - n02 * m11x33_13x31 + n03 * m11x32_12x31);
-            float c1 = -(n00 * m12x33_13x32 - n02 * m10x33_13x30 + n03 * m10x32_12x30);
-            float c2 = +(n00 * m11x33_13x31 - n01 * m10x33_13x30 + n03 * m10x31_11x30);
-            float c3 = -(n00 * m11x32_12x31 - n01 * m10x32_12x30 + n02 * m10x31_11x30);
+            //third row, third column result
+            float detM20 = +(n01 * detM12_13_32_33 - n02 * detM11_13_31_33 + n03 * detM11_12_31_32);
+            float detM21 = -(n00 * detM12_13_32_33 - n02 * detM10_13_30_33 + n03 * detM10_12_30_32);
+            float detM22 = +(n00 * detM11_13_31_33 - n01 * detM10_13_30_33 + n03 * detM10_11_30_31);
+            float detM23 = -(n00 * detM11_12_31_32 - n01 * detM10_12_30_32 + n02 * detM10_11_30_31);
 
             //2x2 sub matrix det
-            float m12x23_13x22 = Matrix2.CalcDeterminant(n12, n13, n22, n23);
-            float m11x23_13x21 = Matrix2.CalcDeterminant(n11, n13, n21, n23);
-            float m11x22_12x21 = Matrix2.CalcDeterminant(n11, n12, n21, n22);
-            float m10x23_13x20 = Matrix2.CalcDeterminant(n10, n13, n20, n23);
-            float m10x22_12x20 = Matrix2.CalcDeterminant(n10, n12, n20, n22);
-            float m10x21_11x20 = Matrix2.CalcDeterminant(n10, n11, n20, n21);
+            float detM12_13_22_23 = Matrix2.CalcDeterminant(n12, n13, n22, n23);
+            float detM11_13_21_23 = Matrix2.CalcDeterminant(n11, n13, n21, n23);
+            float detM11_12_21_22 = Matrix2.CalcDeterminant(n11, n12, n21, n22);
+            float detM10_13_20_23 = Matrix2.CalcDeterminant(n10, n13, n20, n23);
+            float detM10_12_20_22 = Matrix2.CalcDeterminant(n10, n12, n20, n22);
+            float detM10_11_20_21 = Matrix2.CalcDeterminant(n10, n11, n20, n21);
 
-            //fourth row
-            float d0 = -(n01 * m12x23_13x22 - n02 * m11x23_13x21 + n03 * m11x22_12x21);
-            float d1 = +(n00 * m12x23_13x22 - n02 * m10x23_13x20 + n03 * m10x22_12x20);
-            float d2 = -(n00 * m11x23_13x21 - n01 * m10x23_13x20 + n03 * m10x21_11x20);
-            float d3 = +(n00 * m11x22_12x21 - n01 * m10x22_12x20 + n02 * m10x21_11x20);
+            //fourth row, fourth column result
+            float detM30 = -(n01 * detM12_13_22_23 - n02 * detM11_13_21_23 + n03 * detM11_12_21_22);
+            float detM31 = +(n00 * detM12_13_22_23 - n02 * detM10_13_20_23 + n03 * detM10_12_20_22);
+            float detM32 = -(n00 * detM11_13_21_23 - n01 * detM10_13_20_23 + n03 * detM10_11_20_21);
+            float detM33 = +(n00 * detM11_12_21_22 - n01 * detM10_12_20_22 + n02 * detM10_11_20_21);
 
             var r = new Matrix4
             {
-                Row0 = new Vec4(a0, a1, a2, a3) * invertDet,
-                Row1 = new Vec4(b0, b1, b2, b3) * invertDet,
-                Row2 = new Vec4(c0, c1, c2, c3) * invertDet,
-                Row3 = new Vec4(d0, d1, d2, d3) * invertDet
+                Row0 = new Vec4(detM00, detM10, detM20, detM30) * invertDet,
+                Row1 = new Vec4(detM01, detM11, detM21, detM31) * invertDet,
+                Row2 = new Vec4(detM02, detM12, detM22, detM32) * invertDet,
+                Row3 = new Vec4(detM03, detM13, detM23, detM33) * invertDet
             };
 
             return r;

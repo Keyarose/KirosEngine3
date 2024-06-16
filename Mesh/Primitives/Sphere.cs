@@ -296,11 +296,13 @@ namespace KirosEngine3.Mesh.Primitives
         /// <param name="vm">The view matrices to be used in rendering.</param>
         public void DrawGL(ViewMatrixes vm)
         {
-            if (_disposed || !_loaded)
+            if (_disposed || !_loaded && !_warnOnce)
             {
                 Logger.WriteToLog("Attempt to draw unloaded sphere object: {0}", this);
                 Console.WriteLine("Attempt to draw unloaded sphere object: {0}", this);
                 //todo: write to debug console
+
+                _warnOnce = true;
                 return;
             }
 

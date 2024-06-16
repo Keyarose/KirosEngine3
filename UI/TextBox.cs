@@ -8,17 +8,35 @@ using System.Threading.Tasks;
 
 namespace KirosEngine3.UI
 {
+    /// <summary>
+    /// A textbox UI element.
+    /// </summary>
     public class TextBox
     {
         //origin at upper left
+        /// <summary>
+        /// The position of the textbox in screen coordinates.
+        /// </summary>
         protected Vec2 _position;
 
+        /// <summary>
+        /// The size of the textbox in screen coordinates.
+        /// </summary>
         protected Vec2 _size;
 
+        /// <summary>
+        /// The font to be used in the textbox.
+        /// </summary>
         protected Font _font;
 
-        protected Queue<Text> _lines;
-        protected float _visibleLines;//how many lines can be rendered in the box space
+        /// <summary>
+        /// The collection of lines of text in the textbox.
+        /// </summary>
+        protected Queue<string> _lines;
+        /// <summary>
+        /// The number of lines that fit within the textbox.
+        /// </summary>
+        protected float _visibleLines;
 
         /// <summary>
         /// The on screen position of the textbox.
@@ -56,6 +74,13 @@ namespace KirosEngine3.UI
             set { _size.Y = value; }//todo: clamp
         }
 
+        /// <summary>
+        /// Basic constructor.
+        /// </summary>
+        /// <param name="position">The position in screen coordinates.</param>
+        /// <param name="size">The size in screen coordinates.</param>
+        /// <param name="font">The font to be used.</param>
+        /// <param name="maxLines">The maximum number of lines.</param>
         public TextBox(Vec2 position, Vec2 size, Font font, int maxLines)
         {
             _position = position;
@@ -66,7 +91,7 @@ namespace KirosEngine3.UI
             _font = font;
             _visibleLines = _size.Y / _font.Size;
 
-            _lines = new Queue<Text>(maxLines);
+            _lines = new Queue<string>(maxLines);
         }
     }
 }
