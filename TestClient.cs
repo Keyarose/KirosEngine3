@@ -82,7 +82,7 @@ namespace KirosEngine3
 
             //load test text
             {
-                testText = new Text(new Vec2(200.0f, 0.0f), df!, "test");
+                testText = new Text(new Vec2(0.0f, 0.0f), "test");
                 //testText.Color = Color4.Red;
                 testText.Init();
             }
@@ -174,7 +174,7 @@ namespace KirosEngine3
             //testSButton?.DrawGL(viewMatrixes);
             //testTexQ?.DrawGL(viewMatrixes, TextureUnit.Texture1);
             
-            //testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
 
             SwapBuffers();
         }

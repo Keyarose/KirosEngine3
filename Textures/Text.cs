@@ -16,17 +16,17 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The font to be used to generate the text.
         /// </summary>
-        protected Font? _font;
+        protected Font _font = FontManager.Default;
 
         /// <summary>
         /// The name of the shader to be used in rendering.
         /// </summary>
-        protected string _shaderName;//todo: set as default text shader
+        protected string _shaderName = "";//todo: set as default text shader
 
         /// <summary>
         /// The text to be rendered to the screen.
         /// </summary>
-        protected string _text;
+        protected string _text = "";
 
         /// <summary>
         /// The screen position of the text's origin.
@@ -86,9 +86,14 @@ namespace KirosEngine3.Textures
         protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
         /// <summary>
+        /// The buffer usage mode to use when rendering the text.
+        /// </summary>
+        protected BufferUsageHint _bufferUse = BufferUsageHint.StaticDraw;
+
+        /// <summary>
         /// The font to draw the text with
         /// </summary>
-        public Font? Font { get { return _font; } set { _font = value; _textChanged = true; Update(); } }
+        public Font Font { get { return _font; } set { _font = value; _textChanged = true; Update(); } }
 
         /// <summary>
         /// The shader to be used
@@ -118,6 +123,16 @@ namespace KirosEngine3.Textures
         }
 
         /// <summary>
+        /// The vertices of the text object.
+        /// </summary>
+        public TexturedVertex[] Vertices { get { return _sentence.Vertices; } }
+
+        /// <summary>
+        /// The indices of the text object.
+        /// </summary>
+        public uint[] Indices { get { return _sentence.Indexes; } }
+
+        /// <summary>
         /// The color of the text
         /// </summary>
         public Color4 Color { get { return _sentence.Color; } set { _sentence.Color = value; } }
@@ -126,6 +141,16 @@ namespace KirosEngine3.Textures
         /// The draw mode to be used during rendering.
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
+
+        /// <summary>
+        /// The buffer usage mode to use when rendering the text.
+        /// </summary>
+        public BufferUsageHint BufferUsage { get { return _bufferUse; } set { _bufferUse = value; UpdateBuffers(); } }
+
+        /// <summary>
+        /// Basic constructor for XML use.
+        /// </summary>
+        public Text() { }
 
         /// <summary>
         /// Basic constructor for a Text object
@@ -142,21 +167,12 @@ namespace KirosEngine3.Textures
         /// <param name="text">The text to be rendered.</param>
         public Text(Vec2 pos, string text)
         {
-            if (!FontManager.TryGetFont(ConfigKeys.D_FONT_NAME_KEY, out _font))
-            {
-                Console.WriteLine("Warning: Default font is not configured.");
-                Logger.WriteToLog("Warning: Default font is not configured.");
-            }
             _shaderName = "text"; //todo: define environment var for default text shader
             _text = text;
             _pos = pos;
 
-            _sentence = new SentenceData
-            {
-                Vertices = [],
-                Indexes = [],
-                Color = Color4.Black //default to black
-            };
+            _sentence = _font.TextForString(text, pos.AsVec3());
+            _sentence.Color = Color4.Black;
         }
 
         /// <summary>
@@ -172,7 +188,7 @@ namespace KirosEngine3.Textures
             _text = text;
             _pos = pos;
 
-            _sentence = font.TextForString(text, pos.AsVec3());
+            _sentence = _font.TextForString(text, pos.AsVec3());
             _sentence.Color = Color4.Black;
         }
 
@@ -188,11 +204,11 @@ namespace KirosEngine3.Textures
 
             _VBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex.SizeInBytesU * _sentence.Vertices.Length, _sentence.Vertices, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex.SizeInBytesU * _sentence.Vertices.Length, _sentence.Vertices, _bufferUse);
 
             _EBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _sentence.Indexes.Length, _sentence.Indexes, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _sentence.Indexes.Length, _sentence.Indexes, _bufferUse);
 
             //if the shader fails to be found it is logged in TryGetShader.
             if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
@@ -290,14 +306,22 @@ namespace KirosEngine3.Textures
                 _sentence.Vertices = ns.Vertices;
                 _sentence.Indexes = ns.Indexes;
 
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex.SizeInBytesU * _sentence.Vertices.Length, _sentence.Vertices, BufferUsageHint.DynamicDraw);
-
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
-                GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _sentence.Indexes.Length, _sentence.Indexes, BufferUsageHint.DynamicDraw);
+                UpdateBuffers();
 
                 _textChanged = false;
             }
+        }
+
+        /// <summary>
+        /// Update the buffers for changes to the text
+        /// </summary>
+        private void UpdateBuffers()
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex.SizeInBytesU * _sentence.Vertices.Length, _sentence.Vertices, _bufferUse);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _sentence.Indexes.Length, _sentence.Indexes, _bufferUse);
         }
 
         /// <summary>
