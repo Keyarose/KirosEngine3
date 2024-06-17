@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using KirosEngine3.Config;
+using KirosEngine3.Exceptions;
 
 namespace KirosEngine3.Textures
 {
@@ -15,6 +17,17 @@ namespace KirosEngine3.Textures
 
         public static FontManager Instance
         { get { return _instance ??= new FontManager(); } }
+
+        public static Font Default
+        {
+            get
+            {
+                if (TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? f))
+                    return f;
+                else
+                    throw new MissingConfigException(string.Format("Default font name is not configured or incorrect. Name: {0}", ConfigKeys.D_FONT_NAME_KEY));
+            }
+        }
 
         /// <summary>
         /// Add a font to the manager
