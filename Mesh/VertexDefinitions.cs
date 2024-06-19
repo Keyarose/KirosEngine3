@@ -178,6 +178,8 @@ namespace KirosEngine3.Mesh
     /// <summary>
     /// A 2D colored vertex.
     /// </summary>
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public struct ColorVertex2D : IVertex2D
     {
         /// <summary>
@@ -198,6 +200,32 @@ namespace KirosEngine3.Mesh
         /// The size of the vertex in bytes.
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<ColorVertex2D>();
+    }
+
+    /// <summary>
+    /// A 2D textured vertex.
+    /// </summary>
+    public struct TexturedVertex2D : IVertex2D
+    {
+        /// <summary>
+        /// The vertex's position.
+        /// </summary>
+        public Vec2 Position { get; set; }
+
+        /// <summary>
+        /// The vertex's uv.
+        /// </summary>
+        public Vec2 UV { get; set; }
+
+        /// <summary>
+        /// The offset of the vertex's uv.
+        /// </summary>
+        public static readonly int UVOffset = Vec2.SizeInBytesU;
+
+        /// <summary>
+        /// The size of the vertex in bytes.
+        /// </summary>
+        public static readonly int SizeInBytesU = Unsafe.SizeOf<TexturedVertex2D>();
     }
 
     //todo: vertex type checking against shader signature

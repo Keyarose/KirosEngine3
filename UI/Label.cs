@@ -30,7 +30,7 @@ namespace KirosEngine3.UI
         /// <summary>
         /// The vertices of the Label.
         /// </summary>
-        public TexturedVertex[] Vertices { get { return _labelText.Vertices; } }
+        public TexturedVertex2D[] Vertices { get { return _labelText.Vertices; } }
 
         /// <summary>
         /// The indices of the label.

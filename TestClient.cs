@@ -81,17 +81,13 @@ namespace KirosEngine3
             _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
 
             //load test text
-            {
-                testText = new Text(new Vec2(0.0f, 0.0f), "test");
-                //testText.Color = Color4.Red;
-                testText.Init();
-            }
+            testText = new Text(new Vec2(0.0f, 0.0f), "test");
+            //testText.Color = Color4.Red;
+            testText.Init();
 
             //load test point
-            {
-                testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
-                testPoint.Init();
-            }
+            testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
+            testPoint.Init();
 
 
             testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), Color4.Red);
@@ -157,7 +153,8 @@ namespace KirosEngine3
                 Model = Matrix4.Identity,
                 Projection = (camera != null) ? camera.Projection : Matrix4.Identity,
                 View = (camera != null) ? camera.View : Matrix4.Identity,
-                Orthographic = (camera != null) ? camera.Orthographic : Matrix4.Identity
+                Orthographic = (camera != null) ? camera.Orthographic : Matrix4.Identity,
+                UIOrtho = Matrix4.CreateOrthographicOffCenter(0, ClientSize.X, ClientSize.Y, 0, -1f, 1f)
             };
 
             //testTriangle?.DrawGL(viewMatrixes);
@@ -173,8 +170,10 @@ namespace KirosEngine3
 
             //testSButton?.DrawGL(viewMatrixes);
             //testTexQ?.DrawGL(viewMatrixes, TextureUnit.Texture1);
-            
+
+            //hud and 2d
             testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            //end hud and 2d
 
             SwapBuffers();
         }

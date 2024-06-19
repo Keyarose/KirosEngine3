@@ -15,7 +15,7 @@
       </shader>
       <shader name="text" vertShader="FontShader_default.vert" fragShader="FontShader_default.frag">
         <shaderAttribute name="aUV" type="uv" value="vec2"/>
-        <shaderAttribute name="aPosition" type="position" value="vec3"/>
+        <shaderAttribute name="aPosition" type="position" value="vec2"/>
       </shader>
       <shader name="texture" vertShader="TextureShader.vert" fragShader="TextureShader.frag">
         <shaderAttribute name="aUV" type="uv" value="vec2"/>

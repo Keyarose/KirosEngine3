@@ -125,7 +125,7 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The vertices of the text object.
         /// </summary>
-        public TexturedVertex[] Vertices { get { return _sentence.Vertices; } }
+        public TexturedVertex2D[] Vertices { get { return _sentence.Vertices; } }
 
         /// <summary>
         /// The indices of the text object.
@@ -171,7 +171,7 @@ namespace KirosEngine3.Textures
             _text = text;
             _pos = pos;
 
-            _sentence = _font.TextForString(text, pos.AsVec3());
+            _sentence = _font.TextForString(text, Vec2.Zero);
             _sentence.Color = Color4.Black;
         }
 
@@ -188,7 +188,7 @@ namespace KirosEngine3.Textures
             _text = text;
             _pos = pos;
 
-            _sentence = _font.TextForString(text, pos.AsVec3());
+            _sentence = _font.TextForString(text, Vec2.Zero);
             _sentence.Color = Color4.Black;
         }
 
@@ -204,7 +204,7 @@ namespace KirosEngine3.Textures
 
             _VBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex.SizeInBytesU * _sentence.Vertices.Length, _sentence.Vertices, _bufferUse);
+            GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex2D.SizeInBytesU * _sentence.Vertices.Length, _sentence.Vertices, _bufferUse);
 
             _EBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
@@ -216,12 +216,14 @@ namespace KirosEngine3.Textures
                 return false;
             }
 
-            //set the shader attributes for TexturedVertex
-            sh.SetAttribsGL<TexturedVertex>();
+            //set the shader attributes for TexturedVertex2D
+            sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = TexturedVertex2D.SizeInBytesU });
+            sh.SetUVAttribGL(new ShaderAttribSettings { Offset = TexturedVertex2D.UVOffset, Size = 2, Stride= TexturedVertex2D.SizeInBytesU });
+            //sh.SetAttribsGL<TexturedVertex>();
 
             GL.BindVertexArray(0);
 
-            UpdateSentence();
+            Update();
 
             _loaded = true;
             return true;
@@ -274,21 +276,24 @@ namespace KirosEngine3.Textures
 
             sh.UseGL();
             //set the shader uniforms
-            sh.SetUniformIntGL("texture0", (int)tu);
+            sh.SetUniformIntGL("texture0", Texture.TextureUnitToInt(tu));
 
             sh.SetUniformMat4GL("model", vm.Model * _scale * Matrix4.CreateTranslation(_pos.AsVec3()));
-            sh.SetUniformMat4GL("view", vm.View);
-            sh.SetUniformMat4GL("proj", vm.Orthographic);
+            sh.SetUniformMat4GL("proj", vm.UIOrtho);
 
             sh.SetUniformVec4GL("aTextColor", (Vec4)_sentence.Color);
 
             GL.BindVertexArray(_VAO);
 
+
             GL.Enable(EnableCap.Blend);
+
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.DrawElements(_drawMode, _sentence.Indexes.Length, DrawElementsType.UnsignedInt, 0);
 
             GL.Disable(EnableCap.Blend);
+
+
             GL.BindVertexArray(0);
         }
         #endregion
@@ -301,7 +306,7 @@ namespace KirosEngine3.Textures
         {
             if (_font != null)
             {
-                SentenceData ns = _font.TextForString(_text, Vec3.Zero);
+                SentenceData ns = _font.TextForString(_text, Vec2.Zero);
 
                 _sentence.Vertices = ns.Vertices;
                 _sentence.Indexes = ns.Indexes;
@@ -383,7 +388,7 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The vertices of the text.
         /// </summary>
-        public TexturedVertex[] Vertices;
+        public TexturedVertex2D[] Vertices;
 
         /// <summary>
         /// Vertex indices of the text.

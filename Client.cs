@@ -34,7 +34,7 @@ namespace KirosEngine3
         /// <summary>
         /// Flag to allow or disallow the output of OpenGL debug messages that are only notifications.
         /// </summary>
-        protected static bool _showGLDebugNotify = false;
+        private static bool _showGLDebugNotify = false;
 
         /// <summary>
         /// Basic constructor.
@@ -161,5 +161,10 @@ namespace KirosEngine3
         /// The Orthographic matrix, constructed by the active camera object and used mainly for UI/HUD.
         /// </summary>
         public Matrix4 Orthographic { get; set; }
+
+        /// <summary>
+        /// The Orthographic matrix for UI elements.
+        /// </summary>
+        public Matrix4 UIOrtho { get; set; }
     }
 }

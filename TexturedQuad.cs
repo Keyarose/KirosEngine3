@@ -11,7 +11,7 @@ namespace KirosEngine3
     internal class TexturedQuad
     {
         private Quad _quad;
-        private string _textureName;
+        private readonly string _textureName;
 
         private int _VAO;
         private int _VBO;
