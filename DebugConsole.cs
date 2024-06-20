@@ -22,7 +22,7 @@ namespace KirosEngine3
 
         protected int _linesHeight;//how many lines fit in the space
 
-        protected string _defaultFontName = "";
+        protected Font _defaultFont;
 
         protected bool _visible;
 
@@ -57,20 +57,9 @@ namespace KirosEngine3
 
             _lines = [];
             _maxLines = maxLines;
-            
-            if (ConfigVars.TryGetVar(ConfigKeys.D_FONT_NAME_KEY, out string? fontName))
-            {
-                _defaultFontName = fontName!;
-                if (FontManager.TryGetFont(_defaultFontName, out Font? df))
-                {
-                    _linesHeight = df.Size;
-                }
-            }
-            else
-            {
-                Console.WriteLine("Warning: Default font is not configured.");
-                Logger.WriteToLog("Warning: Default font is not configured.");
-            }
+
+            _defaultFont = FontManager.Default;
+            _linesHeight = _defaultFont.Size;
 
             _visible = false; //default to not visible
         }

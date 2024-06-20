@@ -260,11 +260,12 @@ namespace KirosEngine3.Textures
                 return;
             }
 
+            //todo: move use font call up to the caller of this method and group elements using the same font to render in a batch
             //if use font fails or font is null
             if (!_font?.UseFont(tu) ?? false)
             {
-                Logger.WriteToLog("Attempt to use non-existent font texture: {0}", _font);
-                Console.WriteLine("Attempt to use non-existent font texture: {0}", _font);
+                Logger.WriteToLog("Attempt to use non-existent font: {0}", _font);
+                Console.WriteLine("Attempt to use non-existent font: {0}", _font);
                 //todo: write to debug
             }
 

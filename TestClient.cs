@@ -27,10 +27,6 @@ namespace KirosEngine3
     internal class TestClient : Client
     {
         Text? testText;
-        Point? testPoint;
-        Line? testLine;
-        Triangle? testTriangle;
-        Quad? testQuad;
         Cube? testCube;
         Sphere? testSphere;
 
@@ -44,16 +40,13 @@ namespace KirosEngine3
 
         public TestClient(int width, int height) : base (width, height, "Test Client")
         {
-            ConfigVars.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);
-            if (!ConfigVars.LoadFromXML("Resources/Config/generalConfig.xml"))
+            ConfigManager.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);//declare that we're using the OpenGL API
+            if (!ConfigManager.LoadFromXML("Resources/Config/generalConfig.xml"))
             {
                 //failed to load general config perform fallback
             }
 
-            TextureManager.TryAddTexture("defaultFont", ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + "_0.png");//todo: move font texture loading into font and get file name from font xml
-            FontManager.AddFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], new Font(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY],
-            ConfigVars.Instance[ConfigKeys.D_FONT_FILE_KEY] + ".xml",
-            "defaultFont"));//todo: cleanup method call once config system is implemented
+            //FontManager.AddFont(ConfigManager.Instance[ConfigKeys.D_FONT_NAME_KEY], new Font(ConfigManager.Instance[ConfigKeys.D_FONT_NAME_KEY], ConfigManager.Instance[ConfigKeys.D_FONT_FILE_KEY] + ".xml"));
         }
 
         protected override void OnLoad()
@@ -64,7 +57,7 @@ namespace KirosEngine3
             TextureManager.TryAddTexture("wall", "Resources/Textures/wall.jpg");//debug texture
             //end test stuff
 
-            GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);
+            GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);//todo: add general config
             GL.Enable(EnableCap.DepthTest);
             //GL.Enable(EnableCap.DebugOutput);
             //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);//wireframe drawing
@@ -78,26 +71,10 @@ namespace KirosEngine3
             camera = new BaseCamera(2.0f * Vec3.UnitZ + moveC, ClientSize.X, ClientSize.Y, .5f);
             camera.LookAt = Vec3.Zero;
 
-            _ = FontManager.TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? df);//todo: need better configvars access
-
             //load test text
             testText = new Text(new Vec2(0.0f, 0.0f), "test");
             //testText.Color = Color4.Red;
             testText.Init();
-
-            //load test point
-            testPoint = new Point(new Vec3(0.0f, 0.5f, 0.0f), Color4.Yellow);
-            testPoint.Init();
-
-
-            testLine = new Line(Vec3.Zero, new Vec3(0.5f, 0.5f, 0.0f), Color4.Red);
-            testLine.Init();
-
-            testTriangle = new Triangle([new Vec3(0.0f, 0.3f, 0.0f), new Vec3(0.2f, -0.2f, 0.0f), new Vec3(-0.2f, -0.2f, 0.0f)], Color4.Aqua);
-            testTriangle.Init();
-
-            testQuad = Quad.UnitQuad;
-            testQuad.Init();
 
             testCube = Cube.UnitCube;
             testCube.SetColors([Color4.Red, Color4.Blue, Color4.Green, Color4.Yellow]);
@@ -126,8 +103,7 @@ namespace KirosEngine3
             testTexQ.Init();
 
             //kem testing
-            KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B,
-                KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
+           // KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B, KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
 
             //ToString testing
             //Console.WriteLine(testQuad.ToString());
@@ -157,10 +133,6 @@ namespace KirosEngine3
                 UIOrtho = Matrix4.CreateOrthographicOffCenter(0, ClientSize.X, ClientSize.Y, 0, -1f, 1f)
             };
 
-            //testTriangle?.DrawGL(viewMatrixes);
-            //testPoint?.DrawGL(viewMatrixes);
-            //testLine?.DrawGL(viewMatrixes);
-            //testQuad?.DrawGL(viewMatrixes);
             testCube?.DrawGL(viewMatrixes);
             //testSphere?.DrawGL(viewMatrixes);
 
@@ -196,7 +168,6 @@ namespace KirosEngine3
 
         protected override void OnUnload()
         {
-            testPoint?.Dispose();
 
             ShaderManager.OnUnload();
             TextureManager.OnUnload();
