@@ -84,7 +84,7 @@ namespace KirosEngine3
             DateTime now = DateTime.Now;
 
             //default file path and name
-            _filePath = ConfigVars.Instance[ConfigKeys.D_DIR_LOG_KEY] + string.Format("/eventlog_{0}.log", now.ToString("MM/dd/yyyy-HH-mm-ss-fff"));
+            _filePath = ConfigManager.Instance[ConfigKeys.D_DIR_LOG_KEY] + string.Format("/eventlog_{0}.log", now.ToString("MM/dd/yyyy-HH-mm-ss-fff"));
 
             //todo: load max log sizes from config file
 

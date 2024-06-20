@@ -47,7 +47,7 @@ namespace KirosEngine3.Textures
         /// <param name="path">The path to the texture file.</param>
         public Texture(string name, string path)
         {
-            if(ConfigVars.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
+            if(ConfigManager.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
             {
                 _handle = GL.GenTexture();
             }
@@ -65,7 +65,7 @@ namespace KirosEngine3.Textures
         /// </summary>
         internal void Load()
         {
-            if (ConfigVars.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
+            if (ConfigManager.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
             {
                 LoadGL();
             }
@@ -135,7 +135,7 @@ namespace KirosEngine3.Textures
         {
             if (!_disposed)
             {
-                switch (ConfigVars.GetVar(Client.GRAPHICSMODE_KEY))
+                switch (ConfigManager.GetVar(Client.GRAPHICSMODE_KEY))
                 {
                     case Client.GRAPHICSMODE_GL_VAL:
                         {

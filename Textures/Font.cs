@@ -1,4 +1,6 @@
-﻿using KirosEngine3.Math.Vector;
+﻿using KirosEngine3.Config;
+using KirosEngine3.Exceptions;
+using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
 using OpenTK.Graphics.OpenGL4;
 using System;
@@ -8,36 +10,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace KirosEngine3.Textures
 {
-    /// <summary>
-    /// Defines the location and size of the char
-    /// </summary>
-    public struct CharData
-    {
-        /// <summary>
-        /// The X position of the character on the bitmap.
-        /// </summary>
-        [XmlAttribute]
-        public int x;
-        /// <summary>
-        /// The Y position of the character on the bitmap.
-        /// </summary>
-        [XmlAttribute]
-        public int y;
-        /// <summary>
-        /// The width of the character on the bitmap.
-        /// </summary>
-        [XmlAttribute]
-        public int width;
-        /// <summary>
-        /// The height of the character on the bitmap.
-        /// </summary>
-        [XmlAttribute]
-        public int height;
-    }
-
     /// <summary>
     /// Defines a Font for use in text rendering
     /// </summary>
@@ -46,7 +22,7 @@ namespace KirosEngine3.Textures
         private readonly string _name;
         private readonly string _filePath;
 
-        private readonly string _fontTexture;
+        private string[] _fontTextures;
         private int _size;
         private float _spaceSize = 3.0f;
         private float _charPaddingSize = 1.0f;
@@ -91,7 +67,27 @@ namespace KirosEngine3.Textures
         }
 
         /// <summary>
-        /// Basic constructor for a font object
+        /// Basic constructor for a font object.
+        /// </summary>
+        /// <param name="name">The name of the font.</param>
+        /// <param name="filePath">The file path for the font data XML.</param>
+        /// <exception cref="ArgumentException">Throw if the font fails to load due to an issue with the file given by filePath</exception>
+        public Font(string name, string filePath)
+        {
+            _name = name;
+            _filePath = filePath;
+
+            _fontTextures = [];
+            _charData = [];
+
+            if (!LoadFontXML())
+            {
+                throw new ArgumentException(string.Format("Font failed to load with given file name: {0}", filePath), nameof(filePath));
+            }
+        }
+
+        /// <summary>
+        /// Basic constructor for a font object with a texture defined outside the font xml.
         /// </summary>
         /// <param name="name">The name of the font</param>
         /// <param name="filePath">The file path for the font data xml</param>
@@ -101,26 +97,13 @@ namespace KirosEngine3.Textures
         {
             _name = name;
             _filePath = filePath;
-            _fontTexture = tex;
+            _fontTextures = [tex];
             
             _charData = [];
 
             if(!LoadFontXML())
             {
                 throw new ArgumentException(string.Format("Font failed to load with given file name: {0}", filePath), nameof(filePath));
-            }
-            
-            //if the font's texture isn't loaded then do so
-            if (TextureManager.TryGetTexture(tex, out Texture? fontText))
-            {
-                if (!fontText.IsLoaded)
-                {
-                    fontText.Load();
-                }
-            }
-            else
-            {
-                Console.WriteLine("Font texture: {0} is not added to the Manager.", _fontTexture);
             }
         }
 
@@ -144,6 +127,16 @@ namespace KirosEngine3.Textures
 
                     _size = data.Info.Size;
                     _bitmapScale = new Vec2(data.Common.ScaleW, data.Common.ScaleH);
+
+                    if (!ConfigManager.TryGetVar(ConfigKeys.D_DIR_FONT_KEY, out string? fontDir))
+                        throw new MissingConfigException(string.Format("Default Font Directory not set with key: {0}", ConfigKeys.D_DIR_FONT_KEY));
+
+                    foreach (var pg in data.Pages)
+                    {
+                        string textureName = string.Format("Font_{0}_pg_{1}", Name, pg.Id);
+                        TextureManager.AddTexture(textureName, fontDir + "/" + pg.File);
+                        _fontTextures = [.. _fontTextures, textureName];
+                    }
 
                     foreach (CharInfo ci in data.Chars)
                     {
@@ -263,11 +256,25 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// Set the font to be used by the rending engine
         /// </summary>
-        /// <param name="tu">The texture unit for the font's texture</param>
+        /// <param name="tu">The texture units for the font's textures</param>
         /// <returns>True if successfully set, false otherwise</returns>
-        public bool UseFont(TextureUnit tu)
+        public bool UseFont(params TextureUnit[] tu)
         {
-            return TextureManager.UseTextureGL(_fontTexture, tu);
+            if (tu.Length != _fontTextures.Length)
+            {
+                Console.WriteLine("Too few texture units provided to font: {0}", Name);
+                Logger.WriteToLog("Too few texture units provided to font: {0}", Name);
+                return false;
+            }
+
+            int i = 0;
+            foreach (var texture in _fontTextures)//assign each texture for the font a TextureUnit
+            {
+                if (!TextureManager.UseTextureGL(texture, tu[i]))
+                    return false;
+                i++;
+            }
+            return true;
         }
 
         /// <summary>

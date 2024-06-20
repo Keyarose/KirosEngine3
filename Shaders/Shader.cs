@@ -298,6 +298,7 @@ namespace KirosEngine3.Shaders
             GL.UseProgram(_handle);
         }
 
+        //todo: rework attrib setting, too overcomplicated.
         #region SetGivenAttribs
         /// <summary>
         /// If the shader has a position attribute defined set it using the given settings, and no normalization
@@ -768,7 +769,7 @@ namespace KirosEngine3.Shaders
 
             string? vertShader = reader.GetAttribute("vertShader") ?? throw new XmlException("vertShader attribute not found in shader element.");
             string? fragShader = reader.GetAttribute("fragShader") ?? throw new XmlException("fragShader attribute not found in shader element.");
-            string? shaderDir = ConfigVars.GetVar(ConfigKeys.D_DIR_SHADER_KEY) ?? throw new MissingConfigException("Default Shader Directory not defined in configuration.");
+            string? shaderDir = ConfigManager.GetVar(ConfigKeys.D_DIR_SHADER_KEY) ?? throw new MissingConfigException("Default Shader Directory not defined in configuration.");
 
             _vertPath = shaderDir + "/" + vertShader;
             _fragPath = shaderDir + "/" + fragShader;

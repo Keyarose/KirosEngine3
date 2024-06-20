@@ -1,5 +1,6 @@
 ﻿using KirosEngine3.Exceptions;
 using KirosEngine3.Shaders;
+using KirosEngine3.Textures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,22 +14,22 @@ namespace KirosEngine3.Config
     /// <summary>
     /// Loads, stores and makes accessible Configuration values
     /// </summary>
-    internal class ConfigVars
+    internal class ConfigManager
     {
-        private static ConfigVars? _instance;
+        private static ConfigManager? _instance;
 
         private readonly Dictionary<string, string> _vars = [];
 
         /// <summary>
         /// Singleton constructor
         /// </summary>
-        private ConfigVars() { }
+        private ConfigManager() { }
 
         /// <summary>
         /// Singleton accessor
         /// </summary>
-        public static ConfigVars Instance
-        { get { return _instance ??= new ConfigVars(); } }
+        public static ConfigManager Instance
+        { get { return _instance ??= new ConfigManager(); } }
 
         /// <summary>
         /// Accessor for the variables collection
@@ -92,10 +93,9 @@ namespace KirosEngine3.Config
                         }
                     }
 
-                    //todo: change font loading to create entries in the font manager.
                     //default font config
                     AddVar(ConfigKeys.D_FONT_NAME_KEY, data.Defaults.DefaultFont.DefaultFontName);
-                    AddVar(ConfigKeys.D_FONT_FILE_KEY, data.Defaults.DefaultFont.DefaultFontFile);
+                    FontManager.CreateFont(data.Defaults.DefaultFont.DefaultFontName, data.Defaults.DefaultFont.DefaultFontFile + data.Defaults.DefaultFont.FileType);
 
                     //load default shaders
                     LoadDefaultShaderData(data.Defaults.DefaultShaders);
@@ -276,10 +276,6 @@ namespace KirosEngine3.Config
         /// Default font name key.
         /// </summary>
         public const string D_FONT_NAME_KEY = "dFontName";
-        /// <summary>
-        /// Default font file key.
-        /// </summary>
-        public const string D_FONT_FILE_KEY = "dFontFile";
     }
 
     //todo: move to the xml namespace as ConfigDataStruct.cs

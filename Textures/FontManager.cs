@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using KirosEngine3.Config;
 using KirosEngine3.Exceptions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace KirosEngine3.Textures
 {
@@ -22,10 +23,26 @@ namespace KirosEngine3.Textures
         {
             get
             {
-                if (TryGetFont(ConfigVars.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? f))
+                if (TryGetFont(ConfigManager.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? f))
                     return f;
                 else
                     throw new MissingConfigException(string.Format("Default font name is not configured or incorrect. Name: {0}", ConfigKeys.D_FONT_NAME_KEY));
+            }
+        }
+
+        /// <summary>
+        /// Create a new font through the manager.
+        /// </summary>
+        /// <param name="name">The name of the font.</param>
+        /// <param name="fileName">The file name of the font.</param>
+        /// <exception cref="ArgumentException">Thrown if the font name is already in use.</exception>
+        public static void CreateFont(string name, string fileName)
+        {
+            Font nFont = new Font(name, fileName);
+
+            if (!Instance._fonts.TryAdd(name, nFont))
+            {
+                throw new ArgumentException(string.Format("Font name: {0} is already in use.", name));
             }
         }
 

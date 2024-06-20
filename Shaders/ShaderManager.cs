@@ -209,7 +209,7 @@ namespace KirosEngine3.Shaders
         {
             if (Instance._shaders.TryGetValue(name, out var shader))
             {
-                if (ConfigVars.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
+                if (ConfigManager.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
                 {
                     shader.UseGL();
                 }
