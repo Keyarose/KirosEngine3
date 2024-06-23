@@ -1,12 +1,7 @@
 ﻿using KirosEngine3.Exceptions;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace KirosEngine3.Config
@@ -40,12 +35,26 @@ namespace KirosEngine3.Config
         {
             get
             {
-                return _vars[name];
+                return _vars[name];//todo: exception handling
             }
 
             set
             {
                 _vars[name] = value;
+            }
+        }
+
+        /// <summary>
+        /// The graphics mode for the application.
+        /// </summary>
+        public static string GraphicsMode
+        {
+            get
+            {
+                if (TryGetVar(Client.GRAPHICSMODE_KEY, out string? mode))
+                    return mode;
+                else
+                    throw new MissingConfigException(string.Format("Graphics mode is not configured or incorrect. Name: {0}", Client.GRAPHICSMODE_KEY));
             }
         }
 
@@ -100,6 +109,10 @@ namespace KirosEngine3.Config
                     //load default shaders
                     LoadDefaultShaderData(data.Defaults.DefaultShaders);
 
+                    //load colors
+                    var clearColor = data.Defaults.DefaultColors.Where(colors => colors.Name.Equals("clearColor")).First();
+                    string cColor = clearColor.RValue + "," + clearColor.GValue + "," + clearColor.BValue + "," + clearColor.AValue;
+                    AddVar(ConfigKeys.D_CLEAR_COLOR_KEY, cColor);
                     sr.Close();
 
                     return true;
@@ -152,6 +165,11 @@ namespace KirosEngine3.Config
                         default:
                             throw new NotImplementedException(string.Format("Shader does not have an implementation for shader attribute of type: {0}", name.AttribType));
                     }
+                }
+
+                if (shader.DefaultFor != null && shader.DefaultFor.Equals("text"))
+                {
+                    AddVar(ConfigKeys.D_SHADER_TEXT_NAME_KEY, shader.ShaderName);
                 }
 
                 ShaderManager.CreateShader(shader.ShaderName, vertPath, fragPath, attribNames);
@@ -220,7 +238,7 @@ namespace KirosEngine3.Config
         /// <param name="name">The name of the variable to get</param>
         /// <param name="value">The value returned</param>
         /// <returns>True if the variable is found, false otherwise</returns>
-        public static bool TryGetVar(string name, out string? value)
+        public static bool TryGetVar(string name, [NotNullWhen(true)] out string? value)
         {
             if (Instance._vars.TryGetValue(name, out value))
             {
@@ -276,6 +294,14 @@ namespace KirosEngine3.Config
         /// Default font name key.
         /// </summary>
         public const string D_FONT_NAME_KEY = "dFontName";
+        /// <summary>
+        /// Default shader for text name key.
+        /// </summary>
+        public const string D_SHADER_TEXT_NAME_KEY = "dShTextName";
+        /// <summary>
+        /// Default clear color key.
+        /// </summary>
+        public const string D_CLEAR_COLOR_KEY = "dClearColor";
     }
 
     //todo: move to the xml namespace as ConfigDataStruct.cs
@@ -318,6 +344,13 @@ namespace KirosEngine3.Config
         [XmlArray("shaders")]
         [XmlArrayItem("shader")]
         public ConfigDefaultShader[] DefaultShaders { get; set; }
+
+        /// <summary>
+        /// The default colors section.
+        /// </summary>
+        [XmlArray("colors")]
+        [XmlArrayItem("color")]
+        public ConfigDefaultColor[] DefaultColors { get; set; }
     }
 
     /// <summary>
@@ -377,19 +410,25 @@ namespace KirosEngine3.Config
         /// <summary>
         /// The vertex shader file.
         /// </summary>
-        [XmlAttribute ("vertShader")]
+        [XmlAttribute("vertShader")]
         public string VertFile { get; set; }
 
         /// <summary>
         /// The fragment shader file.
         /// </summary>
-        [XmlAttribute ("fragShader")]
+        [XmlAttribute("fragShader")]
         public string FragFile { get; set; }
+
+        /// <summary>
+        /// Marks if the shader is a default for a specific type of rendering.
+        /// </summary>
+        [XmlAttribute("defaultFor")]
+        public string DefaultFor { get; set; }
 
         /// <summary>
         /// The shader attributes.
         /// </summary>
-        [XmlElement ("shaderAttribute")]
+        [XmlElement("shaderAttribute")]
         public ConfigShaderAttrib[] ShaderAttributes { get; set; }
     }
 
@@ -407,11 +446,43 @@ namespace KirosEngine3.Config
         /// <summary>
         /// The type of the attribute. i.e: position, color, uv, normal, etc.
         /// </summary>
-        [XmlAttribute ("type")]
+        [XmlAttribute("type")]
         public string AttribType { get; set; }//position, color, uv, etc.
 
         /*[XmlAttribute ("value")]
         public ShaderValueType Value { get; set; }*/
+    }
+
+    /// <summary>
+    /// Data structure for default color.
+    /// </summary>
+    public struct ConfigDefaultColor
+    {
+        /// <summary>
+        /// The name of the color.
+        /// </summary>
+        [XmlAttribute("name")]
+        public string Name { get; set; }
+        /// <summary>
+        /// The color's r value
+        /// </summary>
+        [XmlAttribute("r")]
+        public string RValue { get; set; }
+        /// <summary>
+        /// The color's g value
+        /// </summary>
+        [XmlAttribute("g")]
+        public string GValue { get; set; }
+        /// <summary>
+        /// The color's b value
+        /// </summary>
+        [XmlAttribute("b")]
+        public string BValue { get; set; }
+        /// <summary>
+        /// The color's a value
+        /// </summary>
+        [XmlAttribute("a")]
+        public string AValue { get; set; }
     }
     #endregion
 }

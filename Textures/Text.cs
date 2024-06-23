@@ -167,7 +167,7 @@ namespace KirosEngine3.Textures
         /// <param name="text">The text to be rendered.</param>
         public Text(Vec2 pos, string text)
         {
-            _shaderName = "text"; //todo: define environment var for default text shader
+            _shaderName = ShaderManager.DefaultTextShaderName ?? "";
             _text = text;
             _pos = pos;
 
@@ -184,7 +184,7 @@ namespace KirosEngine3.Textures
         public Text(Vec2 pos, Font font, string text)
         {
             _font = font;
-            _shaderName = "text";
+            _shaderName = ShaderManager.DefaultTextShaderName ?? "";
             _text = text;
             _pos = pos;
 

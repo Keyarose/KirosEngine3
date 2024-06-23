@@ -49,6 +49,51 @@ namespace KirosEngine3.Shaders
             }
         }
 
+        /// <summary>
+        /// The default text shader for the system if there is one.
+        /// </summary>
+        public static Shader? DefaultTextShader
+        {
+            get
+            {
+                if (DefaultTextShaderName != null)//get the name of the default text shader if there is one
+                {
+                    if (TryGetShader(DefaultTextShaderName, out Shader? sh))//get the default text shader
+                        return sh;
+                    else
+                    {
+                        throw new MissingConfigException(string.Format("Shader named: {0} not found despite supposed to have been loaded from config.", DefaultTextShaderName));
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Default Text Shader is not configured or the wrong key was used: {0}", ConfigKeys.D_SHADER_TEXT_NAME_KEY);
+                    Logger.WriteToLog("Default Text Shader is not configured or the wrong key was used: {0}", ConfigKeys.D_SHADER_TEXT_NAME_KEY);
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The name of the default text shader if there is one.
+        /// </summary>
+        public static string? DefaultTextShaderName
+        {
+            get 
+            {
+                if (ConfigManager.TryGetVar(ConfigKeys.D_SHADER_TEXT_NAME_KEY, out string? sName))//get the name of the default text shader if there is one
+                {
+                    return sName;
+                }
+                else
+                {
+                    Console.WriteLine("Default Text Shader is not configured or the wrong key was used: {0}", ConfigKeys.D_SHADER_TEXT_NAME_KEY);
+                    Logger.WriteToLog("Default Text Shader is not configured or the wrong key was used: {0}", ConfigKeys.D_SHADER_TEXT_NAME_KEY);
+                    return null;
+                }
+            }
+        }
+
         /// <inheritdoc cref="AddShader(string, string, string)"/>
         public static void CreateShader(string name, string vertPath, string fragPath)
         {

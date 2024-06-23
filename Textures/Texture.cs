@@ -47,7 +47,7 @@ namespace KirosEngine3.Textures
         /// <param name="path">The path to the texture file.</param>
         public Texture(string name, string path)
         {
-            if(ConfigManager.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
+            if(ConfigManager.GraphicsMode.Equals(Client.GRAPHICSMODE_GL_VAL))
             {
                 _handle = GL.GenTexture();
             }
@@ -65,7 +65,7 @@ namespace KirosEngine3.Textures
         /// </summary>
         internal void Load()
         {
-            if (ConfigManager.Instance[Client.GRAPHICSMODE_KEY] is string gm && gm.Equals(Client.GRAPHICSMODE_GL_VAL))
+            if (ConfigManager.GraphicsMode.Equals(Client.GRAPHICSMODE_GL_VAL))
             {
                 LoadGL();
             }
@@ -95,9 +95,20 @@ namespace KirosEngine3.Textures
 
                 StbImage.stbi_set_flip_vertically_on_load(1);
 
-                ImageResult image = ImageResult.FromStream(File.OpenRead(_path), ColorComponents.RedGreenBlueAlpha); //todo: exception handling in loading
+                ImageResult? image;
+                try
+                {
+                    image = ImageResult.FromStream(File.OpenRead(_path), ColorComponents.RedGreenBlueAlpha);
+                }
+                catch
+                {
+                    Console.WriteLine("Failed to read the image from file: {0}", _path);
+                    Logger.WriteToLog("Failed to read the image from file: {0}", _path);
+                    //todo: write to debug
+                    return;
+                }
 
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Data);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image!.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Data);
 
                 //todo: allow greater flexibility in setting text params, including mipmaps
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
@@ -118,7 +129,7 @@ namespace KirosEngine3.Textures
         {
             if (!_loaded)
             {
-                Console.WriteLine("Attempting to use texture:" + _name + "without first loading it!"); //todo: exception handling
+                Console.WriteLine("Attempting to use texture:" + _name + "without first loading it!");
                 Logger.WriteToLog(string.Format("Attempt to use texture: {0} without first loading it.", _name));
                 //todo: write to debug console
             }
@@ -135,7 +146,7 @@ namespace KirosEngine3.Textures
         {
             if (!_disposed)
             {
-                switch (ConfigManager.GetVar(Client.GRAPHICSMODE_KEY))
+                switch (ConfigManager.GraphicsMode)
                 {
                     case Client.GRAPHICSMODE_GL_VAL:
                         {
@@ -170,7 +181,7 @@ namespace KirosEngine3.Textures
         {
             if (_disposed == false)
             {
-                Console.WriteLine("Texture named: " + _name + " not properly disposed of."); //todo: exception and handling
+                Console.WriteLine("Texture named: " + _name + " not properly disposed of.");
                 Logger.WriteToLog("Texture named: " + _name + " not properly disposed of.");
                 //todo:write to debug
             }
@@ -179,8 +190,8 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// Convert TextureUnit into it's int, not it's enum as int.
         /// </summary>
-        /// <param name="unit"></param>
-        /// <returns></returns>
+        /// <param name="unit">The TextureUnit to get the int of.</param>
+        /// <returns>The int represented by the TextureUnit.</returns>
         public static int TextureUnitToInt(TextureUnit unit)
         {
             switch (unit)

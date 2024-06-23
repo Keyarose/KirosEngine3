@@ -155,6 +155,41 @@ namespace KirosEngine3.Math.Data
         {
             R = color.R; G = color.G; B = color.B; A = color.A;
         }
+
+        /// <summary>
+        /// Construct a Color vector from a string containing all four components, comma delimitated.
+        /// </summary>
+        /// <param name="colorVals">The string containing the component values.</param>
+        /// <exception cref="ArgumentException">Thrown if there are too few components in the string. Or if there are issues parsing the string into float values.</exception>
+        public Color4(string colorVals)
+        {
+            string[] comp = colorVals.Replace(" ", string.Empty).Split(',');
+
+            if (comp.Length < 4) 
+            {
+                throw new ArgumentException(string.Format("Too few components in the provided string: {0}, number of components: {1}", colorVals, comp.Length));
+            }
+
+            try 
+            {
+                R = float.Parse(comp[0]);
+                G = float.Parse(comp[1]);
+                B = float.Parse(comp[2]);
+                A = float.Parse(comp[3]);
+            }
+            catch (ArgumentNullException exn)
+            {
+                throw new ArgumentException(string.Format("One or more substrings from {0} resulted in a null argument when attempting to parse to float.", colorVals), exn);
+            }
+            catch (OverflowException exo)
+            {
+                throw new ArgumentException(string.Format("One or more components from {0} resulted in an overflow when attempting to parse to float.", colorVals), exo);
+            }
+            catch (FormatException ex)
+            {
+                throw new ArgumentException(string.Format("One or more components from {0} is not formatted correctly to parse to float.", colorVals), ex);
+            }
+        }
         #endregion
 
         #region Color Definitions
@@ -261,10 +296,19 @@ namespace KirosEngine3.Math.Data
         /// <summary>
         /// Handle conversion from System.Drawing.Color to Color4
         /// </summary>
-        /// <param name="c"></param>
+        /// <param name="c">The system color to be converted.</param>
         public static implicit operator Color4(Color c)
         {
             return new Color4(c.R, c.G, c.B, c.A);
+        }
+
+        /// <summary>
+        /// Handle conversion from Color4 to System.Drawing.Color
+        /// </summary>
+        /// <param name="c">The Color4 to be converted.</param>
+        public static explicit operator Color(Color4 c)
+        {
+            return Color.FromArgb((int)(c.A * 255), (int)(c.R * 255), (int)(c.G * 255), (int)(c.B * 255));
         }
         #endregion
 

@@ -7,13 +7,13 @@
       <directory name="Shaders">Resources/Shaders</directory>
       <directory name="Logs">log</directory>
     </directories>
-    <font name="default" file="Resources/Fonts/latin_sas_math_24pt" fType=".xml"/>
+    <font name="latin24pt" file="Resources/Fonts/latin_sas_math_24pt" fType=".xml"/>
     <shaders>
       <shader name="color" vertShader="ColorShader.vert" fragShader="ColorShader.frag">
         <shaderAttribute name="aColor" type="color" value="vec4"/>
         <shaderAttribute name="aPosition" type="position" value="vec3"/>
       </shader>
-      <shader name="text" vertShader="FontShader_default.vert" fragShader="FontShader_default.frag">
+      <shader name="text" vertShader="FontShader_default.vert" fragShader="FontShader_default.frag" defaultFor="text">
         <shaderAttribute name="aUV" type="uv" value="vec2"/>
         <shaderAttribute name="aPosition" type="position" value="vec2"/>
       </shader>
@@ -25,5 +25,8 @@
         <shaderAttribute name="aPosition" type="position" value="vec3"/>
       </shader>
     </shaders>
+    <colors>
+      <color name="clearColor" r="0.2" g="0.3" b="0.3" a="0.1"/>
+    </colors>
   </defaults>
 </config>

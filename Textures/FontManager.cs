@@ -10,15 +10,24 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace KirosEngine3.Textures
 {
-    internal class FontManager
+    /// <summary>
+    /// Loads, stores and manages all fonts used by the program.
+    /// </summary>
+    public class FontManager
     {
         private static FontManager? _instance;
 
         private readonly Dictionary<string, Font> _fonts = [];
 
+        /// <summary>
+        /// The singleton instance of the manager.
+        /// </summary>
         public static FontManager Instance
         { get { return _instance ??= new FontManager(); } }
 
+        /// <summary>
+        /// The program's default font.
+        /// </summary>
         public static Font Default
         {
             get
