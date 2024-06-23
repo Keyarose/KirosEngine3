@@ -18,7 +18,6 @@ namespace KirosEngine3.Textures
 
         private string[] _fontTextures;
         private int _size;
-        private float _spaceSize = 3.0f;
         private float _charPaddingX = 0.0f;
 
         private readonly Dictionary<char, CharInfo> _charData = [];
@@ -37,13 +36,6 @@ namespace KirosEngine3.Textures
         /// </summary>
         public int Size
         { get { return _size; } }
-
-        /// <summary>
-        /// The width to use for a space in the text.
-        /// </summary>
-        /// <remarks>Default value of 3.0</remarks>
-        public float SpaceSize
-        { get { return _spaceSize; } set { _spaceSize = value; } }
 
         /// <summary>
         /// The amount of padding between each character in a text.
@@ -188,56 +180,48 @@ namespace KirosEngine3.Textures
             //todo: kerning support
             foreach (char c in text)
             {
-                if (c == ' ')
-                {
-                    //for a space just shift the start position by space size
-                    pos.X = +_spaceSize;
-                }
-                else
-                {
-                    CharInfo ci = _charData[c];
-                    //OpenGL uv 0,0 is bottom left
-                    //tri 1
-                    //top left -4
-                    textVerts[counterV].Position = pos + new Vec2(ci.XOffset, ci.YOffset);
-                    textVerts[counterV].UV = new Vec2(ci.X, 1 - ci.Y);
-                    textIndices[counterI] = counterV;
-                    counterV++;
-                    counterI++;
+                CharInfo ci = _charData[c];
+                //OpenGL uv 0,0 is bottom left
+                //tri 1
+                //top left -4
+                textVerts[counterV].Position = pos + new Vec2(ci.XOffset, ci.YOffset);
+                textVerts[counterV].UV = new Vec2(ci.X, 1 - ci.Y);
+                textIndices[counterI] = counterV;
+                counterV++;
+                counterI++;
 
-                    //top right -3
-                    textVerts[counterV].Position = pos + new Vec2(ci.Width, 0.0f) + new Vec2(ci.XOffset, ci.YOffset);
-                    textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), 1 - ci.Y);
-                    textIndices[counterI] = counterV;
-                    counterV++;
-                    counterI++;
+                //top right -3
+                textVerts[counterV].Position = pos + new Vec2(ci.Width, 0.0f) + new Vec2(ci.XOffset, ci.YOffset);
+                textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), 1 - ci.Y);
+                textIndices[counterI] = counterV;
+                counterV++;
+                counterI++;
 
-                    //bottom right -2
-                    textVerts[counterV].Position = pos + new Vec2(ci.Width, ci.Height) + new Vec2(ci.XOffset, ci.YOffset);
-                    textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), 1 - ci.Y - (float)(ci.Height / _bitmapScale.Y));
-                    textIndices[counterI] = counterV;
-                    counterV++;
-                    counterI++;
+                //bottom right -2
+                textVerts[counterV].Position = pos + new Vec2(ci.Width, ci.Height) + new Vec2(ci.XOffset, ci.YOffset);
+                textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), 1 - ci.Y - (float)(ci.Height / _bitmapScale.Y));
+                textIndices[counterI] = counterV;
+                counterV++;
+                counterI++;
 
-                    //tri 2
-                    //bottom right
-                    textIndices[counterI] = counterV - 1;
-                    counterI++;
+                //tri 2
+                //bottom right
+                textIndices[counterI] = counterV - 1;
+                counterI++;
 
-                    //bottom left -1
-                    textVerts[counterV].Position = pos + new Vec2(0.0f, ci.Height) + new Vec2(ci.XOffset, ci.YOffset);
-                    textVerts[counterV].UV = new Vec2(ci.X, 1 - ci.Y - (float)(ci.Height / _bitmapScale.Y));
-                    textIndices[counterI] = counterV;
-                    counterV++;//increment for the next char
-                    counterI++;
+                //bottom left -1
+                textVerts[counterV].Position = pos + new Vec2(0.0f, ci.Height) + new Vec2(ci.XOffset, ci.YOffset);
+                textVerts[counterV].UV = new Vec2(ci.X, 1 - ci.Y - (float)(ci.Height / _bitmapScale.Y));
+                textIndices[counterI] = counterV;
+                counterV++;//increment for the next char
+                counterI++;
 
-                    //top left
-                    textIndices[counterI] = counterV - 4;
-                    counterI++;//increment for the next char
+                //top left
+                textIndices[counterI] = counterV - 4;
+                counterI++;//increment for the next char
 
-                    //shift start pos for next letter
-                    pos.X += ci.XAdvance + _charPaddingX;
-                }
+                //shift start pos for next letter
+                pos.X += ci.XAdvance + _charPaddingX;
             }
 
             result.Vertices = textVerts;

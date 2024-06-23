@@ -1,6 +1,7 @@
 ﻿using KirosEngine3.Exceptions;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
+using KirosEngine3.XML;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
@@ -30,17 +31,28 @@ namespace KirosEngine3.Config
         /// Accessor for the variables collection
         /// </summary>
         /// <param name="name">The name of the variable</param>
-        /// <returns>The variable's value</returns>
+        /// <returns>The variable's value, or empty string if not found.</returns>
         public string this[string name]
         {
             get
             {
-                return _vars[name];//todo: exception handling
+                if (_vars.TryGetValue(name, out var value)) 
+                    return value;
+                else
+                {
+                    Console.WriteLine("Config variable named: {0} does not exist.", name);
+                    Logger.WriteToLog("Config variable named: {0} does not exist.", name);
+                    //todo:write to debug
+                    return string.Empty;
+                }
             }
 
             set
             {
-                _vars[name] = value;
+                if (_vars.ContainsKey(name))
+                    _vars[name] = value;
+                else
+                    TryAddVar(name, value);
             }
         }
 
@@ -303,186 +315,4 @@ namespace KirosEngine3.Config
         /// </summary>
         public const string D_CLEAR_COLOR_KEY = "dClearColor";
     }
-
-    //todo: move to the xml namespace as ConfigDataStruct.cs
-    #region General Configuration Data structs
-    /// <summary>
-    /// Data structure for general configuration data.
-    /// </summary>
-    [Serializable]
-    [XmlRoot("config")]
-    public struct GenConfigData
-    {
-        /// <summary>
-        /// The defaults section of the config data.
-        /// </summary>
-        [XmlElement("defaults")]
-        public ConfigDefaults Defaults { get; set; }
-    }
-
-    /// <summary>
-    /// Data structure for configuration default data.
-    /// </summary>
-    public struct ConfigDefaults
-    {
-        /// <summary>
-        /// The default directories section.
-        /// </summary>
-        [XmlArray("directories")]
-        [XmlArrayItem("directory")]
-        public ConfigDefaultDir[] DefaultDirectories { get; set; }
-
-        /// <summary>
-        /// The default font section.
-        /// </summary>
-        [XmlElement("font")]
-        public ConfigDefaultFont DefaultFont { get; set; }
-
-        /// <summary>
-        /// The default shaders section.
-        /// </summary>
-        [XmlArray("shaders")]
-        [XmlArrayItem("shader")]
-        public ConfigDefaultShader[] DefaultShaders { get; set; }
-
-        /// <summary>
-        /// The default colors section.
-        /// </summary>
-        [XmlArray("colors")]
-        [XmlArrayItem("color")]
-        public ConfigDefaultColor[] DefaultColors { get; set; }
-    }
-
-    /// <summary>
-    /// Data structure for default directory data.
-    /// </summary>
-    public struct ConfigDefaultDir
-    {
-        /// <summary>
-        /// The name of the directory.
-        /// </summary>
-        [XmlAttribute("name")]
-        public string DirectoryName { get; set; }
-
-        /// <summary>
-        /// The path to the directory.
-        /// </summary>
-        [XmlText]
-        public string Directory { get; set; }
-    }
-
-    /// <summary>
-    /// Data structure for default font data.
-    /// </summary>
-    public struct ConfigDefaultFont
-    {
-        /// <summary>
-        /// The name of the font.
-        /// </summary>
-        [XmlAttribute("name")]
-        public string DefaultFontName { get; set; }
-
-        /// <summary>
-        /// The name of the font's file.
-        /// </summary>
-        [XmlAttribute("file")]
-        public string DefaultFontFile { get; set; }
-
-        /// <summary>
-        /// The file type of the file.
-        /// </summary>
-        [XmlAttribute("fType")]
-        public string FileType { get; set; }
-    }
-
-    //todo: move to xml as ShaderDataStruct.cs
-    /// <summary>
-    /// Data structure for default shader data.
-    /// </summary>
-    public struct ConfigDefaultShader
-    {
-        /// <summary>
-        /// The name of the shader.
-        /// </summary>
-        [XmlAttribute("name")]
-        public string ShaderName { get; set; }
-
-        /// <summary>
-        /// The vertex shader file.
-        /// </summary>
-        [XmlAttribute("vertShader")]
-        public string VertFile { get; set; }
-
-        /// <summary>
-        /// The fragment shader file.
-        /// </summary>
-        [XmlAttribute("fragShader")]
-        public string FragFile { get; set; }
-
-        /// <summary>
-        /// Marks if the shader is a default for a specific type of rendering.
-        /// </summary>
-        [XmlAttribute("defaultFor")]
-        public string DefaultFor { get; set; }
-
-        /// <summary>
-        /// The shader attributes.
-        /// </summary>
-        [XmlElement("shaderAttribute")]
-        public ConfigShaderAttrib[] ShaderAttributes { get; set; }
-    }
-
-    /// <summary>
-    /// Data structure for shader attributes data.
-    /// </summary>
-    public struct ConfigShaderAttrib
-    {
-        /// <summary>
-        /// The name of the attribute.
-        /// </summary>
-        [XmlAttribute("name")]
-        public string AttribName { get; set; }
-
-        /// <summary>
-        /// The type of the attribute. i.e: position, color, uv, normal, etc.
-        /// </summary>
-        [XmlAttribute("type")]
-        public string AttribType { get; set; }//position, color, uv, etc.
-
-        /*[XmlAttribute ("value")]
-        public ShaderValueType Value { get; set; }*/
-    }
-
-    /// <summary>
-    /// Data structure for default color.
-    /// </summary>
-    public struct ConfigDefaultColor
-    {
-        /// <summary>
-        /// The name of the color.
-        /// </summary>
-        [XmlAttribute("name")]
-        public string Name { get; set; }
-        /// <summary>
-        /// The color's r value
-        /// </summary>
-        [XmlAttribute("r")]
-        public string RValue { get; set; }
-        /// <summary>
-        /// The color's g value
-        /// </summary>
-        [XmlAttribute("g")]
-        public string GValue { get; set; }
-        /// <summary>
-        /// The color's b value
-        /// </summary>
-        [XmlAttribute("b")]
-        public string BValue { get; set; }
-        /// <summary>
-        /// The color's a value
-        /// </summary>
-        [XmlAttribute("a")]
-        public string AValue { get; set; }
-    }
-    #endregion
 }

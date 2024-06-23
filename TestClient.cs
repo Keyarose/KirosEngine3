@@ -25,6 +25,7 @@ namespace KirosEngine3
         Text? testText;
         Cube? testCube;
         Sphere? testSphere;
+        Label? testLabel;
 
         TexturedQuad? testTexQ;
         CoordinateGrid? testGrid;
@@ -77,6 +78,9 @@ namespace KirosEngine3
             testSphere = new Sphere(Vec3.Zero, 1.0f, SphereType.UVSphere, 12, 22, "pos");
             testSphere.Init("pos");
             testSphere.Color = Color4.Blue;
+
+            testLabel = new Label(new(400f, 300f), "Label Test.");
+            testLabel.Init();
 
             testGrid = CoordinateGrid.UnitGridXY;
             testGrid.Init();
@@ -139,6 +143,7 @@ namespace KirosEngine3
 
             //hud and 2d
             testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            testLabel?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //end hud and 2d
 
             SwapBuffers();

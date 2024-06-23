@@ -21,7 +21,7 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The name of the shader to be used in rendering.
         /// </summary>
-        protected string _shaderName = "";//todo: set as default text shader
+        protected string _shaderName = ShaderManager.DefaultTextShaderName ?? "";
 
         /// <summary>
         /// The text to be rendered to the screen.
@@ -245,7 +245,7 @@ namespace KirosEngine3.Textures
         /// </summary>
         /// <param name="vm">The view matrices to be used in rendering.</param>
         /// <param name="tu">The texture unit to be used in rendering.</param>
-        public void DrawGL(ViewMatrixes vm, TextureUnit tu)
+        public void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
         {
             if (!_loaded || _disposed)
             {
@@ -275,9 +275,14 @@ namespace KirosEngine3.Textures
                 return;
             }
 
+            //todo: font paging need more work
             sh.UseGL();
             //set the shader uniforms
-            sh.SetUniformIntGL("texture0", Texture.TextureUnitToInt(tu));
+            string[] shTexUniforms = sh.TextureUniforms;
+            for (int i  = 0; i < shTexUniforms.Length; i++) 
+            {
+                sh.SetUniformIntGL(shTexUniforms[i], Texture.TextureUnitToInt(tu[i]));
+            }
 
             sh.SetUniformMat4GL("model", vm.Model * _scale * Matrix4.CreateTranslation(_pos.AsVec3()));
             sh.SetUniformMat4GL("proj", vm.UIOrtho);
@@ -339,7 +344,6 @@ namespace KirosEngine3.Textures
             {
                 UpdateSentence();
             }
-            //todo: handle updated position
         }
         #endregion
 

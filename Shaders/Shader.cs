@@ -55,6 +55,10 @@ namespace KirosEngine3.Shaders
         /// </summary>
         protected readonly Dictionary<string, int> _uniformLocations = [];
         /// <summary>
+        /// The uniform locations for textures in the shader.
+        /// </summary>
+        protected string[] _textureUniforms = [];
+        /// <summary>
         /// The shader's attributes, keyed by names and organized into Tuples containing the location and value type.
         /// </summary>
         protected Dictionary<string, Tuple<int, ActiveAttribType>> _attribList = [];
@@ -105,6 +109,14 @@ namespace KirosEngine3.Shaders
         public string NormalAttribName
         { get { return _attribNames.Normal; } }
         #endregion
+
+        /// <summary>
+        /// The Shader's texture uniforms.
+        /// </summary>
+        public string[] TextureUniforms
+        {
+            get { return _textureUniforms; }
+        }
 
         /// <summary>
         /// Basic constructor.
@@ -256,10 +268,14 @@ namespace KirosEngine3.Shaders
             GL.GetProgram(_handle, GetProgramParameterName.ActiveUniforms, out var uniformCount);
             for (int i = 0; i < uniformCount; i++) 
             {
-                string key = GL.GetActiveUniform(_handle, i, out _, out _);
+                string key = GL.GetActiveUniform(_handle, i, out _, out ActiveUniformType aType);
                 int location = GL.GetUniformLocation(_handle, key);
 
                 _uniformLocations.Add(key, location);
+                if (aType == ActiveUniformType.Sampler2D)
+                {
+                    _textureUniforms = [.. _textureUniforms, key];
+                }
             }
 
             //form shader signature from attributes

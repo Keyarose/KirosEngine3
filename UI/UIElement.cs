@@ -69,7 +69,7 @@ namespace KirosEngine3.UI
         /// </summary>
         /// <param name="vm">The view matrices to use in rendering.</param>
         /// <param name="tu">The texture units to use for rendering.</param>
-        public abstract void DrawGL(ViewMatrixes vm, TextureUnit[]? tu);
+        public abstract void DrawGL(ViewMatrixes vm, params TextureUnit[] tu);
 
         /// <summary>
         /// Draw the UI element using the DirectX API.

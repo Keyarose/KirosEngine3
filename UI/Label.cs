@@ -152,11 +152,11 @@ namespace KirosEngine3.UI
         }
 
         /// <inheritdoc/>
-        public override void DrawGL(ViewMatrixes vm, TextureUnit[]? tu)
+        public override void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
         {
             if (tu != null && tu.Length > 0)
             {
-                _labelText.DrawGL(vm, tu[0]);
+                _labelText.DrawGL(vm, tu);
             }
             else
             {
