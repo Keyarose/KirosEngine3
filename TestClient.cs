@@ -1,23 +1,19 @@
-﻿using KirosEngine3.Scenes;
+﻿using KirosEngine3.Camera;
+using KirosEngine3.Config;
+using KirosEngine3.Input;
+using KirosEngine3.Math.Data;
+using KirosEngine3.Math.Matrix;
+using KirosEngine3.Math.Vector;
+using KirosEngine3.Mesh;
+using KirosEngine3.Mesh.Primitives;
+using KirosEngine3.Scenes;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
-using KirosEngine3.Math.Vector;
+using KirosEngine3.UI;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using KirosEngine3.Math.Matrix;
-using KirosEngine3.Camera;
-using KirosEngine3.Mesh.Primitives;
-using KirosEngine3.Math.Data;
-using KirosEngine3.Input;
-using KirosEngine3.Config;
-using KirosEngine3.Mesh;
-using KirosEngine3.UI;
+using System.Drawing;
 
 namespace KirosEngine3
 {
@@ -38,15 +34,13 @@ namespace KirosEngine3
 
         ScreenButton? testSButton;
 
-        public TestClient(int width, int height) : base (width, height, "Test Client")
+        public TestClient(int width, int height) : base(width, height, "Test Client")
         {
             ConfigManager.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);//declare that we're using the OpenGL API
             if (!ConfigManager.LoadFromXML("Resources/Config/generalConfig.xml"))
             {
                 //failed to load general config perform fallback
             }
-
-            //FontManager.AddFont(ConfigManager.Instance[ConfigKeys.D_FONT_NAME_KEY], new Font(ConfigManager.Instance[ConfigKeys.D_FONT_NAME_KEY], ConfigManager.Instance[ConfigKeys.D_FONT_FILE_KEY] + ".xml"));
         }
 
         protected override void OnLoad()
@@ -57,7 +51,7 @@ namespace KirosEngine3
             TextureManager.TryAddTexture("wall", "Resources/Textures/wall.jpg");//debug texture
             //end test stuff
 
-            GL.ClearColor(0.2f, 0.3f, 0.3f, 0.1f);//todo: add general config
+            GL.ClearColor((Color)new Color4(ConfigManager.Instance[ConfigKeys.D_CLEAR_COLOR_KEY]));//set clear color from config
             GL.Enable(EnableCap.DepthTest);
             //GL.Enable(EnableCap.DebugOutput);
             //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);//wireframe drawing
@@ -89,7 +83,7 @@ namespace KirosEngine3
 
             testGridXZ = CoordinateGrid.UnitGridXZ;
             testGridXZ.Init();
-            
+
             //testGridXZ.Rotation = Matrix4.CreateRotationZ(MathF.PI / 2);
 
             testGridYZ = CoordinateGrid.UnitGridYZ;
@@ -103,7 +97,7 @@ namespace KirosEngine3
             testTexQ.Init();
 
             //kem testing
-           // KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B, KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
+            // KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B, KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
 
             //ToString testing
             //Console.WriteLine(testQuad.ToString());
@@ -113,7 +107,7 @@ namespace KirosEngine3
         {
             base.OnUpdateFrame(args);
 
-            if(!IsFocused) { return; }
+            if (!IsFocused) { return; }
             //check keyboard state and notify subscribers
             KeyboardEventManager.Update(KeyboardState, args.Time);
         }
