@@ -23,6 +23,11 @@ namespace KirosEngine3.UI
         protected Text _labelText;
 
         /// <summary>
+        /// Flag to enable or disable text wrap.
+        /// </summary>
+        protected bool _textWrap;
+
+        /// <summary>
         /// The element the label describes.
         /// </summary>
         protected UIElement? _attached;
@@ -54,6 +59,15 @@ namespace KirosEngine3.UI
         { 
             get => _labelText.Position; 
             set => _labelText.Position = value;
+        }
+
+        /// <summary>
+        /// Enable or disable text wrap.
+        /// </summary>
+        public bool TextWrap
+        {
+            get => _textWrap;
+            set => _textWrap = value;
         }
 
         /// <summary>

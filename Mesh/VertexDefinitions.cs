@@ -226,6 +226,32 @@ namespace KirosEngine3.Mesh
         /// The size of the vertex in bytes.
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<TexturedVertex2D>();
+
+        #region ToString
+        /// <inheritdoc/>
+        public override readonly string ToString()
+        {
+            return ToString(null, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(string? format)
+        {
+            return ToString(format, null);
+        }
+
+        /// <inheritdoc cref="ToString(string?, IFormatProvider?)"/>
+        public readonly string ToString(IFormatProvider? formatProvider)
+        {
+            return ToString(null, formatProvider);
+        }
+
+        /// <inheritdoc/>
+        public readonly string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return string.Format("Position: {0}, UV: {1}", Position, UV);
+        }
+        #endregion
     }
 
     //todo: vertex type checking against shader signature

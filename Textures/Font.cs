@@ -5,6 +5,7 @@ using KirosEngine3.Mesh;
 using KirosEngine3.XML;
 using OpenTK.Graphics.OpenGL4;
 using System.Xml.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace KirosEngine3.Textures
 {
@@ -151,6 +152,25 @@ namespace KirosEngine3.Textures
         }
 
         /// <summary>
+        /// Get the width the text would have when rendered.
+        /// </summary>
+        /// <param name="text">The text to get the width of.</param>
+        /// <returns>The width of the text.</returns>
+        public float TextWidth(string text)
+        {
+            float result = 0f;
+
+            foreach (char c in text)
+            {
+                CharInfo ci = _charData[c];
+
+                result += ci.Width;
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Construct a Text object for the given string
         /// </summary>
         /// <param name="text">the string text to be turned into a Text object</param>
@@ -227,6 +247,102 @@ namespace KirosEngine3.Textures
             result.Vertices = textVerts;
             result.Indexes = textIndices;
 
+            return result;
+        }
+
+        /// <summary>
+        /// Get the vertex data for a single char.
+        /// </summary>
+        /// <param name="c">The char to get the data for.</param>
+        /// <param name="pos">The position for the char.</param>
+        /// <returns>The resulting data arrays.</returns>
+        public Tuple<TexturedVertex2D[], uint[]> QuadForChar(char c, Vec2 pos)
+        {
+            TexturedVertex2D[] textVerts = new TexturedVertex2D[4];
+            uint[] textIndices = new uint[6];
+
+            uint counterV = 0;
+            int counterI = 0;
+
+            //todo: kerning support
+            CharInfo ci = _charData[c];
+            //OpenGL uv 0,0 is bottom left
+            //tri 1
+            //top left -4
+            textVerts[counterV].Position = pos + new Vec2(ci.XOffset, ci.YOffset);
+            textVerts[counterV].UV = new Vec2(ci.X, 1 - ci.Y);
+            textIndices[counterI] = counterV;
+            counterV++;
+            counterI++;
+
+            //top right -3
+            textVerts[counterV].Position = pos + new Vec2(ci.Width, 0.0f) + new Vec2(ci.XOffset, ci.YOffset);
+            textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), 1 - ci.Y);
+            textIndices[counterI] = counterV;
+            counterV++;
+            counterI++;
+
+            //bottom right -2
+            textVerts[counterV].Position = pos + new Vec2(ci.Width, ci.Height) + new Vec2(ci.XOffset, ci.YOffset);
+            textVerts[counterV].UV = new Vec2(ci.X + (float)(ci.Width / _bitmapScale.X), 1 - ci.Y - (float)(ci.Height / _bitmapScale.Y));
+            textIndices[counterI] = counterV;
+            counterV++;
+            counterI++;
+
+            //tri 2
+            //bottom right
+            textIndices[counterI] = counterV - 1;
+            counterI++;
+
+            //bottom left -1
+            textVerts[counterV].Position = pos + new Vec2(0.0f, ci.Height) + new Vec2(ci.XOffset, ci.YOffset);
+            textVerts[counterV].UV = new Vec2(ci.X, 1 - ci.Y - (float)(ci.Height / _bitmapScale.Y));
+            textIndices[counterI] = counterV;
+            counterI++;
+
+            //top left
+            textIndices[counterI] = counterV - 3;
+
+            //shift start pos for next letter
+            pos.X += ci.XAdvance + _charPaddingX;
+
+            Tuple<TexturedVertex2D[], uint[]> result = new Tuple<TexturedVertex2D[], uint[]> (textVerts, textIndices);
+            return result;
+        }
+
+        /// <summary>
+        /// Get the vertex data for a string.
+        /// </summary>
+        /// <param name="str">The string to get the data for.</param>
+        /// <param name="pos">The starting position for the data.</param>
+        /// <returns>The resulting data.</returns>
+        public Tuple<TexturedVertex2D[], uint[]> QuadsForString(string str, Vec2 pos)
+        {
+            TexturedVertex2D[] textVerts = new TexturedVertex2D[4 * str.Length];
+            uint[] textIndices = new uint[6 * str.Length];
+
+            int vIndex = 0;
+            int iIndex = 0;
+            foreach(char c in str) 
+            {
+                var cRes = QuadForChar(c, pos);
+
+                for (int i = 0; i < 4; i++)
+                {
+                    textVerts[vIndex + i] = cRes.Item1[i];
+                }
+
+                for (int i = 0; i < 6; i ++)
+                {
+                    textIndices[iIndex + i] = cRes.Item2[i] + (uint)vIndex;
+                }
+
+                pos.X += _charData[c].XAdvance + _charPaddingX;
+                vIndex += 4;
+                iIndex += 6;
+            }
+
+            Tuple<TexturedVertex2D[], uint[]> result = new Tuple<TexturedVertex2D[], uint[]>(textVerts, textIndices);
             return result;
         }
 

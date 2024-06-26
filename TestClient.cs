@@ -67,7 +67,9 @@ namespace KirosEngine3
             camera.LookAt = Vec3.Zero;
 
             //load test text
-            testText = new Text(new Vec2(0.0f, 0.0f), "test");
+            testText = new Text(new Vec2(0.0f, 0.0f), "test wrap");
+            testText.Size = new Vec2(80f, 30f);
+            testText.LineCount = 2;
             //testText.Color = Color4.Red;
             testText.Init();
 
