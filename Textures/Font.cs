@@ -24,6 +24,8 @@ namespace KirosEngine3.Textures
         private readonly Dictionary<char, CharInfo> _charData = [];
         private Vec2 _bitmapScale;
 
+        private bool _loaded;
+
         /// <summary>
         /// The name of the font
         /// </summary>
@@ -58,19 +60,8 @@ namespace KirosEngine3.Textures
         /// </summary>
         /// <param name="name">The name of the font.</param>
         /// <param name="filePath">The file path for the font data XML.</param>
-        /// <exception cref="ArgumentException">Throw if the font fails to load due to an issue with the file given by filePath</exception>
-        public Font(string name, string filePath)
+        public Font(string name, string filePath) : this (name, filePath, true)
         {
-            _name = name;
-            _filePath = filePath;
-
-            _fontTextures = [];
-            _charData = [];
-
-            if (!LoadFontXML())
-            {
-                throw new ArgumentException(string.Format("Font failed to load with given file name: {0}", filePath), nameof(filePath));
-            }
         }
 
         /// <summary>
@@ -79,7 +70,6 @@ namespace KirosEngine3.Textures
         /// <param name="name">The name of the font</param>
         /// <param name="filePath">The file path for the font data xml</param>
         /// <param name="tex">The file path for the font bitmap</param>
-        /// <exception cref="ArgumentException">Thrown if the font fails to load due to an issue with the file given by filePath</exception>
         public Font(string name, string filePath, string tex)
         {
             _name = name;
@@ -88,16 +78,50 @@ namespace KirosEngine3.Textures
 
             _charData = [];
 
-            if (!LoadFontXML())
+            if (!LoadFontXMLDefDir())
             {
-                throw new ArgumentException(string.Format("Font failed to load with given file name: {0}", filePath), nameof(filePath));
+                Console.WriteLine("Font failed to load with given file name: {0}", filePath);
+                Logger.WriteToLog("Font failed to load with given file name: {0}", filePath);
+                //todo: write to debug
             }
         }
 
         /// <summary>
-        /// Load the font data from its XML file
+        /// Constructor for a font object that may load from a directory other than the default
         /// </summary>
-        /// <returns>True if loading is successful, false otherwise</returns>
+        /// <param name="name">The name of the font.</param>
+        /// <param name="filePath">The file path for the data file.</param>
+        /// <param name="fromDefaultDir">If true load from the application's default directory, if false treat the file path as the whole path.</param>
+        public Font(string name, string filePath, bool fromDefaultDir)
+        {
+            _name = name;
+            _filePath = filePath;
+            _fontTextures = [];
+
+            _charData = [];
+
+            if (fromDefaultDir)
+            {
+                if (!LoadFontXMLDefDir())
+                {
+                    Console.WriteLine("Font failed to load with given file name: {0}", filePath);
+                    Logger.WriteToLog("Font failed to load with given file name: {0}", filePath);
+                    //todo: write to debug
+                }
+            }
+            else
+            {
+                if (!LoadFontXML())
+                {
+                    Console.WriteLine("Font failed to load with given file name: {0}", filePath);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Load the font for unit testing.
+        /// </summary>
+        /// <returns>True if successfully loaded, false otherwise.</returns>
         private bool LoadFontXML()
         {
             XmlSerializer serialize = new XmlSerializer(typeof(FontData));
@@ -115,8 +139,7 @@ namespace KirosEngine3.Textures
                     _size = data.Info.Size;
                     _bitmapScale = new Vec2(data.Common.ScaleW, data.Common.ScaleH);
 
-                    if (!ConfigManager.TryGetVar(ConfigKeys.D_DIR_FONT_KEY, out string? fontDir))
-                        throw new MissingConfigException(string.Format("Default Font Directory not set with key: {0}", ConfigKeys.D_DIR_FONT_KEY));
+                    string fontDir = new FileInfo(_filePath).DirectoryName ?? "";
 
                     foreach (var pg in data.Pages)
                     {
@@ -137,6 +160,62 @@ namespace KirosEngine3.Textures
                     }
                     sr.Close();
 
+                    _loaded = true;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Load the font data from its XML file
+        /// </summary>
+        /// <returns>True if loading is successful, false otherwise</returns>
+        private bool LoadFontXMLDefDir()
+        {
+            XmlSerializer serialize = new XmlSerializer(typeof(FontData));
+
+            FontData data;
+
+            try
+            {
+                if (!ConfigManager.TryGetVar(ConfigKeys.D_DIR_FONT_KEY, out string? fontDir))
+                    throw new MissingConfigException(string.Format("Default Font Directory not set with key: {0}", ConfigKeys.D_DIR_FONT_KEY));
+
+                using Stream sr = new FileStream(fontDir + "/" + _filePath, FileMode.Open);
+
+                if (sr != null)
+                {
+                    data = (FontData)serialize.Deserialize(sr)!;
+
+                    _size = data.Info.Size;
+                    _bitmapScale = new Vec2(data.Common.ScaleW, data.Common.ScaleH);
+
+                    foreach (var pg in data.Pages)
+                    {
+                        string textureName = string.Format("Font_{0}_pg_{1}", Name, pg.Id);
+                        TextureManager.AddTexture(textureName, fontDir + "/" + pg.File);
+                        _fontTextures = [.. _fontTextures, textureName];
+                    }
+
+                    foreach (CharInfo ci in data.Chars)
+                    {
+                        //convert char x/y to bitmap ratio
+                        CharInfo c = ci;
+                        c.X /= data.Common.ScaleW;
+                        c.Y /= data.Common.ScaleH;
+
+                        //copy each char data to the collection with the key being the respective char
+                        _charData.Add((char)ci.Id, c);
+                    }
+                    sr.Close();
+
+                    _loaded = true;
                     return true;
                 }
             }
@@ -158,6 +237,9 @@ namespace KirosEngine3.Textures
         /// <returns>The width of the text.</returns>
         public float TextWidth(string text)
         {
+            if (!_loaded)
+                Console.WriteLine("Font is not loaded!");
+
             float result = 0f;
 
             foreach (char c in text)
@@ -378,7 +460,7 @@ namespace KirosEngine3.Textures
             //cleanup first
             _charData.Clear();
 
-            LoadFontXML();
+            LoadFontXMLDefDir();
         }
     }
 }

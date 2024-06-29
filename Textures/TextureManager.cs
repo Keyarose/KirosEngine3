@@ -9,11 +9,15 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace KirosEngine3.Textures
 {
-    internal class TextureManager
+    /// <summary>
+    /// Texture resource manager.
+    /// </summary>
+    public class TextureManager
     {
         private static TextureManager? _instance;
 
         private readonly Dictionary<string, Texture> _textures = [];
+        private readonly Dictionary<string, int> _reservations = [];
 
         private bool _autoLoadTextures = false;
 
@@ -37,7 +41,7 @@ namespace KirosEngine3.Textures
         }
 
         /// <summary>
-        /// Add a texture to the manager
+        /// Add a texture to the manager.
         /// </summary>
         /// <param name="name">The name of the texture</param>
         /// <param name="texture">The texture to be added</param>
@@ -46,7 +50,12 @@ namespace KirosEngine3.Textures
         {
             if (!Instance._textures.TryAdd(name, texture))
             {
-                throw new ArgumentException(string.Format("Texture name: {0} is already in use.", name));
+                throw new ArgumentException(string.Format("Texture name: {0} is already in use. Use ReserveTexture if it's loaded elsewhere, or a different name if it's a new resource.", name));
+            }
+            //init the reservation counter for the texture
+            if (!Instance._reservations.TryAdd(name, 1))
+            {
+                throw new ArgumentException(string.Format("Reservation counter for name: {0} already exists!", name));
             }
 
             if (Instance._autoLoadTextures)
@@ -54,77 +63,123 @@ namespace KirosEngine3.Textures
         }
 
         /// <summary>
-        /// Add a texture to the manager using the given texture file
+        /// Add a texture to the manager using the given texture file.
         /// </summary>
-        /// <param name="name">The name of the texture</param>
-        /// <param name="textureFile">The file the texture is stored in</param>
-        /// <exception cref="ArgumentException">Thrown when the name for the texture is already in use</exception>
+        /// <param name="name">The name of the texture.</param>
+        /// <param name="textureFile">The file the texture is stored in.</param>
+        /// <exception cref="ArgumentException">Thrown when the name for the texture is already in use.</exception>
         public static void AddTexture(string name, string textureFile)
         {
-            if (!Instance._textures.TryAdd(name, new Texture(name, textureFile)))
-            {
-                throw new ArgumentException(string.Format("Texture name: {0} is already in use.", name));
-            }
-
-            if (Instance._autoLoadTextures)
-            { Instance._textures[name].Load(); }
+            AddTexture(name, new Texture(name, textureFile));
         }
 
         /// <summary>
-        /// Try to add a texture to the manager
+        /// Try to add a texture to the manager.
         /// </summary>
         /// <param name="name">The name of the texture</param>
         /// <param name="texture">The texture to add</param>
         /// <returns>True if the texture is added to the manager, false otherwise</returns>
+        /// <exception cref="ArgumentException">Thrown when the reservation for the texture name already exists.</exception>
         public static bool TryAddTexture(string name, Texture texture)
         {
             if (Instance._textures.TryAdd(name, texture))
             {
+                //init the reservation counter for the texture
+                if (!Instance._reservations.TryAdd(name, 1))
+                {
+                    throw new ArgumentException(string.Format("Reservation counter for name: {0} already exists!", name));
+                }
+
                 if (Instance._autoLoadTextures)
                 { texture.Load(); }
                 return true;
             }
 
-            Logger.WriteToLog(string.Format("Texture name: {0} is already in use.", name));
-            Console.WriteLine(string.Format("Texture name: {0} is already in use.", name));
+            Logger.WriteToLog(string.Format("Texture name: {0} is already in use. Use ReserveTexture instead.", name));
+            Console.WriteLine(string.Format("Texture name: {0} is already in use. Use ReserveTexture instead.", name));
             //todo: write to debug console
+
             return false;
         }
 
         /// <summary>
-        /// Try to add a texture to the manager
+        /// Try to add a texture to the manager.
         /// </summary>
-        /// <param name="name">The name of the texture</param>
-        /// <param name="textureFile">The file that contains the texture</param>
-        /// <returns>True if the texture is added to the manager, false otherwise</returns>
+        /// <param name="name">The name of the texture.</param>
+        /// <param name="textureFile">The file that contains the texture.</param>
+        /// <returns>True if the texture is added to the manager, false otherwise.</returns>
         public static bool TryAddTexture(string name, string textureFile)
         {
-            if (Instance._textures.TryAdd(name, new Texture(name, textureFile)))
+            return TryAddTexture(name, new Texture(name, textureFile));
+        }
+
+        /// <summary>
+        /// Reserve a texture for use.
+        /// </summary>
+        /// <param name="name">The name of the texture to reserve.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public static bool ReserveTexture(string name)
+        {
+            if (Instance._textures.ContainsKey(name))
             {
-                if (Instance._autoLoadTextures)
-                { Instance._textures[name].Load(); }
+                Instance._reservations[name]++;
                 return true;
             }
-
-            Logger.WriteToLog(string.Format("Texture name: {0} is already in use.", name));
-            Console.WriteLine(string.Format("Texture name: {0} is already in use.", name));
-
-            //todo: write to debug console
             return false;
         }
 
         /// <summary>
-        /// Try to remove a texture from the manager
+        /// Release a reservation on a texture.
         /// </summary>
-        /// <param name="name">The name of the texture to remove</param>
+        /// <param name="name">The name of the texture to release the reservation on.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public static bool ReleaseTexture(string name)
+        {
+            if (Instance._textures.ContainsKey(name))
+            {
+                Instance._reservations[name]--;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Load a texture into memory before use.
+        /// </summary>
+        /// <param name="name">The name of the texture to load.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public static bool LoadTexture(string name)
+        {
+            if (Instance._textures.TryGetValue(name, out var texture))
+            {
+                texture.Load();
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Try to remove a texture from the manager, but only do so if there are no reservations on it.
+        /// </summary>
+        /// <param name="name">The name of the texture to remove.</param>
         /// <returns>True if successful, false otherwise</returns>
         public static bool TryRemoveTexture(string name) 
         {
             //if the texture exists clean it up before removing it to prevent memory leaks
             if (Instance._textures.TryGetValue(name, out var texture))
             {
-                texture.Dispose();
-                return Instance._textures.Remove(name);
+                if (Instance._reservations[name] == 0)
+                {
+                    texture.Dispose();
+                    Instance._reservations.Remove(name);
+                    return Instance._textures.Remove(name);
+                }
+                else if (Instance._reservations[name] < 0)
+                {
+                    Logger.WriteToLog(string.Format("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name));
+                    Console.WriteLine(string.Format("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name));
+                    //todo: write to debug
+                }
             }
 
             return false;
@@ -189,6 +244,7 @@ namespace KirosEngine3.Textures
             foreach (var key in Instance._textures.Keys)
             {
                 Instance._textures[key].Dispose();
+                Instance._reservations.Remove(key);
             }
             Instance._textures.Clear();
 

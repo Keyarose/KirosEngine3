@@ -10,7 +10,7 @@ namespace KirosEngine3.Config
     /// <summary>
     /// Loads, stores and makes accessible Configuration values
     /// </summary>
-    internal class ConfigManager
+    public class ConfigManager
     {
         private static ConfigManager? _instance;
 

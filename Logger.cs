@@ -144,6 +144,7 @@ namespace KirosEngine3
         /// <param name="message">The string to write</param>
         public static void WriteToLog(string message)
         {
+#if !UNIT_TEST
             if(Instance._enabled && (Instance._fileInfo != null))
             {
                 if(!Instance.IsLogFull())
@@ -179,6 +180,7 @@ namespace KirosEngine3
                     }
                 }
             }
+#endif
         }
 
         /// <summary>

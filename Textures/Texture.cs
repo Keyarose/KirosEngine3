@@ -15,7 +15,7 @@ namespace KirosEngine3.Textures
     /// </summary>
     public class Texture : IDisposable
     {
-        private readonly int _handle;
+        private int _handle;
         private readonly string _name;
         private readonly string _path;
 
@@ -47,15 +47,6 @@ namespace KirosEngine3.Textures
         /// <param name="path">The path to the texture file.</param>
         public Texture(string name, string path)
         {
-            if(ConfigManager.GraphicsMode.Equals(Client.GRAPHICSMODE_GL_VAL))
-            {
-                _handle = GL.GenTexture();
-            }
-            else
-            {
-                _handle = -1;//todo: replace with DX equivalent
-            }
-
             _name = name;
             _path = path;
         }
@@ -91,6 +82,7 @@ namespace KirosEngine3.Textures
         {
             if (!_loaded)
             {
+                _handle = GL.GenTexture();
                 GL.BindTexture(TextureTarget.Texture2D, _handle);
 
                 StbImage.stbi_set_flip_vertically_on_load(1);
