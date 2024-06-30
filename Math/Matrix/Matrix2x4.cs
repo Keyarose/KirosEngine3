@@ -851,6 +851,11 @@ namespace KirosEngine3.Math.Matrix
 
             return string.Format("{0}\n{1}", r0, r1);
         }
+
+        public string ToDrawString()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
 #if OPENTK

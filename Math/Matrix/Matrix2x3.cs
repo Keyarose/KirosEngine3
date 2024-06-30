@@ -850,6 +850,10 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        public string ToDrawString()
+        {
+            throw new NotImplementedException();
+        }
 #if OPENTK
         #region OpenTKCompat
         /// <summary>

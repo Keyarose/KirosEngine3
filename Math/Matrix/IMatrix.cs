@@ -101,6 +101,12 @@ namespace KirosEngine3.Math.Matrix
         string ToString(string? format, IFormatProvider? formatProvider);
 
         /// <summary>
+        /// Get a string representation that the font renderer can turn into a drawable matrix.
+        /// </summary>
+        /// <returns>The resulting string.</returns>
+        string ToDrawString();
+
+        /// <summary>
         /// Get a transposed copy of the matrix.
         /// </summary>
         /// <returns>The resulting transpose.</returns>

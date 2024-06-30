@@ -1968,6 +1968,11 @@ namespace KirosEngine3.Math.Matrix
 
             return string.Format("{0}\n\t{1}\n\t{2}\n\t{3}", r0, r1, r2, r3);
         }
+
+        public string ToDrawString()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
 #if OPENTK

@@ -26,6 +26,7 @@ namespace KirosEngine3
         Cube? testCube;
         Sphere? testSphere;
         Label? testLabel;
+        Text? matDraw;
 
         TexturedQuad? testTexQ;
         CoordinateGrid? testGrid;
@@ -102,6 +103,11 @@ namespace KirosEngine3
             testTexQ = new TexturedQuad([new(0f, 0f, 0f), new(200f, 0f, 0f), new(200f, 200f, 0f), new(0f, 200f, 0f)], [0, 1, 2, 2, 3, 0], "defaultFont");
             testTexQ.Init();
 
+            Matrix2 testM2 = new(0.2f, 0.7f, 2f, 87f);
+            Console.WriteLine(testM2.ToDrawString());
+            matDraw = new Text(new(400, 50), testM2.ToDrawString());
+            matDraw.Init();
+
             //kem testing
             // KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B, KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
 
@@ -146,6 +152,7 @@ namespace KirosEngine3
             //hud and 2d
             testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             testLabel?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            matDraw?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //end hud and 2d
 
             SwapBuffers();

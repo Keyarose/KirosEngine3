@@ -1028,6 +1028,44 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        /// <inheritdoc/>
+        public readonly string ToDrawString()
+        {
+            string result;
+            string ln1;
+            string ln2;
+            string ln3;
+            string ln4;
+
+            int m00l = M00.ToString().Length;
+            int m01l = M01.ToString().Length;
+            int m10l = M10.ToString().Length;
+            int m11l = M11.ToString().Length;
+
+            bool row1Larger = m00l + m01l + 1 > m10l + m11l + 1;
+
+            if (row1Larger)
+            {
+                int lineDiffSize = m00l + m01l - m10l - m11l;
+                ln1 = "\u250C" + new string(' ', m00l + m01l + 1) +"\u2510\n";
+                ln2 = string.Format("\u2502{0} {1}\u2502\n", M00, M01);
+                ln3 = string.Format("\u2502{0}", M10) + new string(' ', lineDiffSize + 1)  + string.Format("{0}\u2502\n", M11);
+                ln4 = "\u2514" + new string(' ', m00l + m01l + 1) + "\u2518";
+            }
+            else
+            {
+                int lineDiffSize = m10l + m11l - m00l - m01l;
+                ln1 = "\u250C" + new string(' ', m10l + m11l + 1) + "\u2510\n";
+                ln2 = string.Format("\u2502{0}", M00) + new string(' ', lineDiffSize + 1) + string.Format("{0}\u2502\n", M01);
+                ln3 = string.Format("\u2502{0} {1}\u2502\n", M10, M11);
+                ln4 = "\u2514" + new string(' ', m10l + m11l + 1) +"\u2518";
+            }
+
+            result = ln1 + ln2 + ln3 + ln4;
+
+            return result;
+        }
+
 #if OPENTK
         #region OpenTKCompat
         /// <summary>
