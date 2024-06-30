@@ -73,6 +73,11 @@ namespace KirosEngine3.Textures
         protected int _EBO;
 
         /// <summary>
+        /// Flag to toggle the use of blend in render.
+        /// </summary>
+        protected bool _blendEnabled = true;
+
+        /// <summary>
         /// Flag that shows if the Text has been loaded.
         /// </summary>
         protected bool _loaded = false;
@@ -88,6 +93,11 @@ namespace KirosEngine3.Textures
         protected bool _textChanged = false;
 
         private bool _warnOnce = false;//flag to ensure that not loaded is logged only once instead of every frame
+
+        /// <summary>
+        /// The text draw mode to be used.
+        /// </summary>
+        protected TextDrawMode _tDrawMode = TextDrawMode.ByBlock;
 
         /// <summary>
         /// The draw mode to be used in rendering.
@@ -166,6 +176,11 @@ namespace KirosEngine3.Textures
         public Color4 Color { get { return _sentence.Color; } set { _sentence.Color = value; } }
 
         /// <summary>
+        /// The text draw mode to be used in rendering.
+        /// </summary>
+        public TextDrawMode TextDrawMode { get { return _tDrawMode; } set { _tDrawMode = value; } }
+
+        /// <summary>
         /// The draw mode to be used during rendering.
         /// </summary>
         public PrimitiveType DrawMode { get { return _drawMode; } set { _drawMode = value; } }
@@ -222,6 +237,22 @@ namespace KirosEngine3.Textures
             {
                 Color = Color4.Black
             };
+        }
+
+        /// <summary>
+        /// Enable the use of blend in rendering.
+        /// </summary>
+        public void EnableBlend()
+        {
+            _blendEnabled = true;
+        }
+
+        /// <summary>
+        /// Disable the use of blend in rendering.
+        /// </summary>
+        public void DisableBlend()
+        {
+            _blendEnabled = false;
         }
 
         #region Loading
@@ -303,7 +334,7 @@ namespace KirosEngine3.Textures
                             indexes[indexOffset] = lineData.Item2[iI] + (uint)lastLineVertCount;//add the number of verts in the last line to each for the vert offset
                             indexOffset++;
                         }
-                        lastLineVertCount = lineData.Item1.Length;
+                        lastLineVertCount += lineData.Item1.Length;
                     }
 
                     _sentence.Vertices = verts;
@@ -417,13 +448,16 @@ namespace KirosEngine3.Textures
 
             GL.BindVertexArray(_VAO);
 
+            if (_blendEnabled)
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            }
 
-            GL.Enable(EnableCap.Blend);
-
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.DrawElements(_drawMode, _sentence.Indexes.Length, DrawElementsType.UnsignedInt, 0);
 
-            GL.Disable(EnableCap.Blend);
+            if (_blendEnabled)
+                GL.Disable(EnableCap.Blend);
 
 
             GL.BindVertexArray(0);

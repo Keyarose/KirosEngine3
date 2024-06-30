@@ -46,6 +46,7 @@ namespace KirosEngine3.Textures
         /// <param name="name">The name of the texture</param>
         /// <param name="texture">The texture to be added</param>
         /// <exception cref="ArgumentException">Thrown when the name for the texture is already in use</exception>
+        /// <exception cref="CollectionCleanupException">Thrown if the reservation collection is already using the name.</exception>
         public static void AddTexture(string name, Texture texture)
         {
             if (!Instance._textures.TryAdd(name, texture))
@@ -55,7 +56,7 @@ namespace KirosEngine3.Textures
             //init the reservation counter for the texture
             if (!Instance._reservations.TryAdd(name, 1))
             {
-                throw new ArgumentException(string.Format("Reservation counter for name: {0} already exists!", name));
+                throw new CollectionCleanupException(string.Format("Reservation counter for name: {0} already exists even though a texture didn't!", name), nameof(_reservations));
             }
 
             if (Instance._autoLoadTextures)
@@ -87,7 +88,7 @@ namespace KirosEngine3.Textures
                 //init the reservation counter for the texture
                 if (!Instance._reservations.TryAdd(name, 1))
                 {
-                    throw new ArgumentException(string.Format("Reservation counter for name: {0} already exists!", name));
+                    throw new CollectionCleanupException(string.Format("Reservation counter for name: {0} already exists even though a texture didn't!", name), nameof(_reservations));
                 }
 
                 if (Instance._autoLoadTextures)

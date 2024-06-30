@@ -5,7 +5,6 @@ using KirosEngine3.Mesh;
 using KirosEngine3.XML;
 using OpenTK.Graphics.OpenGL4;
 using System.Xml.Serialization;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace KirosEngine3.Textures
 {
@@ -19,6 +18,7 @@ namespace KirosEngine3.Textures
 
         private string[] _fontTextures;
         private int _size;
+        private int _tabSize = 8;//defaults to 8 spaces
         private float _charPaddingX = 0.0f;
 
         private readonly Dictionary<char, CharInfo> _charData = [];
@@ -41,6 +41,23 @@ namespace KirosEngine3.Textures
         { get { return _size; } }
 
         /// <summary>
+        /// The font's tab size in spaces.
+        /// </summary>
+        public int TabSize
+        {
+            get { return _tabSize; }
+            set { _tabSize = value; }
+        }
+
+        /// <summary>
+        /// The size of the font's space.
+        /// </summary>
+        public int SpaceSize
+        {
+            get { return _charData[' '].Width; }
+        }
+
+        /// <summary>
         /// The amount of padding between each character in a text.
         /// </summary>
         /// <remarks>Default value of 1.0</remarks>
@@ -56,11 +73,36 @@ namespace KirosEngine3.Textures
         }
 
         /// <summary>
+        /// Predefined CharInfo for unknown character or U+25A1 from the font.
+        /// </summary>
+        public CharInfo UnknownChar
+        {
+            get
+            {
+                if (_charData.TryGetValue((char)9633, out CharInfo value))
+                {
+                    return value;
+                }
+                return new CharInfo
+                {
+                    Height = _size,
+                    Width = _charData[' '].Width,
+                    XOffset = 0,
+                    YOffset = 0,
+                    X = 0,
+                    Y = 0,
+                    Page = 0,
+                    XAdvance = 6
+                };
+            }
+        }
+
+        /// <summary>
         /// Basic constructor for a font object.
         /// </summary>
         /// <param name="name">The name of the font.</param>
         /// <param name="filePath">The file path for the font data XML.</param>
-        public Font(string name, string filePath) : this (name, filePath, true)
+        public Font(string name, string filePath) : this(name, filePath, true)
         {
         }
 
@@ -274,15 +316,39 @@ namespace KirosEngine3.Textures
         {
             SentenceData result = new SentenceData();
 
+            Vec2 startPos = pos;
+
             TexturedVertex2D[] textVerts = new TexturedVertex2D[text.Length * 4];
             uint[] textIndices = new uint[text.Length * 6];
 
             uint counterV = 0;
             int counterI = 0;
             //todo: kerning support
-            foreach (char c in text)
+            foreach (char c in text)//todo: handle newline and tab
             {
-                CharInfo ci = _charData[c];
+                CharInfo ci;
+
+                try
+                {
+                    ci = _charData[c];
+                }
+                catch (KeyNotFoundException)
+                {
+                    ci = UnknownChar;//the character is not supported by the current font
+                }
+
+                if (c == '\n')//handle new line char
+                {
+                    pos = new(startPos.X, pos.Y + _size);
+                    continue;
+                }
+
+                if (c == '\t')//handle tab char as TabSize number of spaces
+                {
+                    ci = _charData[' '];
+                    ci.Width *= TabSize;
+                    ci.XAdvance *= TabSize;
+                }
                 //OpenGL uv 0,0 is bottom left
                 //tri 1
                 //top left -4
@@ -340,6 +406,8 @@ namespace KirosEngine3.Textures
         /// <returns>The resulting data arrays.</returns>
         public Tuple<TexturedVertex2D[], uint[]> QuadForChar(char c, Vec2 pos)
         {
+            Vec2 startPos = pos;
+
             TexturedVertex2D[] textVerts = new TexturedVertex2D[4];
             uint[] textIndices = new uint[6];
 
@@ -347,7 +415,28 @@ namespace KirosEngine3.Textures
             int counterI = 0;
 
             //todo: kerning support
-            CharInfo ci = _charData[c];
+            CharInfo ci;
+
+            try
+            {
+                ci = _charData[c];
+            }
+            catch (KeyNotFoundException)
+            {
+                ci = UnknownChar;//the character is not supported by the current font
+            }
+
+            if (c == '\n')//handle new line char
+            {
+                ci = _charData[' '];
+            }
+
+            if (c == '\t')//handle tab char as TabSize number of spaces
+            {
+                ci = _charData[' '];
+                ci.Width *= TabSize;
+                ci.XAdvance *= TabSize;
+            }
             //OpenGL uv 0,0 is bottom left
             //tri 1
             //top left -4
@@ -385,10 +474,7 @@ namespace KirosEngine3.Textures
             //top left
             textIndices[counterI] = counterV - 3;
 
-            //shift start pos for next letter
-            pos.X += ci.XAdvance + _charPaddingX;
-
-            Tuple<TexturedVertex2D[], uint[]> result = new Tuple<TexturedVertex2D[], uint[]> (textVerts, textIndices);
+            Tuple<TexturedVertex2D[], uint[]> result = new Tuple<TexturedVertex2D[], uint[]>(textVerts, textIndices);
             return result;
         }
 
@@ -400,12 +486,14 @@ namespace KirosEngine3.Textures
         /// <returns>The resulting data.</returns>
         public Tuple<TexturedVertex2D[], uint[]> QuadsForString(string str, Vec2 pos)
         {
+            Vec2 startPos = pos;
+
             TexturedVertex2D[] textVerts = new TexturedVertex2D[4 * str.Length];
             uint[] textIndices = new uint[6 * str.Length];
 
             int vIndex = 0;
             int iIndex = 0;
-            foreach(char c in str) 
+            foreach (char c in str)
             {
                 var cRes = QuadForChar(c, pos);
 
@@ -414,12 +502,33 @@ namespace KirosEngine3.Textures
                     textVerts[vIndex + i] = cRes.Item1[i];
                 }
 
-                for (int i = 0; i < 6; i ++)
+                for (int i = 0; i < 6; i++)
                 {
                     textIndices[iIndex + i] = cRes.Item2[i] + (uint)vIndex;
                 }
 
-                pos.X += _charData[c].XAdvance + _charPaddingX;
+                float posXInc = 0f;
+                try
+                {
+                    posXInc = _charData[c].XAdvance + _charPaddingX;
+                }
+                catch (KeyNotFoundException) 
+                {
+                    posXInc = UnknownChar.XAdvance + _charPaddingX;
+                }
+
+                if (c == '\t')//handle tab char
+                {
+                    posXInc = _charData[' '].XAdvance * 8 + _charPaddingX;
+                }
+
+                pos.X += posXInc;
+
+                if (c == '\n')//handle new line char
+                {
+                    pos = new(startPos.X, pos.Y + _size);
+                }
+
                 vIndex += 4;
                 iIndex += 6;
             }

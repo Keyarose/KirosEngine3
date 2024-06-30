@@ -7,7 +7,7 @@
       <directory name="Shaders">Resources/Shaders</directory>
       <directory name="Logs">log</directory>
     </directories>
-    <font name="latin24pt" file="latin_sas_math_24pt" fType=".xml"/>
+    <font name="latin24pt" file="arial_sas_math_24pt" fType=".fnt"/>
     <shaders>
       <shader name="color" vertShader="ColorShader.vert" fragShader="ColorShader.frag">
         <shaderAttribute name="aColor" type="color" value="vec4"/>
