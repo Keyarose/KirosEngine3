@@ -1968,12 +1968,121 @@ namespace KirosEngine3.Math.Matrix
 
             return string.Format("{0}\n\t{1}\n\t{2}\n\t{3}", r0, r1, r2, r3);
         }
+        #endregion
 
+        /// <inheritdoc/>
         public string ToDrawString()
         {
-            throw new NotImplementedException();
+            string result;
+            string ln1, ln2, ln3, ln4, ln5, ln6;
+
+            //column 1
+            ln2 = string.Format("\u2502{0}", M00);
+            ln3 = string.Format("\u2502{0}", M10);
+            ln4 = string.Format("\u2502{0}", M20);
+            ln5 = string.Format("\u2502{0}", M30);
+
+            for (int i = 1; i < 4; i ++)
+            {
+                if (ln2.Length > ln3.Length && ln2.Length > ln4.Length && ln2.Length > ln5.Length)
+                {
+                    int diff23 = ln2.Length - ln3.Length;
+                    int diff24 = ln2.Length - ln4.Length;
+                    int diff25 = ln2.Length - ln5.Length;
+
+                    ln2 += string.Format(" {0}", M01);
+                    ln3 += new string(' ', diff23) + string.Format(" {0}", this[1, i]);
+                    ln4 += new string(' ', diff24) + string.Format(" {0}", this[2, i]);
+                    ln5 += new string(' ', diff25) + string.Format(" {0}", this[3, i]);
+                }
+                else if (ln3.Length > ln2.Length && ln3.Length > ln4.Length && ln3.Length > ln5.Length)
+                {
+                    int diff = ln3.Length - ln2.Length;
+                    int diff34 = ln3.Length - ln4.Length;
+                    int diff35 = ln3.Length - ln5.Length;
+
+                    ln2 += new string(' ', diff) + string.Format(" {0}", this[0, i]);
+                    ln3 += string.Format(" {0}", this[1, i]);
+                    ln4 += new string(' ', diff34) + string.Format(" {0}", this[2, i]);
+                    ln5 += new string(' ', diff35) + string.Format(" {0}", this[3, i]);
+                }
+                else if (ln4.Length > ln2.Length && ln4.Length > ln3.Length && ln4.Length > ln5.Length)
+                {
+                    int diff = ln4.Length - ln2.Length;
+                    int diff43 = ln4.Length - ln3.Length;
+                    int diff45 = ln4.Length - ln5.Length;
+
+                    ln2 += new string(' ', diff) + string.Format(" {0}", this[0, i]);
+                    ln3 += new string(' ', diff43) + string.Format(" {0}", this[1, i]);
+                    ln4 += string.Format(" {0}", this[2, i]);
+                    ln5 += new string(' ', diff45) + string.Format(" {0}", this[3, i]);
+                }
+                else
+                {
+                    int diff = ln5.Length - ln2.Length;
+                    int diff53 = ln5.Length - ln3.Length;
+                    int diff54 = ln5.Length - ln4.Length;
+
+                    ln2 += new string(' ', diff) + string.Format(" {0}", this[0, i]);
+                    ln3 += new string(' ', diff53) + string.Format(" {0}", this[1, i]);
+                    ln4 += new string(' ', diff54) + string.Format(" {0}", this[2, i]);
+                    ln5 += string.Format(" {0}", this[3, i]);
+                }
+            }
+
+            //end bracket
+            if (ln2.Length > ln3.Length && ln2.Length > ln4.Length && ln2.Length > ln5.Length)
+            {
+                int diff = ln2.Length - ln3.Length;
+                int diff24 = ln2.Length - ln4.Length;
+                int diff25 = ln2.Length - ln5.Length;
+
+                ln2 += "\u2502\n";
+                ln3 += new string(' ', diff) + "\u2502\n";
+                ln4 += new string(' ', diff24) + "\u2502\n";
+                ln5 += new string(' ', diff25) + "\u2502\n";
+            }
+            else if (ln3.Length > ln2.Length && ln3.Length > ln4.Length && ln3.Length > ln5.Length)
+            {
+                int diff = ln3.Length - ln2.Length;
+                int diff34 = ln3.Length - ln4.Length;
+                int diff35 = ln3.Length - ln5.Length;
+
+                ln2 += new string(' ', diff) + "\u2502\n";
+                ln3 += "\u2502\n";
+                ln4 += new string(' ', diff34) + "\u2502\n";
+                ln5 += new string(' ', diff35) + "\u2502\n";
+            }
+            else if (ln4.Length > ln2.Length && ln4.Length > ln3.Length && ln4.Length > ln5.Length)
+            {
+                int diff = ln4.Length - ln2.Length;
+                int diff43 = ln4.Length - ln3.Length;
+                int diff45 = ln4.Length - ln5.Length;
+
+                ln2 += new string(' ', diff) + "\u2502\n";
+                ln3 += new string(' ', diff43) + "\u2502\n";
+                ln4 += "\u2502\n";
+                ln5 += new string(' ', diff45) + "\u2502\n";
+            }
+            else
+            {
+                int diff = ln5.Length - ln2.Length;
+                int diff53 = ln5.Length - ln3.Length;
+                int diff54 = ln5.Length - ln4.Length;
+
+                ln2 += new string(' ', diff) + "\u2502\n";
+                ln3 += new string(' ', diff53) + "\u2502\n";
+                ln4 += new string(' ', diff54) + "\u2502\n";
+                ln5 += "\u2502\n";
+            }
+
+            ln1 = "\u250C" + new string(' ', ln2.Length - 3) + "\u2510\n";
+            ln6 = "\u2514" + new string(' ', ln2.Length - 3) + "\u2518\n";
+
+            result = ln1 + ln2 + ln3 + ln4 + ln5 + ln6;
+
+            return result;
         }
-        #endregion
 
 #if OPENTK
         #region OpenTKCompat

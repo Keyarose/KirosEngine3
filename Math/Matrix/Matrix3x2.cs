@@ -845,12 +845,85 @@ namespace KirosEngine3.Math.Matrix
 
             return string.Format("{0}\n{1}\n{2}", r0, r1, r2);
         }
-
-        public string ToDrawString()
-        {
-            throw new NotImplementedException();
-        }
         #endregion
+
+        /// <inheritdoc/>
+        public readonly string ToDrawString()
+        {
+            string result;
+            string ln1, ln2, ln3, ln4, ln5;
+
+            //column 1
+            ln2 = string.Format("\u2502{0}", M00);
+            ln3 = string.Format("\u2502{0}", M10);
+            ln4 = string.Format("\u2502{0}", M20);
+
+            //column 2
+            if (ln2.Length > ln3.Length && ln2.Length > ln4.Length)
+            {
+                int diff23 = ln2.Length - ln3.Length;
+                int diff24 = ln2.Length - ln4.Length;
+
+                ln2 += string.Format(" {0}", M01);
+                ln3 += new string(' ', diff23) + string.Format(" {0}", M11);
+                ln4 += new string(' ', diff24) + string.Format(" {0}", M21);
+            }
+            else if (ln3.Length > ln2.Length && ln3.Length > ln4.Length)
+            {
+                int diff = ln3.Length - ln2.Length;
+                int diff34 = ln3.Length - ln4.Length;
+
+                ln2 += new string(' ', diff) + string.Format(" {0}", M01);
+                ln3 += string.Format(" {0}", M11);
+                ln4 += new string(' ', diff34) + string.Format(" {0}", M21);
+            }
+            else
+            {
+                int diff = ln4.Length - ln2.Length;
+                int diff43 = ln4.Length - ln3.Length;
+
+                ln2 += new string(' ', diff) + string.Format(" {0}", M01);
+                ln3 += new string(' ', diff43) + string.Format(" {0}", M11);
+                ln4 += string.Format(" {0}", M21);
+            }
+
+            //end bracket
+            if (ln2.Length > ln3.Length && ln2.Length > ln4.Length)
+            {
+                int diff = ln2.Length - ln3.Length;
+                int diff24 = ln2.Length - ln4.Length;
+
+                ln2 += "\u2502\n";
+                ln3 += new string(' ', diff) + "\u2502\n";
+                ln4 += new string(' ', diff24) + "\u2502\n";
+
+            }
+            else if (ln3.Length > ln2.Length && ln3.Length > ln4.Length)
+            {
+                int diff = ln3.Length - ln2.Length;
+                int diff34 = ln3.Length - ln4.Length;
+
+                ln2 += new string(' ', diff) + "\u2502\n";
+                ln3 += "\u2502\n";
+                ln4 += new string(' ', diff34) + "\u2502\n";
+            }
+            else
+            {
+                int diff = ln4.Length - ln2.Length;
+                int diff43 = ln4.Length - ln3.Length;
+
+                ln2 += new string(' ', diff) + "\u2502\n";
+                ln3 += new string(' ', diff43) + "\u2502\n";
+                ln4 += "\u2502\n";
+            }
+
+            ln1 = "\u250C" + new string(' ', ln2.Length - 3) + "\u2510\n";
+            ln5 = "\u2514" + new string(' ', ln2.Length - 3) + "\u2518\n";
+
+            result = ln1 + ln2 + ln3 + ln4 + ln5;
+
+            return result;
+        }
 
 #if OPENTK
         #region OpenTKCompat

@@ -1037,29 +1037,43 @@ namespace KirosEngine3.Math.Matrix
             string ln3;
             string ln4;
 
-            int m00l = M00.ToString().Length;
-            int m01l = M01.ToString().Length;
-            int m10l = M10.ToString().Length;
-            int m11l = M11.ToString().Length;
 
-            bool row1Larger = m00l + m01l + 1 > m10l + m11l + 1;
+            //column 1
+            ln2 = string.Format("\u2502{0}", M00);
+            ln3 = string.Format("\u2502{0}", M10);
 
-            if (row1Larger)
+            //column 2
+            if (ln2.Length > ln3.Length)
             {
-                int lineDiffSize = m00l + m01l - m10l - m11l;
-                ln1 = "\u250C" + new string(' ', m00l + m01l + 1) +"\u2510\n";
-                ln2 = string.Format("\u2502{0} {1}\u2502\n", M00, M01);
-                ln3 = string.Format("\u2502{0}", M10) + new string(' ', lineDiffSize + 1)  + string.Format("{0}\u2502\n", M11);
-                ln4 = "\u2514" + new string(' ', m00l + m01l + 1) + "\u2518";
+                int diff = ln2.Length - ln3.Length;
+
+                ln2 += string.Format(" {0}", M01);
+                ln3 += new string(' ', diff) + string.Format(" {0}", M11);
             }
             else
             {
-                int lineDiffSize = m10l + m11l - m00l - m01l;
-                ln1 = "\u250C" + new string(' ', m10l + m11l + 1) + "\u2510\n";
-                ln2 = string.Format("\u2502{0}", M00) + new string(' ', lineDiffSize + 1) + string.Format("{0}\u2502\n", M01);
-                ln3 = string.Format("\u2502{0} {1}\u2502\n", M10, M11);
-                ln4 = "\u2514" + new string(' ', m10l + m11l + 1) +"\u2518";
+                int diff = ln3.Length - ln2.Length;
+
+                ln2 += new string(' ', diff) + string.Format(" {0}", M01);
+                ln3 += string.Format(" {0}", M11);
             }
+
+            //end bracket
+            if (ln2.Length > ln3.Length)
+            {
+                int diff = ln2.Length - ln3.Length;
+                ln2 += "\u2502\n";
+                ln3 += new string(' ', diff) + "\u2502\n";
+            }
+            else
+            {
+                int diff = ln3.Length - ln2.Length;
+                ln2 += new string(' ', diff) + "\u2502\n";
+                ln3 += "\u2502\n";
+            }
+
+            ln1 = "\u250C" + new string(' ', ln2.Length - 3) + "\u2510\n";
+            ln4 = "\u2514" + new string(' ', ln2.Length - 3) + "\u2518\n";
 
             result = ln1 + ln2 + ln3 + ln4;
 

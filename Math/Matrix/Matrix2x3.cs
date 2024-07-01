@@ -850,9 +850,54 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
-        public string ToDrawString()
+        /// <inheritdoc/>
+        public readonly string ToDrawString()
         {
-            throw new NotImplementedException();
+            string result;
+            string ln1, ln2, ln3, ln4;
+
+            //column 1
+            ln2 = string.Format("\u2502{0}", M00);
+            ln3 = string.Format("\u2502{0}", M10);
+
+            for (int i = 1; i < 3; i++)
+            {
+                if (ln2.Length > ln3.Length)
+                {
+                    int diff = ln2.Length - ln3.Length;
+
+                    ln2 += string.Format(" {0}", this[0, i]);
+                    ln3 += new string(' ', diff) + string.Format(" {0}", this[1, i]);
+                }
+                else
+                {
+                    int diff = ln3.Length - ln2.Length;
+
+                    ln2 += new string(' ', diff) + string.Format(" {0}", this[0, i]);
+                    ln3 += string.Format(" {0}", this[1, i]);
+                }
+            }
+
+            //end bracket
+            if(ln2.Length > ln3.Length)
+            {
+                int diff = ln2.Length - ln3.Length;
+                ln2 += "\u2502\n";
+                ln3 += new string(' ', diff) + "\u2502\n";
+            }
+            else
+            {
+                int diff = ln3.Length - ln2.Length;
+                ln2 += new string(' ', diff) + "\u2502\n";
+                ln3 += "\u2502\n";
+            }
+
+            ln1 = "\u250C" + new string(' ', ln2.Length - 3) + "\u2510\n";
+            ln4 = "\u2514" + new string(' ', ln2.Length - 3) + "\u2518\n";
+
+            result = ln1 + ln2 + ln3 + ln4;
+
+            return result;
         }
 #if OPENTK
         #region OpenTKCompat
