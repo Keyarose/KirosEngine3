@@ -35,17 +35,17 @@ namespace KirosEngine3.UI
         /// <summary>
         /// The vertices of the Label.
         /// </summary>
-        public TexturedVertex2D[] Vertices { get { return _labelText.Vertices; } }
+        public TexturedVertex2D[][] Vertices { get { return _labelText.Vertices; } }
 
         /// <summary>
         /// The indices of the label.
         /// </summary>
-        public uint[] Indices { get { return _labelText.Indices; } }
+        public uint[][] Indices { get { return _labelText.Indices; } }
 
         /// <summary>
         /// The text rendered by the label.
         /// </summary>
-        public string LabelText { get { return _labelText.Sentence; } set { _labelText.Sentence = value; } }
+        public string[] LabelText { get { return _labelText.Lines; } set { _labelText.Lines = value; } }
 
         /// <summary>
         /// The UI Element the label describes.
