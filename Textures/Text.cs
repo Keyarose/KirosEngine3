@@ -25,7 +25,7 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The text to be rendered to the screen.
         /// </summary>
-        protected string _text = "";
+        protected string[] _text = [];
 
         /// <summary>
         /// The screen position of the text's origin.
@@ -53,9 +53,19 @@ namespace KirosEngine3.Textures
         protected SentenceData _sentence;
 
         /// <summary>
-        /// The number of lines the text should span.
+        /// The vertices of the text.
         /// </summary>
-        protected int _lines = 1;
+        protected TexturedVertex2D[][] _verts = [];
+
+        /// <summary>
+        /// The indices of the list.
+        /// </summary>
+        protected uint[][] _indices = [];
+
+        /// <summary>
+        /// The number of lines the text spans.
+        /// </summary>
+        protected int _lineCount = 1;
 
         /// <summary>
         /// The vertex array object.
@@ -65,12 +75,12 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The vertex buffer object.
         /// </summary>
-        protected int _VBO;
+        protected int[] _VBO = [];
 
         /// <summary>
         /// The element/index buffer object.
         /// </summary>
-        protected int _EBO;
+        protected int[] _EBO = [];
 
         /// <summary>
         /// Flag to toggle the use of blend in render.
@@ -122,12 +132,12 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The text itself
         /// </summary>
-        public string Sentence { get { return _text; } set { _text = value; _textChanged = true; Update(); } }
+        public string[] Lines { get { return _text; } set { _text = value; _textChanged = true; Update(); } }
 
         /// <summary>
-        /// Get or set the number of lines the text should span, default 1.
+        /// Get the number of lines the text spans.
         /// </summary>
-        public int LineCount { get { return _lines; } set { _lines = value; _textChanged = true; Update(); } }
+        public int LineCount { get { return _lineCount; } }
 
         /// <summary>
         /// The position of the text
@@ -163,12 +173,12 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The vertices of the text object.
         /// </summary>
-        public TexturedVertex2D[] Vertices { get { return _sentence.Vertices; } }
+        public TexturedVertex2D[][] Vertices { get { return _verts; } }
 
         /// <summary>
         /// The indices of the text object.
         /// </summary>
-        public uint[] Indices { get { return _sentence.Indexes; } }
+        public uint[][] Indices { get { return _indices; } }
 
         /// <summary>
         /// The color of the text
@@ -188,7 +198,7 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The buffer usage mode to use when rendering the text.
         /// </summary>
-        public BufferUsageHint BufferUsage { get { return _bufferUse; } set { _bufferUse = value; UpdateBuffers(); } }
+        public BufferUsageHint BufferUsage { get { return _bufferUse; } set { _bufferUse = value; } }
 
         /// <summary>
         /// Basic constructor for XML use.
@@ -208,17 +218,7 @@ namespace KirosEngine3.Textures
         /// </summary>
         /// <param name="pos">The screen origin position of the text.</param>
         /// <param name="text">The text to be rendered.</param>
-        public Text(Vec2 pos, string text)
-        {
-            _shaderName = ShaderManager.DefaultTextShaderName ?? "";
-            _text = text;
-            _pos = pos;
-
-            _sentence = new()
-            {
-                Color = Color4.Black
-            };
-        }
+        public Text(Vec2 pos, string text) : this(pos, FontManager.Default, text) { }
 
         /// <summary>
         /// Constructor for a Text object.
@@ -230,8 +230,11 @@ namespace KirosEngine3.Textures
         {
             _font = font;
             _shaderName = ShaderManager.DefaultTextShaderName ?? "";
-            _text = text;
             _pos = pos;
+
+            //process text, if there is no n\ then text is only one line
+            _text = text.Split("\n");
+            _lineCount = _text.Length;
 
             _sentence = new()
             {
@@ -262,121 +265,31 @@ namespace KirosEngine3.Textures
         /// <returns>True if init is successful, false otherwise.</returns>
         public bool Init()
         {
-            if (_lines > 1) //wrap to multiple lines
+            string[] endText = FitText(_text);
+
+            _verts = new TexturedVertex2D[endText.Length][];
+            _indices = new uint[endText.Length][];
+
+            //compile string data
+            for (int i = 0; i < endText.Length; i++)
             {
-                float textWidth = _font.TextWidth(_text);
+                //set the position to the font height * the line number
+                Vec2 posOffset = new Vec2(0f, _font.Size * i);
+                Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(endText[i], posOffset);
 
-                if (textWidth > _size.X)//text is too long needs to wrap
-                {
-                    string[] subs = _text.Split(" ");//todo: delimiter setting.
-                    int iLine = 0;
-
-                    string[] lines = new string[_lines];
-
-                    for (int i = 0; i < subs.Length; i++) //for each sub string
-                    {
-                        float subWidth = _font.TextWidth(subs[i]);
-
-                        if (iLine == lines.Length - 1)//if we're on the last line
-                        {
-                            for (int j = i; j < subs.Length; j++)//put all remaining subs on it
-                            {
-                                lines[iLine] += " " + subs[j];
-                            }
-                            i = subs.Length;//we've processed all subs
-                        }
-                        else //we still have lines left after this
-                        {
-                            int k = i + 1;
-                            string section = subs[i];
-                            int numSubs = 1;
-                            while (subWidth < _size.X && k < subs.Length)//while under the width and have subs left
-                            {
-                                subWidth = _font.TextWidth(section + " " + subs[k]);//check the size of adding the next section
-
-                                if (subWidth > _size.X)//if it's too big break out of the loop
-                                {
-                                    continue;
-                                }
-                                else //still under the width add it and go to the next one
-                                {
-                                    section += " " + subs[k];
-                                    numSubs++;
-                                    k++;
-                                }
-                            }
-
-                            lines[iLine++] = section;//set the section to a line
-                        }
-                    }
-
-                    //produce and compile stringData
-                    TexturedVertex2D[] verts = new TexturedVertex2D[_text.Length * 4];
-                    uint[] indexes = new uint[_text.Length * 6];
-                    int vertOffset = 0;
-                    int indexOffset = 0;
-                    int lastLineVertCount = 0;
-
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        //set the position to the font height * the line number
-                        Vec2 posOffset = new Vec2(0f, _font.Size * i);
-                        Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(lines[i], posOffset);
-
-                        for (int iV = 0; iV < lineData.Item1.Length; iV++)//copy the vert data
-                        {
-                            verts[vertOffset] = lineData.Item1[iV];
-                            vertOffset++;
-                        }
-
-                        for (int iI = 0; iI < lineData.Item2.Length; iI++)
-                        {
-                            indexes[indexOffset] = lineData.Item2[iI] + (uint)lastLineVertCount;//add the number of verts in the last line to each for the vert offset
-                            indexOffset++;
-                        }
-                        lastLineVertCount += lineData.Item1.Length;
-                    }
-
-                    _sentence.Vertices = verts;
-                    _sentence.Indexes = indexes;
-                }
-                else //text is short enough to fit as is
-                {
-                    Tuple<TexturedVertex2D[], uint[]> stringData = _font.QuadsForString(_text, Vec2.Zero);
-
-                    _sentence.Vertices = stringData.Item1;
-                    _sentence.Indexes = stringData.Item2;
-                }
-            }
-            else //no word wrap
-            {
-                Tuple<TexturedVertex2D[], uint[]> stringData = _font.QuadsForString(_text, Vec2.Zero);
-
-                _sentence.Vertices = stringData.Item1;
-                _sentence.Indexes = stringData.Item2;
+                _verts[i] = lineData.Item1;
+                _indices[i] = lineData.Item2;
             }
 
+            _VBO = new int[endText.Length];
+            _EBO = new int[endText.Length];
+
+            //gen the buffers, but don't buffer until draw
             _VAO = GL.GenVertexArray();
             GL.BindVertexArray(_VAO);
 
-            _VBO = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex2D.SizeInBytesU * _sentence.Vertices.Length, _sentence.Vertices, _bufferUse);
-
-            _EBO = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _sentence.Indexes.Length, _sentence.Indexes, _bufferUse);
-
-            //if the shader fails to be found it is logged in TryGetShader.
-            if (!ShaderManager.TryGetShader(_shaderName, out Shader? sh))
-            {
-                return false;
-            }
-
-            //set the shader attributes for TexturedVertex2D
-            sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = TexturedVertex2D.SizeInBytesU });
-            sh.SetUVAttribGL(new ShaderAttribSettings { Offset = TexturedVertex2D.UVOffset, Size = 2, Stride = TexturedVertex2D.SizeInBytesU });
-            //sh.SetAttribsGL<TexturedVertex>();
+            GL.GenBuffers(_verts.Length, _VBO);
+            GL.GenBuffers(_indices.Length, _EBO);
 
             GL.BindVertexArray(0);
 
@@ -385,15 +298,76 @@ namespace KirosEngine3.Textures
             _loaded = true;
             return true;
         }
+
+        /// <summary>
+        /// Fit the provided text to the width of the text's size using the set font.
+        /// </summary>
+        /// <param name="text">The text to fit.</param>
+        /// <returns>The resulting array of strings sized to fit.</returns>
+        private string[] FitText(string[] text)
+        {
+            string[] result = [];
+            for (int li = 0; li < text.Length; li++)
+            {
+                string line = text[li];
+
+                float textWidth = _font.TextWidth(line);
+
+                if (textWidth > _size.X)//text is too long needs to wrap
+                {
+                    string[] subs = line.Split(' ');//todo: delimiter setting.
+
+                    string[] resLines = new string[subs.Length];//at most sub.length lines
+                    int resI = 0;
+
+                    for (int i = 0; i < subs.Length; i++)
+                    {
+                        float subWidth = _font.TextWidth(subs[i]);
+
+                        string section = subs[i];
+                        int subI = i + 1;
+                        while (subWidth < _size.X && subI < subs.Length)//while under the width and have subs left
+                        {
+                            subWidth = _font.TextWidth(section + " " + subs[subI]);
+
+                            if (subWidth > _size.X)//too big, exit the loop and move on
+                            {
+                                continue;
+                            }
+                            else //can fit more add the current section and move to the next.
+                            {
+                                section += " " + subs[subI];
+                                subI++;
+                            }
+                        }
+
+                        resLines[resI] = section;
+                        resI++;
+                    }
+
+                    resLines = resLines.Where(x => !string.IsNullOrEmpty(x)).ToArray();//trim any empty values
+                    foreach (var r in resLines)//copy to the final text array
+                    {
+                        result = [.. result, r];
+                    }
+                }
+                else //the line fits
+                {
+                    result = [.. result, line];
+                }
+            }
+
+            return result;
+        }
         #endregion
 
         /// <summary>
         /// Set the text to the given string
         /// </summary>
-        /// <param name="text">The string to set the text to</param>
+        /// <param name="text">The string to set the text to.</param>
         public void SetText(string text)
         {
-            Sentence = text;
+            _text = text.Split("\n");
         }
 
         #region Draw
@@ -454,7 +428,19 @@ namespace KirosEngine3.Textures
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             }
 
-            GL.DrawElements(_drawMode, _sentence.Indexes.Length, DrawElementsType.UnsignedInt, 0);
+            for (int i = 0; i < _verts.Length; i++)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO[i]);
+                GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex2D.SizeInBytesU * _verts[i].Length, _verts[i], _bufferUse);
+
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO[i]);
+                GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _indices[i].Length, _indices[i], _bufferUse);
+
+
+                sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = TexturedVertex2D.SizeInBytesU });
+                sh.SetUVAttribGL(new ShaderAttribSettings { Offset = TexturedVertex2D.UVOffset, Size = 2, Stride = TexturedVertex2D.SizeInBytesU });
+                GL.DrawElements(_drawMode, _indices[i].Length, DrawElementsType.UnsignedInt, 0);
+            }
 
             if (_blendEnabled)
                 GL.Disable(EnableCap.Blend);
@@ -472,29 +458,26 @@ namespace KirosEngine3.Textures
         {
             if (_font != null)
             {
-                Tuple<TexturedVertex2D[], uint[]> stringData = _font.QuadsForString(_text, Vec2.Zero);
+                string[] endText = FitText(_text);
 
-                _sentence.Vertices = stringData.Item1;
-                _sentence.Indexes = stringData.Item2;
+                _verts = new TexturedVertex2D[endText.Length][];
+                _indices = new uint[endText.Length][];
 
-                UpdateBuffers();
+                //compile string data
+                for (int i = 0; i < endText.Length; i++)
+                {
+                    //set the position to the font height * the line number
+                    Vec2 posOffset = new Vec2(0f, _font.Size * i);
+                    Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(endText[i], posOffset);
+
+                    _verts[i] = lineData.Item1;
+                    _indices[i] = lineData.Item2;
+                }
 
                 _textChanged = false;
             }
         }
-
-        /// <summary>
-        /// Update the buffers for changes to the text
-        /// </summary>
-        private void UpdateBuffers()
-        {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex.SizeInBytesU * _sentence.Vertices.Length, _sentence.Vertices, _bufferUse);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _sentence.Indexes.Length, _sentence.Indexes, _bufferUse);
-        }
-
+                
         /// <summary>
         /// Update Text for changes in the last frame.
         /// </summary>
@@ -520,8 +503,8 @@ namespace KirosEngine3.Textures
                     //clear managed items
                 }
 
-                GL.DeleteBuffer(_VBO);
-                GL.DeleteBuffer(_EBO);
+                GL.DeleteBuffers(_verts.Length, _VBO);
+                GL.DeleteBuffers(_indices.Length, _EBO);
                 GL.DeleteVertexArray(_VAO);
                 _disposed = true;
             }
