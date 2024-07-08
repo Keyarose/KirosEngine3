@@ -402,7 +402,7 @@ namespace KirosEngine3.Math.Vector
                 d = -d;
 
             if (d == T.One) { return true; }
-            //todo: abs the dot?
+            
             return false;
         }
         #endregion
@@ -739,7 +739,7 @@ namespace KirosEngine3.Math.Vector
                         return r;
                     }
                 case 7:
-                    throw new NotImplementedException();//todo:
+                    throw new NotImplementedException("Cross product in R⁷ not yet implemented.");//todo: R⁷ Cross product
                 default:
                     throw new UndefinedMathOperationException("Cross product is undefined for vectors of size other than three or seven.");
             }

@@ -503,7 +503,7 @@ namespace KirosEngine3.Math.Matrix
         /// <returns>The resulting matrix.</returns>
         public static Matrix2x4 Subtract(Matrix2x4 lhs, Matrix2x4 rhs)
         {
-            return new Matrix2x4(lhs.Row0 - rhs.Row0, lhs.Row1 - lhs.Row1);
+            return new Matrix2x4(lhs.Row0 - rhs.Row0, lhs.Row1 - rhs.Row1);
         }
 
         /// <summary>
