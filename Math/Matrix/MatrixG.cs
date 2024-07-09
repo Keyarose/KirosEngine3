@@ -328,6 +328,101 @@ namespace KirosEngine3.Math.Matrix
         }
         #endregion
 
+        #region StructFormFactory
+        /// <summary>
+        /// Create a Matrix2 from the MatrixG's value, truncating what doesn't fit.
+        /// </summary>
+        /// <param name="strict">True enables strict fitting.</param>
+        /// <returns>The resulting Matrix2.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if strict is true and the matrix is not the correct size.</exception>
+        public Matrix2 AsMatrix2(bool strict = false)
+        {
+            if (strict)
+            {
+                if (RowCount != 2 || ColumnCount != 2)
+                    throw InvalidOpExceptionAsStructBuilder(RowCount, ColumnCount, nameof(Matrix2));
+
+                return new Matrix2(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]));
+            }
+            else
+            {
+                if (RowCount == 0)
+                {
+                    return new Matrix2();
+                }
+                else if (RowCount == 1)
+                {
+                    if (ColumnCount == 1)
+                    {
+                        return new Matrix2(float.CreateTruncating(_m[0, 0]), 0.0f, 0.0f, 0.0f);
+                    }
+
+                    return new Matrix2(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), 0.0f, 0.0f);
+                }
+                else
+                {
+                    if (ColumnCount == 1)
+                    {
+                        return new Matrix2(float.CreateTruncating(_m[0, 0]), 0.0f, float.CreateTruncating(_m[1, 0]), 0.0f);
+                    }
+
+                    return new Matrix2(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Create a Matrix2x3 from the MatrixG's value, truncating what doesn't fit.
+        /// </summary>
+        /// <param name="strict">True enables strict fitting.</param>
+        /// <returns>The resulting Matrix2x3</returns>
+        /// <exception cref="InvalidOperationException">Throw if strict is true and the matrix is not the correct size.</exception>
+        public Matrix2x3 AsMatrix2x3(bool strict = false)
+        {
+            if (strict)
+            {
+                if (RowCount != 2 || ColumnCount != 3)
+                    throw InvalidOpExceptionAsStructBuilder(RowCount, ColumnCount, nameof(Matrix2x3));
+
+                return new Matrix2x3(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[0, 2]), float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]), float.CreateTruncating(_m[1, 2]));
+            }
+            else
+            {
+                if (RowCount == 0)
+                {
+                    return new Matrix2x3();
+                }
+                else if (RowCount == 1)
+                {
+                    if (ColumnCount == 1)
+                    {
+                        return new Matrix2x3(float.CreateTruncating(_m[0, 0]), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                    }
+                    else if (ColumnCount == 2)
+                    {
+                        return new Matrix2x3(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), 0.0f, 0.0f, 0.0f, 0.0f);
+                    }
+
+                    return new Matrix2x3(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[0, 2]), 0.0f, 0.0f, 0.0f);
+                }
+                else
+                {
+                    if (ColumnCount == 1)
+                    {
+                        return new Matrix2x3(float.CreateTruncating(_m[0, 0]), 0.0f, 0.0f, float.CreateTruncating(_m[1, 0]), 0.0f, 0.0f);
+                    }
+                    else if (ColumnCount == 2)
+                    {
+                        return new Matrix2x3(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), 0.0f, float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]), 0.0f);
+                    }
+
+                    return new Matrix2x3(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[0, 2]), float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]), float.CreateTruncating(_m[1, 2]));
+                }
+            }
+        }
+        //todo: more structs
+        #endregion
+
         /// <summary>
         /// Return the Columns of the matrix as an array.
         /// </summary>
@@ -722,6 +817,13 @@ namespace KirosEngine3.Math.Matrix
             }
 
             return result;
+        }
+        #endregion
+
+        #region ExceptionBuilders
+        private static InvalidOperationException InvalidOpExceptionAsStructBuilder(int rowCount, int columnCount, string structName)
+        {
+            return new InvalidOperationException(string.Format("Matrix of dimensions {0}x{1} does not fit in {2} under strict usage.", rowCount, columnCount, structName));
         }
         #endregion
         //todo: methods

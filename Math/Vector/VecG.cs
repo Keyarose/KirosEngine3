@@ -197,57 +197,94 @@ namespace KirosEngine3.Math.Vector
 
         #region StructFormFactory
         /// <summary>
-        /// Create a Vec2 from the VecG's value truncating what doesn't fit
+        /// Create a Vec2 from the VecG's value truncating what doesn't fit.
         /// </summary>
+        /// <param name="strict">True enables strict fitting.</param>
         /// <returns>The Vec2 result</returns>
-        public Vec2 AsVec2()
+        /// <exception cref="InvalidOperationException">Thrown if strict is true and the vector is not the correct size.</exception>
+        public Vec2 AsVec2(bool strict = false)
         {
-            if (Size == 1)
+            if (strict)
             {
-                return new Vec2(float.CreateTruncating(_comp[0]), 0.0f);
+                if (Size != 2)
+                    throw InvalidOpExceptionAsStructBuilder(Size, nameof(Vec2));
+
+                return new Vec2(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]));
             }
             else
-                return new Vec2(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]));
+            {
+                if (Size == 1)
+                {
+                    return new Vec2(float.CreateTruncating(_comp[0]), 0.0f);
+                }
+                else
+                    return new Vec2(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]));
+            }
         }
 
         /// <summary>
         /// Create a Vec3 from the VecG's value truncating what doesn't fit
         /// </summary>
+        /// <param name="strict">True enables strict fitting.</param>
         /// <returns>The resulting Vec3</returns>
-        public Vec3 AsVec3()
+        /// <exception cref="InvalidOperationException">Thrown if strict is true and the vector is not the correct size.</exception>
+        public Vec3 AsVec3(bool strict = false)
         {
-            if (Size == 1)
+            if (strict)
             {
-                return new Vec3(float.CreateTruncating(_comp[0]), 0.0f, 0.0f);
-            }
-            else if (Size == 2)
-            {
-                return new Vec3(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), 0.0f);
+                if (Size != 3)
+                    throw InvalidOpExceptionAsStructBuilder(Size, nameof(Vec3));
+
+                return new Vec3(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), float.CreateTruncating(_comp[2]));
             }
             else
-                return new Vec3(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), float.CreateTruncating(_comp[2]));
+            {
+
+                if (Size == 1)
+                {
+                    return new Vec3(float.CreateTruncating(_comp[0]), 0.0f, 0.0f);
+                }
+                else if (Size == 2)
+                {
+                    return new Vec3(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), 0.0f);
+                }
+                else
+                    return new Vec3(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), float.CreateTruncating(_comp[2]));
+            }
         }
 
         /// <summary>
         /// Create a Vec4 from the VecG's value truncating what doesn't fit
         /// </summary>
+        /// <param name="strict">True enables strict fitting.</param>
         /// <returns>The resulting Vec4</returns>
-        public Vec4 AsVec4()
+        /// <exception cref="InvalidOperationException">Thrown if strict is true and the vector is not the correct size.</exception>
+        public Vec4 AsVec4(bool strict = false)
         {
-            if (Size == 1)
+            if (strict)
             {
-                return new Vec4(float.CreateTruncating(_comp[0]), 0.0f, 0.0f, 0.0f);
-            }
-            else if (Size == 2)
-            {
-                return new Vec4(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), 0.0f, 0.0f);
-            }
-            else if (Size == 3)
-            {
-                return new Vec4(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), float.CreateTruncating(_comp[2]), 0.0f);
+                if (Size != 4)
+                    throw InvalidOpExceptionAsStructBuilder(Size,nameof(Vec4));
+
+                return new Vec4(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), float.CreateTruncating(_comp[2]), float.CreateTruncating(_comp[3]));
             }
             else
-                return new Vec4(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), float.CreateTruncating(_comp[2]), float.CreateTruncating(_comp[3]));
+            {
+                if (Size == 1)
+                {
+                    return new Vec4(float.CreateTruncating(_comp[0]), 0.0f, 0.0f, 0.0f);
+                }
+                else if (Size == 2)
+                {
+                    return new Vec4(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), 0.0f, 0.0f);
+                }
+                else if (Size == 3)
+                {
+                    return new Vec4(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), float.CreateTruncating(_comp[2]), 0.0f);
+                }
+                else
+                    return new Vec4(float.CreateTruncating(_comp[0]), float.CreateTruncating(_comp[1]), float.CreateTruncating(_comp[2]), float.CreateTruncating(_comp[3]));
+            }
         }
         #endregion
 
@@ -402,7 +439,7 @@ namespace KirosEngine3.Math.Vector
                 d = -d;
 
             if (d == T.One) { return true; }
-            
+
             return false;
         }
         #endregion
@@ -760,6 +797,13 @@ namespace KirosEngine3.Math.Vector
             {
                 throw;
             }
+        }
+        #endregion
+
+        #region ExceptionBuilders
+        private static InvalidOperationException InvalidOpExceptionAsStructBuilder(int size, string structName)
+        {
+            return new InvalidOperationException(string.Format("Vector of size: {0} does not fit in {1} under strict usage.", size, structName));
         }
         #endregion
     }
