@@ -52,6 +52,14 @@ namespace KirosEngine3
             TextureManager.TryAddTexture("wall", "Resources/Textures/wall.jpg");//debug texture
             //end test stuff
 
+            //gauss testing
+            MatrixG<float> gausTest = new MatrixG<float>([new VecG<float>([0, 0, 2, -4, -5, 2, 5]), new VecG<float>([0, 1, -1, 1, 3, 1, -1]), new VecG<float>([0, 6, 0, -6, 5, 16, 7])]);
+            MatrixG<float> gTest2 = new MatrixG<float>([new VecG<float>([1, 2, -1, 2, 1, 2]), new VecG<float>([-1, -2, 1, 2, 3, 6]), new VecG<float>([2, 4, -3, 2, 0, 3]), new VecG<float>([-3, -6, 2, 0, 3, 9])]);
+            Console.WriteLine(gTest2.ToString());
+            gTest2.ReducedRowEchelonGaussian();
+            Console.WriteLine(gTest2);
+            //end gauss testing
+
             GL.ClearColor((Color)new Color4(ConfigManager.Instance[ConfigKeys.D_CLEAR_COLOR_KEY]));//set clear color from config
             GL.Enable(EnableCap.DepthTest);
             //GL.Enable(EnableCap.DebugOutput);

@@ -1,10 +1,5 @@
 ﻿using KirosEngine3.Math.Vector;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.Math.Matrix
 {
@@ -18,6 +13,12 @@ namespace KirosEngine3.Math.Matrix
 
         private int _rowCount;
         private int _columnCount;
+
+        /// <summary>
+        /// The matrix's pivot positions if it has been converted to row echelon form
+        /// </summary>
+        private int[] _pivotPositions = [];
+        private bool _echelonForm = false;
 
         /// <summary>
         /// The number of rows in the matrix.
@@ -41,7 +42,48 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// The size of the columns in the matrix.
         /// </summary>
-        public int ColumnSize { get { return _rowCount; }}
+        public int ColumnSize { get { return _rowCount; } }
+
+        /// <summary>
+        /// Indicates if the matrix is in Echelon Form
+        /// </summary>
+        public bool IsEchelonForm { get { return _echelonForm; } }
+
+        /// <summary>
+        /// Indicates if the matrix is Consistent or not.
+        /// </summary>
+        public bool IsConsistent
+        {
+            get
+            {
+                return GetConsistency();
+            }
+        }
+
+        /// <summary>
+        /// The rank of the matrix or -1 if not in Echelon Form.
+        /// </summary>
+        public int Rank
+        {
+            get
+            {
+                return GetRank();
+            }
+        }
+
+        /// <summary>
+        /// The Nullity of the matrix or -1 if not in Echelon Form.
+        /// </summary>
+        public int Nullity
+        {
+            get
+            {
+                if (!_echelonForm)
+                    return -1;
+
+                return ColumnCount - Rank;
+            }
+        }
 
         /// <summary>
         /// Index accessor for the matrix's cells.
@@ -54,6 +96,42 @@ namespace KirosEngine3.Math.Matrix
             get { return _m[row, column]; }
 
             set { _m[row, column] = value; }
+        }
+
+        /// <summary>
+        /// Get the rank of the matrix, returns -1 if it is not in echelon form.
+        /// </summary>
+        /// <returns>The rank of the matrix or -1.</returns>
+        public int GetRank()
+        {
+            if (!_echelonForm) return -1;
+
+            return _pivotPositions.Length;
+        }
+
+        /// <summary>
+        /// Check to see if the matrix is consistent.
+        /// </summary>
+        /// <returns>True if it is consistent, false if not in echelon form or not consistent.</returns>
+        public bool GetConsistency()
+        {
+            if (!_echelonForm) return false;
+
+            for (int i = 0; i < RowCount; i++)
+            {
+                for (int j = 0; j < ColumnCount; j++)
+                {
+                    if (_m[i, j] != T.Zero)//if the row contains a non zero
+                    {
+                        if (j == ColumnCount - 1)//if its the last column its not consistent
+                            return false;
+
+                        break;//if its not the last column break and go to the next row
+                    }
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -70,7 +148,7 @@ namespace KirosEngine3.Math.Matrix
                 {
                     for (int j = 0; j < _columnCount; j++)
                     {
-                        newMat[i,j] = _m[i, j];
+                        newMat[i, j] = _m[i, j];
                     }
                 }
             }
@@ -122,6 +200,7 @@ namespace KirosEngine3.Math.Matrix
             _m = newMat;
         }
 
+        #region Constructors
         /// <summary>
         /// Basic constructor.
         /// </summary>
@@ -133,6 +212,45 @@ namespace KirosEngine3.Math.Matrix
             _columnCount = columnCount;
 
             _m = new T[rowCount, columnCount];
+        }
+
+        /// <summary>
+        /// Basic constructor with values.
+        /// </summary>
+        /// <param name="values">The values for the matrix.</param>
+        public MatrixG(T[,] values)
+        {
+            _rowCount = values.GetLength(0);
+            _columnCount = values.GetLength(1);
+
+            _m = values;
+        }
+
+        /// <summary>
+        /// Constructor with values fit into the given dimensions.
+        /// </summary>
+        /// <param name="values">The values for the matrix.</param>
+        /// <param name="rows">The number of rows.</param>
+        /// <param name="columns">The number of columns.</param>
+        /// <exception cref="ArgumentException">Thrown if the array of values will not fit in the given dimensions.</exception>
+        public MatrixG(T[] values, int rows, int columns)
+        {
+            if (values != null && (values.Length != rows * columns))
+                throw new ArgumentException(string.Format("The number of values in the array does not match the specified array size."));
+
+            _rowCount = rows;
+            _columnCount = columns;
+
+            _m = new T[_rowCount, _columnCount];
+
+            for (int i = 0; i < _rowCount; i++)
+            {
+                for (int j = 0; j < _columnCount; j++)
+                {
+                    int t = i * _columnCount + j;
+                    _m[i, j] = values![t];
+                }
+            }
         }
 
         /// <summary>
@@ -189,6 +307,26 @@ namespace KirosEngine3.Math.Matrix
                 }
             }
         }
+        #endregion
+
+        #region CommonValueFactory
+        /// <summary>
+        /// The Identity matrix for the given size.
+        /// </summary>
+        /// <param name="dimensions">The dimensional size of the matrix to create.</param>
+        /// <returns>The resulting Identity matrix.</returns>
+        public MatrixG<T> Identity(int dimensions)
+        {
+            MatrixG<T> result = new MatrixG<T>(dimensions, dimensions);
+
+            for (int i = 0; i < dimensions; i++)
+            {
+                result[i, i] = T.One;
+            }
+
+            return result;
+        }
+        #endregion
 
         /// <summary>
         /// Return the Columns of the matrix as an array.
@@ -198,7 +336,7 @@ namespace KirosEngine3.Math.Matrix
         {
             VecG<T>[] result = new VecG<T>[_columnCount];
 
-            for (int i = 0; i< _columnCount; i++)
+            for (int i = 0; i < _columnCount; i++)
             {
                 result[i] = new VecG<T>(ColumnSize);
 
@@ -240,7 +378,7 @@ namespace KirosEngine3.Math.Matrix
         /// <summary>
         /// The matrix's Row Space, see <see cref="GetRows"/>
         /// </summary>
-        public VecG<T>[] RowSpace =>GetRows();
+        public VecG<T>[] RowSpace => GetRows();
 
         /// <summary>
         /// Clone the matrix.
@@ -315,6 +453,8 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="secondRow">The index of the second row to exchange.</param>
         public void RowInterchange(int firstRow, int secondRow)
         {
+            if (firstRow == secondRow) return;//nothing needs to be done.
+
             for (int i = 0; i < RowSize; i++)//move each row value by value
             {
                 (_m[secondRow, i], _m[firstRow, i]) = (_m[firstRow, i], _m[secondRow, i]);
@@ -354,7 +494,7 @@ namespace KirosEngine3.Math.Matrix
         /// <param name="scalar">The scalar to multiply the row by.</param>
         public void RowScaling(int row, T scalar)
         {
-            for (int i = 0; row < RowSize; row++)
+            for (int i = 0; i < RowSize; i++)
             {
                 _m[row, i] *= scalar;
             }
@@ -430,13 +570,113 @@ namespace KirosEngine3.Math.Matrix
         #endregion
 
         /// <summary>
-        /// Convert the matrix into it's reduced row echelon form using gaussian elimination.
+        /// Convert the matrix into it's row echelon form using gaussian elimination.
         /// </summary>
-        /// <returns>The resulting matrix.</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public MatrixG<T> ReducedRowEchelonGaussian()
+        public void RowEchelonGaussian()
         {
-            throw new NotImplementedException();
+            VecG<T>[] columns = GetColumns();
+            int[] pivotColumns = [];//column
+
+            for (int rI = 0; rI < RowCount; rI++)
+            {
+                //find the first non zero column
+                int cI;
+
+                if (pivotColumns == null || pivotColumns.Length == 0)
+                {
+                    cI = 0;//if we're at the start begin with 0
+                }
+                else
+                {
+                    cI = pivotColumns[^1] + 1;//otherwise begin with the column after the last pivot
+                }
+
+                int nzRow = -1;
+                while (cI < columns.Length)//while there are columns left to check, see if there are non zero values, and if they are cI is the pivot index
+                {
+                    bool found = false;
+                    for (int i = rI; i < RowCount; i++)
+                    {
+                        T cell = _m[i, cI];
+                        if (cell != T.Zero)
+                        {
+                            nzRow = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        break;
+                    cI++;
+                }
+
+                if (cI >= columns.Length)//no non zero columns left
+                {
+                    break;
+                }
+
+                pivotColumns = [.. pivotColumns, cI];//the found pivot
+
+                if (nzRow < 0)
+                {
+                    throw new Exception("Error in Gaussian, column that should have a non zero value did not return one.");//todo: custom exception
+                }
+
+                //perform row exchange to bring the non zero row to the pivot position
+                RowInterchange(rI, nzRow);
+
+                //zero the values below the pivot in the column
+                columns = GetColumns();//update the columns for the row interchange
+                VecG<T> pCol = columns[pivotColumns[rI]];
+
+                T pVal = pCol[rI];//value at the pivot pos
+                for (int i = rI + 1; i < pCol.Size; i++)//from the first value below the pivot and down
+                {
+                    if (pCol[i] != T.Zero)//if a value is not zero perform row addition on that value's row with a multiplier of -value / pivot value
+                    {
+                        T mul = -pCol[i] / pVal;
+                        RowAddition(rI, i, mul);
+                    }
+                }
+            }
+            _pivotPositions = pivotColumns ?? [];
+            _echelonForm = true;//todo: only set true if successful
+        }
+
+        /// <summary>
+        /// Convert the matrix into reduced row echelon form using gaussian elimination.
+        /// </summary>
+        public void ReducedRowEchelonGaussian()
+        {
+            RowEchelonGaussian();//convert to row echelon
+
+            int pivotCount = _pivotPositions.Length;
+
+            for (int i = pivotCount - 1; i >= 0; i--) //for each pivot position starting at the bottom
+            {
+                int column = _pivotPositions[i];
+                T pivotVal = _m[i, column];
+                if (pivotVal != T.One)//if the pivot is not 1 make it 1
+                {
+                    T mul = T.One / pivotVal;
+                    RowScaling(i, mul);
+                }
+
+            }
+
+            for (int i = pivotCount - 1; i >= 0; i--)
+            {
+                int column = _pivotPositions[i];
+                T pivotVal = _m[i, column];
+                for (int j = i - 1; j >= 0; j--)//for each row above the pivot
+                {
+                    if (_m[j, column] != T.Zero)//if the value above the pivot is not 0 make it 0
+                    {
+                        T mul = -_m[j, column] / pivotVal;
+                        RowAddition(i, j, mul);
+                    }
+                }
+            }
         }
 
         #region ToString
