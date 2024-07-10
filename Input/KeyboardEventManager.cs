@@ -1,10 +1,4 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.Input
 {
@@ -44,6 +38,12 @@ namespace KirosEngine3.Input
         private Dictionary<string, Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>> _eventRegistry = [];
 
         /// <summary>
+        /// Grouped collection of alpha numeric keys for registration.
+        /// </summary>
+        public static Keys[] AlphaNum => [Keys.A, Keys.B, Keys.C, Keys.D, Keys.E, Keys.F, Keys.G, Keys.H, Keys.I, Keys.J, Keys.K, Keys.L, Keys.M, Keys.N, Keys.O,
+        Keys.P, Keys.Q, Keys.R, Keys.S, Keys.T, Keys.U, Keys.V, Keys.W, Keys.X, Keys.Y, Keys.Z, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0];
+
+        /// <summary>
         /// Basic constructor.
         /// </summary>
         private KeyboardEventManager()
@@ -70,7 +70,7 @@ namespace KirosEngine3.Input
         public static bool SubscribeKeyboardEvent(string context, Keys key, KeyboardEventType type, KeyboardEventHandler callback)
         {
             //empty string is not allowed as a context
-            if (context != string.Empty) 
+            if (context != string.Empty)
             {
                 Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler> contextList = [];
 
@@ -304,7 +304,7 @@ namespace KirosEngine3.Input
             if (Instance._eventRegistry.TryGetValue(context, out Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>? contextList))
             {
                 result = "";
-                foreach (var keh in contextList) 
+                foreach (var keh in contextList)
                 {
                     result += string.Format("Key: {1} EventType: {2} Count: {0} \n",
                         keh.Value.GetInvocationList().Length, keh.Key.Item1.ToString(), keh.Key.Item2.ToString());

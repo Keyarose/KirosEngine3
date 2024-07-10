@@ -420,6 +420,64 @@ namespace KirosEngine3.Math.Matrix
                 }
             }
         }
+
+        /// <summary>
+        /// Create a Matrix2x4 from the MatrixG's value, truncating what doesn't fit.
+        /// </summary>
+        /// <param name="strict">True enables strict fitting.</param>
+        /// <returns>The resulting Matrix2x4.</returns>
+        /// <exception cref="InvalidOperationException">Throw if strict is true and the matrix is not the correct size.</exception>
+        public Matrix2x4 AsMatrix2x4(bool strict = false)
+        {
+            if (strict)
+            {
+                if (RowCount != 2 || ColumnCount != 3)
+                    throw InvalidOpExceptionAsStructBuilder(RowCount, ColumnCount, nameof(Matrix2x4));
+
+                return new Matrix2x4(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[0, 2]), float.CreateTruncating(_m[0, 3]), float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]), float.CreateTruncating(_m[1, 2]), float.CreateTruncating(_m[2, 2]));
+            }
+            else
+            {
+                if (RowCount == 0)
+                {
+                    return new Matrix2x4();
+                }
+                else if (RowCount == 1)
+                {
+                    if (ColumnCount == 1)
+                    {
+                        return new Matrix2x4(float.CreateTruncating(_m[0, 0]), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                    }
+                    else if (ColumnCount == 2)
+                    {
+                        return new Matrix2x4(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                    }
+                    else if (ColumnCount == 3)
+                    {
+                        return new Matrix2x4(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[0, 2]), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                    }
+
+                    return new Matrix2x4(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[0, 2]), float.CreateTruncating(_m[0, 3]), 0.0f, 0.0f, 0.0f, 0.0f);
+                }
+                else
+                {
+                    if (ColumnCount == 1)
+                    {
+                        return new Matrix2x4(float.CreateTruncating(_m[0, 0]), 0.0f, 0.0f, 0.0f, float.CreateTruncating(_m[1, 0]), 0.0f, 0.0f, 0.0f);
+                    }
+                    else if (ColumnCount == 2)
+                    {
+                        return new Matrix2x4(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), 0.0f, 0.0f, float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]), 0.0f, 0.0f);
+                    }
+                    else if (ColumnCount == 3)
+                    {
+                        return new Matrix2x4(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[0, 2]), 0.0f, float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]), float.CreateTruncating(_m[1, 2]), 0.0f);
+                    }
+
+                    return new Matrix2x4(float.CreateTruncating(_m[0, 0]), float.CreateTruncating(_m[0, 1]), float.CreateTruncating(_m[0, 2]), float.CreateTruncating(_m[0, 3]), float.CreateTruncating(_m[1, 0]), float.CreateTruncating(_m[1, 1]), float.CreateTruncating(_m[1, 2]), float.CreateTruncating(_m[1, 3]));
+                }
+            }
+        }
         //todo: more structs
         #endregion
 

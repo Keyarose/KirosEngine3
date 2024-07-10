@@ -372,7 +372,7 @@ namespace KirosEngine3.Textures
 
         #region Draw
         /// <summary>
-        /// DrawGL the text using the OpenGL API.
+        /// Draw the text using the OpenGL API.
         /// </summary>
         /// <param name="vm">The view matrices to be used in rendering.</param>
         /// <param name="tu">The texture unit to be used in rendering.</param>

@@ -34,6 +34,7 @@ namespace KirosEngine3
         BaseCamera? camera;
 
         ScreenButton? testSButton;
+        TextBox? testTextBox;
 
         public TestClient(int width, int height) : base(width, height, "Test Client")
         {
@@ -52,13 +53,6 @@ namespace KirosEngine3
             TextureManager.TryAddTexture("wall", "Resources/Textures/wall.jpg");//debug texture
             //end test stuff
 
-            //gauss testing
-            MatrixG<float> gausTest = new MatrixG<float>([new VecG<float>([0, 0, 2, -4, -5, 2, 5]), new VecG<float>([0, 1, -1, 1, 3, 1, -1]), new VecG<float>([0, 6, 0, -6, 5, 16, 7])]);
-            MatrixG<float> gTest2 = new MatrixG<float>([new VecG<float>([1, 2, -1, 2, 1, 2]), new VecG<float>([-1, -2, 1, 2, 3, 6]), new VecG<float>([2, 4, -3, 2, 0, 3]), new VecG<float>([-3, -6, 2, 0, 3, 9])]);
-            Console.WriteLine(gTest2.ToString());
-            gTest2.ReducedRowEchelonGaussian();
-            Console.WriteLine(gTest2);
-            //end gauss testing
 
             GL.ClearColor((Color)new Color4(ConfigManager.Instance[ConfigKeys.D_CLEAR_COLOR_KEY]));//set clear color from config
             GL.Enable(EnableCap.DepthTest);
@@ -105,12 +99,14 @@ namespace KirosEngine3
             testSButton = new ScreenButton(new Vec2(100.0f, 0.0f), Color4.Yellow, new Vec2(200f, 300f), "color");
             testSButton.Init();
 
+            testTextBox = new TextBox(new Vec2(2.0f, 0f), new Vec2(798f, 300f), "inputbox", FontManager.Default, 50);
+            testTextBox.Init();
+
+            KeyboardEventManager.CurrentContext = testTextBox.InputContext;
+
             //testTexQ = new TexturedQuad(Quad.UnitQuad, "wall");
             testTexQ = new TexturedQuad([new(0f, 0f, 0f), new(200f, 0f, 0f), new(200f, 200f, 0f), new(0f, 200f, 0f)], [0, 1, 2, 2, 3, 0], "defaultFont");
             testTexQ.Init();
-
-            Matrix2x3 testM2 = new(0.2f, 0.7f, 2f, 87f, 3.5f, 7.887f);
-            Console.WriteLine(testM2.ToDrawString());
 
             //kem testing
             // KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B, KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
@@ -126,6 +122,8 @@ namespace KirosEngine3
             if (!IsFocused) { return; }
             //check keyboard state and notify subscribers
             KeyboardEventManager.Update(KeyboardState, args.Time);
+
+            testTextBox?.Update();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -156,6 +154,7 @@ namespace KirosEngine3
             //hud and 2d
             testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             testLabel?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            testTextBox?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //end hud and 2d
 
             SwapBuffers();
