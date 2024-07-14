@@ -68,7 +68,7 @@ namespace KirosEngine3
         }
 
         /// <summary>
-        /// OpenGL debug delegate _instance
+        /// OpenGL debug delegate instance
         /// </summary>
         private static DebugProc DebugDelegate = new DebugProc(OnDebugMessage);
 

@@ -41,7 +41,7 @@ namespace KirosEngine3
         protected int _currentLineCount = 0;
 
         /// <summary>
-        /// Accessor for the logger _instance
+        /// Accessor for the logger instance
         /// </summary>
         public static Logger Instance
         {
