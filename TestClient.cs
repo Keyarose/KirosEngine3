@@ -38,6 +38,7 @@ namespace KirosEngine3
 
         public TestClient(int width, int height) : base(width, height, "Test Client")
         {
+            //todo: load app config in program
             ConfigManager.AddVar(GRAPHICSMODE_KEY, GRAPHICSMODE_GL_VAL);//declare that we're using the OpenGL API
             if (!ConfigManager.LoadFromXML("Resources/Config/generalConfig.xml"))
             {
@@ -53,6 +54,7 @@ namespace KirosEngine3
             TextureManager.TryAddTexture("wall", "Resources/Textures/wall.jpg");//debug texture
             //end test stuff
 
+            //FontManager.CreateFont("arial16", "latin_sas_math_16pt.xml");
 
             GL.ClearColor((Color)new Color4(ConfigManager.Instance[ConfigKeys.D_CLEAR_COLOR_KEY]));//set clear color from config
             GL.Enable(EnableCap.DepthTest);
@@ -99,7 +101,7 @@ namespace KirosEngine3
             testSButton = new ScreenButton(new Vec2(100.0f, 0.0f), Color4.Yellow, new Vec2(200f, 300f), "color");
             testSButton.Init();
 
-            testTextBox = new TextBox(new Vec2(2.0f, 0f), new Vec2(798f, 300f), "inputbox", FontManager.Default, 50);
+            testTextBox = new TextBox(new Vec2(2.0f, 0f), new Vec2(798f, 300f), "inputbox", FontManager.GetFont("arial16"), 50);
             testTextBox.Init();
 
             KeyboardEventManager.CurrentContext = testTextBox.InputContext;
@@ -110,6 +112,7 @@ namespace KirosEngine3
 
             //kem testing
             // KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B, KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
+            MouseEventManager.SubscribeMouseEvent(MouseEventManager.GLOBAL_CONTEXT, Input.MouseButton.None, MouseEventType.Moved, (object sender, MouseEventArgs args) => { Console.WriteLine(args.ScreenPosition); });
 
             //ToString testing
             //Console.WriteLine(testQuad.ToString());
@@ -122,8 +125,10 @@ namespace KirosEngine3
             if (!IsFocused) { return; }
             //check keyboard state and notify subscribers
             KeyboardEventManager.Update(KeyboardState, args.Time);
+            MouseEventManager.Update(MouseState, args.Time);
 
             testTextBox?.Update();
+            DebugConsole.Instance?.Update();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -152,7 +157,8 @@ namespace KirosEngine3
             //testTexQ?.DrawGL(viewMatrixes, TextureUnit.Texture1);
 
             //hud and 2d
-            testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            DebugConsole.Instance?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            //testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             testLabel?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             testTextBox?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //end hud and 2d
@@ -167,13 +173,8 @@ namespace KirosEngine3
         protected override void OnResize(ResizeEventArgs e)
         {
             base.OnResize(e);
-
+            //todo: handle components that make use of window size
             GL.Viewport(0, 0, e.Width, e.Height);
-        }
-
-        protected override void OnTextInput(TextInputEventArgs e)
-        {
-            base.OnTextInput(e);//todo: explore usages, or ignore in favor of an agnostic method?
         }
 
         protected override void OnUnload()

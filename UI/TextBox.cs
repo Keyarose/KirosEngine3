@@ -3,16 +3,10 @@ using KirosEngine3.Math.Data;
 using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
-using KirosEngine3.Mesh.Primitives;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.UI
 {
@@ -117,6 +111,7 @@ namespace KirosEngine3.UI
         /// </summary>
         protected bool _activeTextChanged = false;
 
+        #region Properties
         /// <summary>
         /// The on screen position of the textbox.
         /// </summary>
@@ -162,6 +157,16 @@ namespace KirosEngine3.UI
         }
 
         /// <summary>
+        /// The maximum number of lines in the textbox.
+        /// </summary>
+        public int MaxLines
+        {
+            get { return _maxLines; }
+            set { _maxLines = value; }
+        }
+        #endregion
+
+        /// <summary>
         /// Basic constructor.
         /// </summary>
         /// <param name="position">The position in screen coordinates.</param>
@@ -169,14 +174,14 @@ namespace KirosEngine3.UI
         /// <param name="name">The name of the textbox component.</param>
         /// <param name="font">The font to be used.</param>
         /// <param name="maxLines">The maximum number of lines.</param>
-        public TextBox(Vec2 position, Vec2 size, string name, Font font, int maxLines)
+        public TextBox(Vec2 position, Vec2 size, string name, Font? font, int maxLines)
         {
             _position = position;
             _size = size;
             _name = name;
             //todo: clamp size to fit on screen
 
-            _font = font;
+            _font = font ?? FontManager.Default;
             _visibleLines = (int)(_size.Y / _font.Size);
 
             _maxLines = maxLines;
@@ -184,6 +189,9 @@ namespace KirosEngine3.UI
 
             _inputContext = "textbox-" + name;
             KeyboardEventManager.SubscribeKeyboardEvents(_inputContext, KeyboardEventManager.AlphaNum, KeyboardEventType.KeyPressed, OnKeyPress);
+            KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Space, KeyboardEventType.KeyPressed, OnKeyPress);
+            KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Backspace, KeyboardEventType.KeyPressed, OnKeyPress);
+            KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Enter, KeyboardEventType.KeyPressed, OnKeyPress);
             KeyboardEventManager.SubscribeKeyboardEvents(_inputContext, KeyboardEventManager.AlphaNum, KeyboardEventType.KeyHeld, OnKeyHeld);
         }
 
@@ -250,7 +258,7 @@ namespace KirosEngine3.UI
 
             //set the shader uniforms
             string[] shTexUniforms = sh.TextureUniforms;
-            for (int i = 0; i < shTexUniforms.Length; i++)
+            for (int i = 0; i < shTexUniforms.Length; i++)//todo: handle too few textureUnits
             {
                 sh.SetUniformIntGL(shTexUniforms[i], Texture.TextureUnitToInt(tu[i]));
             }
@@ -264,8 +272,10 @@ namespace KirosEngine3.UI
 
             if (_blendEnabled)
             {
+                
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+                GL.DepthFunc(DepthFunction.Lequal);
             }
 
             for (int i = 0; i < int.Min(_visibleLines - 1, _lines.Count); i++) //for each visible line, or all existing lines if fewer than vis lines
@@ -295,7 +305,10 @@ namespace KirosEngine3.UI
             GL.DrawElements(_drawMode, _aLIndices.Length, DrawElementsType.UnsignedInt, 0);
 
             if (_blendEnabled)
+            {
+                GL.DepthFunc(DepthFunction.Less);//return to default
                 GL.Disable(EnableCap.Blend);
+            }
 
             GL.BindVertexArray(0);
         }
@@ -312,7 +325,7 @@ namespace KirosEngine3.UI
                 for (int i = 0; i < int.Min(_visibleLines - 1, _lines.Count); i++) //for each line, except 1 reserved for the active line
                 {
                     Tuple<string, TexturedVertex2D[], uint[]> line = _lines[i + _scrollPos];//get the line based on an offset of scroll pos
-                    Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(line.Item1, _position + new Vec2(0, _font.Size * i));
+                    Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(line.Item1, new Vec2(0, _font.Size * i));
 
                     _lines[i] = new Tuple<string, TexturedVertex2D[], uint[]>(line.Item1, lineData.Item1, lineData.Item2);
                 }
@@ -326,9 +339,9 @@ namespace KirosEngine3.UI
         /// </summary>
         private void UpdateActiveText()
         {
-            if (_font != null) 
+            if (_font != null)
             {
-                Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(_activeLine, _position + new Vec2(0, _font.Size * _visibleLines - 1));//position at the last line
+                Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(_activeLine, new Vec2(0, _font.Size * _visibleLines - 1));//position at the last line
 
                 _aLVerts = lineData.Item1;
                 _aLIndices = lineData.Item2;
@@ -347,7 +360,7 @@ namespace KirosEngine3.UI
                 UpdateText();
             }
 
-            if(_activeTextChanged)
+            if (_activeTextChanged)
             {
                 UpdateActiveText();
             }
@@ -362,20 +375,25 @@ namespace KirosEngine3.UI
         /// <param name="args">The event arguments.</param>
         public void OnKeyPress(object sender, KeyboardEventArgs args)
         {
-            char nChar = (char)args.Key;
-
-            float lineLength = _font.TextWidth(_activeLine + nChar);
-            if (lineLength < Width)//if the line fits
+            char nChar;
+            if (args.Key == Keys.Backspace)
             {
-                _activeLine += nChar;
-                _activeTextChanged = true;
+                if (_activeLine.Length > 0) 
+                {
+                    _activeLine = _activeLine.Remove(_activeLine.Length - 1);//remove the last char
+                }
+                else
+                {
+                    //active line is 0
+                    //todo: if allowed bring the previous line back to active, if there is one
+                }
             }
-            else //if it doesn't
+            else if (args.Key == Keys.Enter)
             {
                 _lines.Add(new Tuple<string, TexturedVertex2D[], uint[]>(_activeLine, [], []));//store the line as is
-                _activeLine = "" + nChar;//and start a new one
+                _activeLine = "";//and start a new one
                 _scrollPos = (_scrollPos < _maxLines) ? _scrollPos++ : _maxLines;//cap scrollPos at max lines 
-                //todo: fix update jump
+                                                                                 //todo: fix update jump
 
                 if (_lines.Count > _maxLines)
                 {
@@ -384,6 +402,54 @@ namespace KirosEngine3.UI
 
                 _textChanged = true;
             }
+            else
+            {
+                if (KeyboardEventManager.AlphaNum.Contains(args.Key))
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                    {
+                        nChar = (char)args.Key;
+
+                    }
+                    else
+                    {
+                        nChar = char.ToLower((char)args.Key);
+                    }
+                }
+                else if (args.Key == Keys.Space)
+                {
+                    nChar = ' ';
+                }
+                else if (args.Key == Keys.Enter)
+                {
+                    nChar = '\n';
+                }
+                else
+                {
+                    nChar = '\u25A1';
+                }
+
+                float lineLength = _font.TextWidth(_activeLine + nChar);
+                if (lineLength < Width)//if the line fits
+                {
+                    _activeLine += nChar;
+                }
+                else //if it doesn't
+                {
+                    _lines.Add(new Tuple<string, TexturedVertex2D[], uint[]>(_activeLine, [], []));//store the line as is
+                    _activeLine = "" + nChar;//and start a new one
+                    _scrollPos = (_scrollPos < _maxLines) ? _scrollPos++ : _maxLines;//cap scrollPos at max lines 
+                                                                                     //todo: fix update jump
+
+                    if (_lines.Count > _maxLines)
+                    {
+                        _lines.RemoveAt(0);//remove the first line
+                    }
+
+                    _textChanged = true;
+                }
+            }
+            _activeTextChanged = true;
         }
 
         /// <summary>
