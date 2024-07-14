@@ -226,9 +226,9 @@ namespace KirosEngine3.Textures
         /// <param name="pos">The screen origin position of the text.</param>
         /// <param name="font">The font for the text to be rendered in.</param>
         /// <param name="text">The text to be rendered.</param>
-        public Text(Vec2 pos, Font font, string text)
+        public Text(Vec2 pos, Font? font, string text)
         {
-            _font = font;
+            _font = font ?? FontManager.Default;
             _shaderName = ShaderManager.DefaultTextShaderName ?? "";
             _pos = pos;
 

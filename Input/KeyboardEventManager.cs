@@ -14,15 +14,22 @@ namespace KirosEngine3.Input
         { get { return _instance ??= new KeyboardEventManager(); } }
 
         private string _context = "";
+        private string _previousContext = "";
         private static KeyboardState? _lastState;
         private static bool _capsLockState = false;
         private static bool _numLockState = false;
 
         /// <summary>
-        /// The current program context, which decides what key notifications to send out.
+        /// The current input context, which decides what key notifications to send out.
         /// </summary>
         public static string CurrentContext
-        { get { return Instance._context; } set { Instance._context = value; } }
+        { get { return Instance._context; } set { SetContext(value); } }
+
+        /// <summary>
+        /// The previous input context before the last assignment to the current context.
+        /// </summary>
+        public static string PreviousContext
+        { get { return Instance._previousContext; } }
 
         /// <summary>
         /// The global program context for key events that always need to be sent regardless of the current context.
@@ -55,6 +62,24 @@ namespace KirosEngine3.Input
             }
 
             //todo: other platform support.
+        }
+
+        /// <summary>
+        /// Set the current input context.
+        /// </summary>
+        /// <param name="context">The identifying string for the current context.</param>
+        public static void SetContext(string context)
+        {
+            Instance._previousContext = Instance._context;
+            Instance._context = context;
+        }
+
+        /// <summary>
+        /// Revert the current input context to the previous context.
+        /// </summary>
+        public static void RevertContext()
+        {
+            Instance._context = Instance._previousContext;
         }
 
         #region Add/Remove

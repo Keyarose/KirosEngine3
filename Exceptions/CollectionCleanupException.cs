@@ -26,7 +26,7 @@ namespace KirosEngine3.Exceptions
         public CollectionCleanupException(string message, Exception innerException) : base(message, innerException) { }
 
         /// <summary>
-        /// Initialize a new instance of the CollectionCleanupException class with a specified error message, and the name of the related collection.
+        /// Initialize a new _instance of the CollectionCleanupException class with a specified error message, and the name of the related collection.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="collectionName">The name of the collection that caused the error.</param>
@@ -36,7 +36,7 @@ namespace KirosEngine3.Exceptions
         }
 
         /// <summary>
-        /// Initialize a new instance of the CollectionCleanupException class with a specified error message, an inner exception, and the name of the related collection.
+        /// Initialize a new _instance of the CollectionCleanupException class with a specified error message, an inner exception, and the name of the related collection.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="collectionName">The name of the collection that caused the error.</param>

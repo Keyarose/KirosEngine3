@@ -20,7 +20,12 @@ namespace KirosEngine3.Textures
         private readonly Dictionary<string, Font> _fonts = [];
 
         /// <summary>
-        /// The singleton instance of the manager.
+        /// The default font.
+        /// </summary>
+        private static Font? _default;
+
+        /// <summary>
+        /// The singleton _instance of the manager.
         /// </summary>
         public static FontManager Instance
         { get { return _instance ??= new FontManager(); } }
@@ -32,11 +37,20 @@ namespace KirosEngine3.Textures
         {
             get
             {
-                if (TryGetFont(ConfigManager.Instance[ConfigKeys.D_FONT_NAME_KEY], out Font? f))
-                    return f;
+                if (_default != null)
+                    return _default;
                 else
-                    throw new MissingConfigException(string.Format("Default font name is not configured or incorrect. Name: {0}", ConfigKeys.D_FONT_NAME_KEY));
+                    throw new MissingConfigException("Default font is not set.");
             }
+        }
+
+        /// <summary>
+        /// Set the default font to the given one.
+        /// </summary>
+        /// <param name="font">The font to set as default.</param>
+        public static void SetDefault(Font font)
+        {
+            _default = font;
         }
 
         /// <summary>
@@ -95,6 +109,18 @@ namespace KirosEngine3.Textures
         public static bool TryRemoveFont(string name)
         {
             return Instance._fonts.Remove(name);
+        }
+
+        /// <summary>
+        /// Get the font represented by the given name if it exists.
+        /// </summary>
+        /// <param name="name">The name of the font.</param>
+        /// <returns>The font for the name, or null.</returns>
+        public static Font? GetFont(string name)
+        {
+            Instance._fonts.TryGetValue(name, out Font? fnt);
+
+            return fnt;
         }
 
         /// <summary>

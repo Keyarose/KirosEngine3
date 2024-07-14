@@ -29,12 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Fonts\latin_sas_math_16pt.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Fonts\latin_sas_math_16pt_0.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\Shaders\FontShader_default.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

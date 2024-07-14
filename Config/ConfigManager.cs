@@ -109,17 +109,34 @@ namespace KirosEngine3.Config
                             default:
                                 Console.WriteLine("Unhanded directory name: {1} encountered in {0}, is it a typo or did someone forget a case?", xmlFile, cdd.DirectoryName);
                                 Logger.WriteToLog("Unhanded directory name: {1} encountered in {0}, is it a typo or did someone forget a case?", xmlFile, cdd.DirectoryName);
-                                //todo: write to debug
+                                
                                 break;
                         }
                     }
 
-                    //default font config
-                    AddVar(ConfigKeys.D_FONT_NAME_KEY, data.Defaults.DefaultFont.DefaultFontName);
-                    FontManager.CreateFont(data.Defaults.DefaultFont.DefaultFontName, data.Defaults.DefaultFont.DefaultFontFile + data.Defaults.DefaultFont.FileType);
+                    //load fonts and set the default one
+                    foreach (ConfigDefaultFont df in data.Defaults.DefaultFonts)
+                    {
+                        FontManager.CreateFont(df.DefaultFontName, df.DefaultFontFile + df.FileType);
+
+                        if (df.Default)
+                        {
+                            if (FontManager.TryGetFont(df.DefaultFontName, out Font? fnt))
+                            {
+                                FontManager.SetDefault(fnt);
+                            }
+                            else
+                            {
+                                throw new Exception(string.Format("Failed to initialize default font. Name: {0}", df.DefaultFontName));
+                            }
+                        }
+                    }
 
                     //load default shaders
                     LoadDefaultShaderData(data.Defaults.DefaultShaders);
+
+                    //load debug console, requires both fonts and shaders to load first
+                    LoadDebugConsole(data.SystemUI.DebugConsoleValues);
 
                     //load colors
                     var clearColor = data.Defaults.DefaultColors.Where(colors => colors.Name.Equals("clearColor")).First();
@@ -139,6 +156,43 @@ namespace KirosEngine3.Config
             }
 
             return false;
+        }
+
+        private static void LoadDebugConsole(ConfigDebugConsole consoleSettings)
+        {
+            if (!TryGetVar("ScreenWidth", out string? widthStr))
+                throw new MissingConfigException("Screen Width was not set.");
+
+            int screenWidth = int.Parse(widthStr);
+
+            if (!TryGetVar("ScreenHeight", out string? heightStr))
+                throw new MissingConfigException("Screen Height was not set.");
+
+            int screenHeight = int.Parse(heightStr);
+
+            //todo: exception handling
+            //parse settings
+            float posPercent = float.Parse(consoleSettings.PosX.TrimEnd(['%', ' '])) / 100f;
+            int posX = (int)(posPercent * screenWidth);
+
+            float posYPer = float.Parse(consoleSettings.PosY.TrimEnd(['%', ' '])) / 100f;
+            int posY = (int)(posYPer * screenHeight);
+
+            float widthPer = float.Parse(consoleSettings.Width.TrimEnd(['%', ' '])) / 100f;
+            int width = (int)(widthPer * screenWidth);
+
+            float heightPer = float.Parse(consoleSettings.Height.TrimEnd(['%', ' '])) / 100f;
+            int height = (int)(heightPer * screenHeight);
+
+            int maxLine = int.Parse(consoleSettings.MaxLines);
+
+            if (!FontManager.TryGetFont(consoleSettings.Font, out Font? font))
+            {
+                Console.WriteLine("Font for Debug Console not found, are you trying to load it after the console?");
+                Logger.WriteToLog("Font for Debug Console not found, are you trying to load it after the console?");
+            }
+
+            DebugConsole.Create(posX, posY, width, height, maxLine, font);
         }
 
         /// <summary>

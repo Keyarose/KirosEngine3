@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Math.Vector;
+﻿using KirosEngine3.Config;
+using KirosEngine3.Math.Vector;
 using KirosEngine3.testclients;
 
 namespace KirosEngine3
@@ -17,7 +18,9 @@ namespace KirosEngine3
             }
             else 
             {
-                using Client client = new TestClient(800, 600);
+                ConfigManager.AddVar("ScreenWidth", "1200");
+                ConfigManager.AddVar("ScreenHeight", "900");
+                using Client client = new TestClient(1200, 900);
                 client.Run();
             }
         }

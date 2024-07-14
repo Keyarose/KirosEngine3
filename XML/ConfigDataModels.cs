@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace KirosEngine3.XML
 {
@@ -19,6 +14,12 @@ namespace KirosEngine3.XML
         /// </summary>
         [XmlElement("defaults")]
         public ConfigDefaults Defaults { get; set; }
+
+        /// <summary>
+        /// The system UI section of the config data.
+        /// </summary>
+        [XmlElement("systemUI")]
+        public ConfigSystemUI SystemUI { get; set; }
     }
 
     /// <summary>
@@ -36,8 +37,9 @@ namespace KirosEngine3.XML
         /// <summary>
         /// The default font section.
         /// </summary>
-        [XmlElement("font")]
-        public ConfigDefaultFont DefaultFont { get; set; }
+        [XmlArray("fonts")]
+        [XmlArrayItem("font")]
+        public ConfigDefaultFont[] DefaultFonts { get; set; }
 
         /// <summary>
         /// The default shaders section.
@@ -94,6 +96,12 @@ namespace KirosEngine3.XML
         /// </summary>
         [XmlAttribute("fType")]
         public string FileType { get; set; }
+
+        /// <summary>
+        /// Flag to indicate if the font is the default, should be set true for only one.
+        /// </summary>
+        [XmlAttribute("default")]
+        public bool Default { get; set; }
     }
 
     //todo: move to xml as ShaderDataStruct.cs
@@ -184,5 +192,59 @@ namespace KirosEngine3.XML
         /// </summary>
         [XmlAttribute("a")]
         public string AValue { get; set; }
+    }
+
+    /// <summary>
+    /// Data structure for system UI.
+    /// </summary>
+    public struct ConfigSystemUI
+    {
+        /// <summary>
+        /// The settings for the debug console.
+        /// </summary>
+        [XmlElement("debugConsole")]
+        public ConfigDebugConsole DebugConsoleValues { get; set; }
+    }
+
+    /// <summary>
+    /// Data structure for the debug console settings.
+    /// </summary>
+    public struct ConfigDebugConsole
+    {
+        /// <summary>
+        /// The X position of the debug console in screen coordinates.
+        /// </summary>
+        [XmlAttribute("posX")]
+        public string PosX { get; set; }
+
+        /// <summary>
+        /// The Y position of the debug console in screen coordinates.
+        /// </summary>
+        [XmlAttribute("posY")]
+        public string PosY { get; set; }
+
+        /// <summary>
+        /// The width of the debug console.
+        /// </summary>
+        [XmlAttribute("width")]
+        public string Width { get; set; }
+
+        /// <summary>
+        /// The height of the debug console.
+        /// </summary>
+        [XmlAttribute("height")]
+        public string Height { get; set; }
+
+        /// <summary>
+        /// The maximum number of lines in the console's textbox.
+        /// </summary>
+        [XmlAttribute("maxLines")]
+        public string MaxLines { get; set; }
+
+        /// <summary>
+        /// The name of the font to use in the console.
+        /// </summary>
+        [XmlAttribute("font")]
+        public string Font { get; set; }
     }
 }

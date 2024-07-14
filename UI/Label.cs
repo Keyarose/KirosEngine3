@@ -122,7 +122,7 @@ namespace KirosEngine3.UI
         /// <param name="size">The size of the label.</param>
         /// <param name="font">The font to be used for the text.</param>
         /// <param name="text">The text of the label.</param>
-        public Label(Vec2 pos, Vec2 size, Font font, string text) : this(pos, size, font, text, null) { }
+        public Label(Vec2 pos, Vec2 size, Font? font, string text) : this(pos, size, font, text, null) { }
 
         /// <summary>
         /// Construct a Label of the given size using the provided font and text.
@@ -132,7 +132,7 @@ namespace KirosEngine3.UI
         /// <param name="font">The font to be used for the text.</param>
         /// <param name="text">The text of the label.</param>
         /// <param name="attached">The UIElement described by the Label.</param>
-        public Label(Vec2 pos, Vec2 size, Font font, string text, UIElement? attached)
+        public Label(Vec2 pos, Vec2 size, Font? font, string text, UIElement? attached)
         {
             _size = size;
             _labelText = new Text(pos, font, text);
