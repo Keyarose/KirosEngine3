@@ -176,6 +176,22 @@ namespace KirosEngine3.Mesh
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Vertex2D : IVertex2D
+    {
+        /// <inheritdoc/>
+        public Vec2 Position { get; set; }
+
+        /// <summary>
+        /// The size of the vertex in bytes.
+        /// </summary>
+        public static readonly int SizeInBytesU = Unsafe.SizeOf<Vertex2D>();
+    }
+
+    /// <summary>
     /// A 2D colored vertex.
     /// </summary>
     [Serializable]

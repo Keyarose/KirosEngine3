@@ -3,6 +3,7 @@ using KirosEngine3.Math.Data;
 using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
+using KirosEngine3.Mesh.Primitives;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
 using OpenTK.Graphics.OpenGL4;
@@ -13,18 +14,9 @@ namespace KirosEngine3.UI
     /// <summary>
     /// A textbox UI element.
     /// </summary>
-    public class TextBox
+    public class TextBox : UIElement
     {
         //origin at upper left
-        /// <summary>
-        /// The position of the textbox in screen coordinates.
-        /// </summary>
-        protected Vec2 _position;
-
-        /// <summary>
-        /// The size of the textbox in screen coordinates.
-        /// </summary>
-        protected Vec2 _size;
 
         /// <summary>
         /// The unique name of the textbox.
@@ -78,10 +70,13 @@ namespace KirosEngine3.UI
         /// </summary>
         protected int _maxLines;
 
+        private Vertex2D[] _borderVerts = new Vertex2D[6];
+        private uint[] _borderIndices = new uint[14];
 
         private int _VAO;
         private int[] _VBO = [];
         private int[] _EBO = [];
+        private int _borderVBO;
 
         /// <summary>
         /// Flag that shows if blend is enabled.
@@ -92,6 +87,7 @@ namespace KirosEngine3.UI
         /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
+        #region Flags
         /// <summary>
         /// Flag that shows if the textbox has been loaded
         /// </summary>
@@ -110,12 +106,13 @@ namespace KirosEngine3.UI
         /// Flag that shows if the active text has changed since the last update
         /// </summary>
         protected bool _activeTextChanged = false;
+        #endregion
 
         #region Properties
         /// <summary>
         /// The on screen position of the textbox.
         /// </summary>
-        public Vec2 Position
+        public override Vec2 Position
         {
             get { return _position; }
             set { _position = value; }//todo: clamp to prevent the box from going off screen
@@ -124,7 +121,7 @@ namespace KirosEngine3.UI
         /// <summary>
         /// The size of the textbox.
         /// </summary>
-        public Vec2 Size
+        public override Vec2 Size
         {
             get { return _size; }
             set { _size = value; }//todo: clamp to prevent off screen flow
@@ -133,7 +130,7 @@ namespace KirosEngine3.UI
         /// <summary>
         /// The width of the textbox.
         /// </summary>
-        public float Width
+        public override float Width
         {
             get { return _size.X; }
             set { _size.X = value; }//todo: clamp to prevent off screen flow
@@ -142,7 +139,7 @@ namespace KirosEngine3.UI
         /// <summary>
         /// The height of the textbox.
         /// </summary>
-        public float Height
+        public override float Height
         {
             get { return _size.Y; }
             set { _size.Y = value; }//todo: clamp
@@ -192,6 +189,8 @@ namespace KirosEngine3.UI
             KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Space, KeyboardEventType.KeyPressed, OnKeyPress);
             KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Backspace, KeyboardEventType.KeyPressed, OnKeyPress);
             KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Enter, KeyboardEventType.KeyPressed, OnKeyPress);
+            KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Up, KeyboardEventType.KeyPressed, OnKeyPress);
+            KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Down, KeyboardEventType.KeyPressed, OnKeyPress);
             KeyboardEventManager.SubscribeKeyboardEvents(_inputContext, KeyboardEventManager.AlphaNum, KeyboardEventType.KeyHeld, OnKeyHeld);
         }
 
@@ -200,18 +199,30 @@ namespace KirosEngine3.UI
         /// Initialize the textbox.
         /// </summary>
         /// <returns>True if successful.</returns>
-        public bool Init()
+        public override bool Init()
         {
-            _VBO = new int[_visibleLines];
+            _VBO = new int[_visibleLines];//one for each line
             _EBO = new int[_visibleLines];
 
             _VAO = GL.GenVertexArray();
             GL.BindVertexArray(_VAO);
 
-            GL.GenBuffers(_visibleLines, _VBO);
-            GL.GenBuffers(_visibleLines, _EBO);
+            GL.GenBuffers(_VBO.Length, _VBO);
+            GL.GenBuffers(_EBO.Length, _EBO);
+            _borderVBO = GL.GenBuffer();
 
             GL.BindVertexArray(0);
+
+            //define border verts
+            float abvLL = _font.Size * (_visibleLines - 1) - 1;//one px above last line
+            _borderVerts[0] = new Vertex2D { Position = _position};
+            _borderVerts[1] = new Vertex2D { Position = new Vec2(Width, _position.Y) };
+            _borderVerts[2] = new Vertex2D { Position = new Vec2(Width, abvLL + _position.Y) };
+            _borderVerts[3] = new Vertex2D { Position = _position + new Vec2(0f, abvLL) };
+            _borderVerts[4] = new Vertex2D { Position = new Vec2(_position.X, Height + _position.Y) };
+            _borderVerts[5] = new Vertex2D { Position = _size + _position };
+
+            _borderIndices = [0, 1, 1, 2, 2, 3, 3, 0, 3, 4, 4, 5, 5, 2];
 
             _loaded = true;
             return true;
@@ -219,12 +230,18 @@ namespace KirosEngine3.UI
         #endregion
 
         #region Draw
+        /// <inheritdoc/>
+        public override void Draw()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Draw the textbox using the OpenGL API.
         /// </summary>
         /// <param name="vm">The view matrices to be used in rendering.</param>
         /// <param name="tu">The texture units to be used in rendering.</param>
-        public void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
+        public override void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
         {
             if (!_loaded || _disposed)
             {
@@ -278,7 +295,7 @@ namespace KirosEngine3.UI
                 GL.DepthFunc(DepthFunction.Lequal);
             }
 
-            for (int i = 0; i < int.Min(_visibleLines - 1, _lines.Count); i++) //for each visible line, or all existing lines if fewer than vis lines
+            for (int i = 0; i < int.Min(_visibleLines - 1, _lines.Count - _scrollPos); i++) //for each visible line, or all existing lines if fewer than vis lines
             {
                 Tuple<string, TexturedVertex2D[], uint[]> line = _lines[_scrollPos + i];
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO[i]);
@@ -304,6 +321,12 @@ namespace KirosEngine3.UI
             sh.SetUVAttribGL(new ShaderAttribSettings { Offset = TexturedVertex2D.UVOffset, Size = 2, Stride = TexturedVertex2D.SizeInBytesU });
             GL.DrawElements(_drawMode, _aLIndices.Length, DrawElementsType.UnsignedInt, 0);
 
+            //draw the border if enabled
+            if (_border)
+            {
+                DrawBorder(vm);
+            }
+
             if (_blendEnabled)
             {
                 GL.DepthFunc(DepthFunction.Less);//return to default
@@ -311,6 +334,38 @@ namespace KirosEngine3.UI
             }
 
             GL.BindVertexArray(0);
+        }
+
+        /// <inheritdoc/>
+        public override void DrawDX()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DrawBorder(ViewMatrixes vm)
+        {
+            //get the color shader
+            if (!ShaderManager.TryGetShader(ShaderManager.DefaultColor2DShaderName, out Shader? sh))
+            {
+                Console.WriteLine("Cannot draw border for {0} when default color shader is null.", nameof(TextBox));
+                Logger.WriteToLog("Cannot draw border for {0} when default color shader is null.", nameof(TextBox));
+                return;
+            }
+
+            sh.UseGL();
+            sh.SetUniformMat4GL("model", vm.Model);
+            sh.SetUniformMat4GL("proj", vm.UIOrtho);
+            sh.SetUniformVec4GL("aColor", (Vec4)_borderColor);
+
+            //buffer border
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _borderVBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, Vertex2D.SizeInBytesU * _borderVerts.Length, _borderVerts, BufferUsageHint.StaticDraw);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO[_visibleLines - 1]);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _borderIndices.Length, _borderIndices, BufferUsageHint.StaticDraw);
+
+            sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vertex2D.SizeInBytesU });
+            GL.DrawElements(PrimitiveType.Lines, _borderIndices.Length, DrawElementsType.UnsignedInt, 0);
         }
         #endregion
 
@@ -322,12 +377,12 @@ namespace KirosEngine3.UI
         {
             if (_font != null)
             {
-                for (int i = 0; i < int.Min(_visibleLines - 1, _lines.Count); i++) //for each line, except 1 reserved for the active line
+                for (int i = 0; i < int.Min(_visibleLines - 1, _lines.Count - _scrollPos); i++) //for each line, except 1 reserved for the active line
                 {
                     Tuple<string, TexturedVertex2D[], uint[]> line = _lines[i + _scrollPos];//get the line based on an offset of scroll pos
                     Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(line.Item1, new Vec2(0, _font.Size * i));
 
-                    _lines[i] = new Tuple<string, TexturedVertex2D[], uint[]>(line.Item1, lineData.Item1, lineData.Item2);
+                    _lines[i + _scrollPos] = new Tuple<string, TexturedVertex2D[], uint[]>(line.Item1, lineData.Item1, lineData.Item2);
                 }
 
                 _textChanged = false;
@@ -341,7 +396,7 @@ namespace KirosEngine3.UI
         {
             if (_font != null)
             {
-                Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(_activeLine, new Vec2(0, _font.Size * _visibleLines - 1));//position at the last line
+                Tuple<TexturedVertex2D[], uint[]> lineData = _font.QuadsForString(_activeLine, new Vec2(0, _font.Size * (_visibleLines - 1)));//position at the last line
 
                 _aLVerts = lineData.Item1;
                 _aLIndices = lineData.Item2;
@@ -364,6 +419,14 @@ namespace KirosEngine3.UI
             {
                 UpdateActiveText();
             }
+        }
+
+        /// <summary>
+        /// Do updates and changes that need to be done when the box or it's parent container have be resized.
+        /// </summary>
+        public void OnResize()
+        {
+            //todo:
         }
         #endregion
 
@@ -392,14 +455,34 @@ namespace KirosEngine3.UI
             {
                 _lines.Add(new Tuple<string, TexturedVertex2D[], uint[]>(_activeLine, [], []));//store the line as is
                 _activeLine = "";//and start a new one
-                _scrollPos = (_scrollPos < _maxLines) ? _scrollPos++ : _maxLines;//cap scrollPos at max lines 
-                                                                                 //todo: fix update jump
+
+                if (_lines.Count > _visibleLines - 1)//if we're over the number of lines visible in the box
+                {
+                    if (_scrollPos < _maxLines)
+                    {
+                        _scrollPos++;
+                    }
+                }
 
                 if (_lines.Count > _maxLines)
                 {
                     _lines.RemoveAt(0);//remove the first line
                 }
 
+                _textChanged = true;
+            }
+            else if (args.Key == Keys.Up)
+            {
+                //scroll up
+                _scrollPos--;
+                _scrollPos = int.Clamp(_scrollPos, 0, _lines.Count - 1);
+                _textChanged = true;
+            }
+            else if (args.Key == Keys.Down)
+            {
+                //scroll down
+                _scrollPos++;
+                _scrollPos = int.Clamp(_scrollPos, 0, _lines.Count - 1);//todo: allow scrolling to be configured to not scroll until only one line shows
                 _textChanged = true;
             }
             else
@@ -438,8 +521,13 @@ namespace KirosEngine3.UI
                 {
                     _lines.Add(new Tuple<string, TexturedVertex2D[], uint[]>(_activeLine, [], []));//store the line as is
                     _activeLine = "" + nChar;//and start a new one
-                    _scrollPos = (_scrollPos < _maxLines) ? _scrollPos++ : _maxLines;//cap scrollPos at max lines 
-                                                                                     //todo: fix update jump
+                    if (_lines.Count > _visibleLines - 1)//if we're over the number of lines visible in the box
+                    {
+                        if (_scrollPos < _maxLines)
+                        {
+                            _scrollPos++;
+                        }
+                    }
 
                     if (_lines.Count > _maxLines)
                     {
@@ -460,7 +548,7 @@ namespace KirosEngine3.UI
         public void OnKeyHeld(object sender, KeyboardEventArgs args)
         {
 
-            _textChanged = true;
+            //_textChanged = true;
         }
         #endregion
     }

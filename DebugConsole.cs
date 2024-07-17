@@ -124,6 +124,7 @@ namespace KirosEngine3
         {
             _mousePosLabel.Init();
             _textBox.Init();
+            _textBox.Border = true;
         }
         #endregion
 

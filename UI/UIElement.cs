@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Math.Vector;
+﻿using KirosEngine3.Math.Data;
+using KirosEngine3.Math.Vector;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,27 @@ namespace KirosEngine3.UI
         /// <summary>
         /// The position of the element on screen.
         /// </summary>
-        protected Vec2 _screenPos;
+        protected Vec2 _position;
 
         /// <summary>
         /// The size of the element.
         /// </summary>
         protected Vec2 _size;
+
+        /// <summary>
+        /// Enable or disable the drawing of the element's border.
+        /// </summary>
+        protected bool _border;
+
+        /// <summary>
+        /// The width of the border lines in px.
+        /// </summary>
+        protected int _borderWidth;
+
+        /// <summary>
+        /// The color of the border, defaults to black.
+        /// </summary>
+        protected Color4 _borderColor = Color4.Black;
 
         /// <summary>
         /// The element that contains this one.
@@ -31,27 +47,42 @@ namespace KirosEngine3.UI
         /// <summary>
         /// The UI element's position.
         /// </summary>
-        public virtual Vec2 Position { get { return _screenPos; } set { _screenPos = value; } }
+        public virtual Vec2 Position { get { return _position; } set { _position = value; } }
 
         /// <summary>
         /// The size of the UI element.
         /// </summary>
-        public Vec2 Size { get { return _size; } set { _size = value; } }
+        public virtual Vec2 Size { get { return _size; } set { _size = value; } }
 
         /// <summary>
         /// The width of the UI element.
         /// </summary>
-        public float Width { get { return _size.X; } set { _size.X = value; } }
+        public virtual float Width { get { return _size.X; } set { _size.X = value; } }
 
         /// <summary>
         /// The height of the UI element.
         /// </summary>
-        public float Height { get { return _size.Y; } set { _size.Y = value; } }
+        public virtual float Height { get { return _size.Y; } set { _size.Y = value; } }
+
+        /// <summary>
+        /// Enable or disable the drawing of a border around the UIElement.
+        /// </summary>
+        public virtual bool Border { get { return _border; } set { _border = value; } }
+
+        /// <summary>
+        /// The width of the border in px.
+        /// </summary>
+        public virtual int BorderWidth { get { return _borderWidth; } set { _borderWidth = value; } }
+
+        /// <summary>
+        /// The color of the element's border.
+        /// </summary>
+        public virtual Color4 BorderColor { get { return _borderColor; } set { _borderColor = value; } }
 
         /// <summary>
         /// The parent UI Element to this one.
         /// </summary>
-        public UIElement? Parent { get { return _containingElement; } set { _containingElement = value; } }
+        public virtual UIElement? Parent { get { return _containingElement; } set { _containingElement = value; } }
 
         /// <summary>
         /// Load the UI element and prepare it for rendering.

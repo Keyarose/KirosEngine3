@@ -54,8 +54,6 @@ namespace KirosEngine3
             TextureManager.TryAddTexture("wall", "Resources/Textures/wall.jpg");//debug texture
             //end test stuff
 
-            //FontManager.CreateFont("arial16", "latin_sas_math_16pt.xml");
-
             GL.ClearColor((Color)new Color4(ConfigManager.Instance[ConfigKeys.D_CLEAR_COLOR_KEY]));//set clear color from config
             GL.Enable(EnableCap.DepthTest);
             //GL.Enable(EnableCap.DebugOutput);
@@ -110,10 +108,6 @@ namespace KirosEngine3
             testTexQ = new TexturedQuad([new(0f, 0f, 0f), new(200f, 0f, 0f), new(200f, 200f, 0f), new(0f, 200f, 0f)], [0, 1, 2, 2, 3, 0], "defaultFont");
             testTexQ.Init();
 
-            //kem testing
-            // KeyboardEventManager.SubscribeKeyboardEvent("system", Keys.B, KeyboardEventType.KeyHeld, (object sender, KeyboardEventArgs args) => { testLine!.End += new Vec3(0.0f, 0.001f, 0.0f); });
-            MouseEventManager.SubscribeMouseEvent(MouseEventManager.GLOBAL_CONTEXT, Input.MouseButton.None, MouseEventType.Moved, (object sender, MouseEventArgs args) => { Console.WriteLine(args.ScreenPosition); });
-
             //ToString testing
             //Console.WriteLine(testQuad.ToString());
         }
@@ -160,7 +154,7 @@ namespace KirosEngine3
             DebugConsole.Instance?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             testLabel?.DrawGL(viewMatrixes, TextureUnit.Texture0);
-            testTextBox?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            //testTextBox?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //end hud and 2d
 
             SwapBuffers();
