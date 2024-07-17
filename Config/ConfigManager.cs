@@ -233,9 +233,24 @@ namespace KirosEngine3.Config
                     }
                 }
 
-                if (shader.DefaultFor != null && shader.DefaultFor.Equals("text"))
+                if (shader.DefaultFor != null)
                 {
-                    AddVar(ConfigKeys.D_SHADER_TEXT_NAME_KEY, shader.ShaderName);
+                    switch(shader.DefaultFor) 
+                    {
+                        case "text":
+                            ShaderManager.DefaultTextShaderName = shader.ShaderName;
+                            break;
+                        case "color":
+                            ShaderManager.DefaultColorShaderName = shader.ShaderName;
+                            break;
+                        case "color2d":
+                            ShaderManager.DefaultColor2DShaderName = shader.ShaderName;
+                            break;
+                        default:
+                            Console.WriteLine("Shader defaultFor: {0} is not a handled case.", shader.DefaultFor);
+                            Logger.WriteToLog("Shader defaultFor: {0} is not a handled case.", shader.DefaultFor);
+                            break;
+                    }
                 }
 
                 ShaderManager.CreateShader(shader.ShaderName, vertPath, fragPath, attribNames);
@@ -360,10 +375,6 @@ namespace KirosEngine3.Config
         /// Default font name key.
         /// </summary>
         public const string D_FONT_NAME_KEY = "dFontName";
-        /// <summary>
-        /// Default shader for text name key.
-        /// </summary>
-        public const string D_SHADER_TEXT_NAME_KEY = "dShTextName";
         /// <summary>
         /// Default clear color key.
         /// </summary>

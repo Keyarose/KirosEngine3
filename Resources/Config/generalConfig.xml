@@ -24,8 +24,11 @@
         <shaderAttribute name="aUV" type="uv" value="vec2"/>
         <shaderAttribute name="aPosition" type="position" value="vec3"/>
       </shader>
-      <shader name="pos" vertShader="PosShader.vert" fragShader="PosShader.frag">
+      <shader name="pos" vertShader="PosShader.vert" fragShader="PosShader.frag" defaultFor="color">
         <shaderAttribute name="aPosition" type="position" value="vec3"/>
+      </shader>
+      <shader name="pos2d" vertShader="Pos2DColor.vert" fragShader="Pos2DColor.frag" defaultFor="color2d">
+        <shaderAttribute name="aPosition" type="position" value="vec2"/>
       </shader>
     </shaders>
     <colors>

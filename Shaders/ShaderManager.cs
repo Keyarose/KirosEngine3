@@ -15,6 +15,10 @@ namespace KirosEngine3.Shaders
     public sealed class ShaderManager
     {
         private static ShaderManager? _instance;
+
+        private static string _defaultTextShaderName = string.Empty;
+        private static string _defaultColorShaderName = string.Empty;
+        private static string _defaultColor2DShaderName = string.Empty;
         
         private readonly Dictionary<string, Shader> _shaders = [];
 
@@ -49,6 +53,7 @@ namespace KirosEngine3.Shaders
             }
         }
 
+        #region Default Shaders
         /// <summary>
         /// The default text shader for the system if there is one.
         /// </summary>
@@ -56,19 +61,17 @@ namespace KirosEngine3.Shaders
         {
             get
             {
-                if (DefaultTextShaderName != null)//get the name of the default text shader if there is one
+                if (_defaultTextShaderName != string.Empty)//get the name of the default text shader if there is one
                 {
                     if (TryGetShader(DefaultTextShaderName, out Shader? sh))//get the default text shader
                         return sh;
                     else
-                    {
-                        throw new MissingConfigException(string.Format("Shader named: {0} not found despite supposed to have been loaded from config.", DefaultTextShaderName));
-                    }
+                        throw new MissingConfigException(string.Format("Shader named: {0} not found despite supposedly having been loaded from config.", DefaultTextShaderName));
                 }
                 else
                 {
-                    Console.WriteLine("Default Text Shader is not configured or the wrong key was used: {0}", ConfigKeys.D_SHADER_TEXT_NAME_KEY);
-                    Logger.WriteToLog("Default Text Shader is not configured or the wrong key was used: {0}", ConfigKeys.D_SHADER_TEXT_NAME_KEY);
+                    Console.WriteLine("Default Text Shader is not configured or the wrong name was used: {0}", _defaultTextShaderName);
+                    Logger.WriteToLog("Default Text Shader is not configured or the wrong name was used: {0}", _defaultTextShaderName);
                     return null;
                 }
             }
@@ -77,22 +80,74 @@ namespace KirosEngine3.Shaders
         /// <summary>
         /// The name of the default text shader if there is one.
         /// </summary>
-        public static string? DefaultTextShaderName
+        public static string DefaultTextShaderName
         {
-            get 
+            get { return _defaultTextShaderName; } set { _defaultTextShaderName = value; }
+        }
+
+        /// <summary>
+        /// Get or set the name of the default color shader.
+        /// </summary>
+        public static string DefaultColorShaderName
+        {
+            get { return _defaultColorShaderName; } set { _defaultColorShaderName = value; }
+        }
+
+        /// <summary>
+        /// The default shader for simple color shading.
+        /// </summary>
+        public static Shader? DefaultColorShader
+        {
+            get
             {
-                if (ConfigManager.TryGetVar(ConfigKeys.D_SHADER_TEXT_NAME_KEY, out string? sName))//get the name of the default text shader if there is one
+                if (_defaultColorShaderName != string.Empty)
                 {
-                    return sName;
+                    if (TryGetShader(_defaultColorShaderName, out Shader? sh))//get the default color shader
+                        return sh;
+                    else
+                        throw new MissingConfigException(string.Format("Shader named: {0} not found despite supposedly having been loaded from config.", _defaultColorShaderName));
                 }
                 else
                 {
-                    Console.WriteLine("Default Text Shader is not configured or the wrong key was used: {0}", ConfigKeys.D_SHADER_TEXT_NAME_KEY);
-                    Logger.WriteToLog("Default Text Shader is not configured or the wrong key was used: {0}", ConfigKeys.D_SHADER_TEXT_NAME_KEY);
+                    Console.WriteLine("Default Color Shader is not configured or the wrong name was used: {0}", _defaultColorShaderName);
+                    Logger.WriteToLog("Default Color Shader is not configured or the wrong name was used: {0}", _defaultColorShaderName);
                     return null;
                 }
             }
         }
+
+        /// <summary>
+        /// Get or set the name of the default 2D color shader.
+        /// </summary>
+        public static string DefaultColor2DShaderName
+        {
+            get { return _defaultColor2DShaderName; }
+            set { _defaultColor2DShaderName = value; }
+        }
+
+        /// <summary>
+        /// The default shader for simple 2D color shading.
+        /// </summary>
+        public static Shader? DefaultColor2DShader
+        {
+            get
+            {
+                if (_defaultColor2DShaderName != string.Empty)
+                {
+                    if (TryGetShader(_defaultColor2DShaderName, out Shader? sh))//get the default color shader
+                        return sh;
+                    else
+                        throw new MissingConfigException(string.Format("Shader named: {0} not found despite supposedly having been loaded from config.", _defaultColor2DShaderName));
+                }
+                else
+                {
+                    Console.WriteLine("Default 2D Color Shader is not configured or the wrong name was used: {0}", _defaultColor2DShaderName);
+                    Logger.WriteToLog("Default 2D Color Shader is not configured or the wrong name was used: {0}", _defaultColor2DShaderName);
+                    return null;
+                }
+            }
+        }
+        #endregion
 
         /// <inheritdoc cref="AddShader(string, string, string)"/>
         public static void CreateShader(string name, string vertPath, string fragPath)
