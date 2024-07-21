@@ -384,7 +384,7 @@ namespace KirosEngine3.Textures
                 {
                     Logger.WriteToLog("Attempt to draw unloaded Text object: {0}", this);
                     Console.WriteLine("Attempt to draw unloaded Text object: {0}", this);
-                    //todo: write to debug
+                    DebugConsole.WriteLine("Attempt to draw unloaded Text object: {0}", this);
                     _warnOnce = true;
                 }
 
@@ -393,11 +393,11 @@ namespace KirosEngine3.Textures
 
             //todo: move use font call up to the caller of this method and group elements using the same font to render in a batch
             //if use font fails or font is null
-            if (!_font?.UseFont(tu) ?? false)
+            if (!_font.UseFont(tu))
             {
-                Logger.WriteToLog("Attempt to use non-existent font: {0}", _font);
-                Console.WriteLine("Attempt to use non-existent font: {0}", _font);
-                //todo: write to debug
+                Logger.WriteToLog("Attempt to use font: {0} failed", _font);
+                Console.WriteLine("Attempt to use font: {0} failed", _font);
+                DebugConsole.WriteLine("Attempt to use font: {0} failed", _font);
             }
 
             //if the shader fails to be added to the pipeline it is logged in TryGetShader

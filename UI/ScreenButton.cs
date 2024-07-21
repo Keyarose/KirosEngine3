@@ -157,7 +157,8 @@ namespace KirosEngine3.UI
             {
                 Logger.WriteToLog("Attempt to draw unloaded ScreenButton object: {0}", this);
                 Console.WriteLine("Attempt to draw unloaded ScreenButton object: {0}", this);
-                //todo: write to debug console
+                DebugConsole.WriteLine("Attempt to draw unloaded ScreenButton object: {0}", this);
+
                 return;
             }
 

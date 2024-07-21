@@ -1019,7 +1019,7 @@ namespace KirosEngine3.Math.Matrix
             {
                 Console.WriteLine("Matrix4: {0} has a determinant of 0. Thus normalize is undefined.", this);
                 Logger.WriteToLog("Matrix4: {0} has a determinant of 0. Thus normalize is undefined.", this);
-                //todo: write debug
+                DebugConsole.WriteLine("Matrix4: {0} has a determinant of 0. Thus normalize is undefined.", this);
             }
             else
             {

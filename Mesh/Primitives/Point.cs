@@ -113,7 +113,8 @@ namespace KirosEngine3.Mesh.Primitives
             {
                 Logger.WriteToLog("Attempt to draw unloaded point object: {0}", this);
                 Console.WriteLine("Attempt to draw unloaded point object: {0}", this);
-                //todo: write to debug console
+                DebugConsole.WriteLine("Attempt to draw unloaded point object: {0}", this);
+
                 return;
             }
 

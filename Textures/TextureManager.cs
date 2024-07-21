@@ -96,9 +96,9 @@ namespace KirosEngine3.Textures
                 return true;
             }
 
-            Logger.WriteToLog(string.Format("Texture name: {0} is already in use. Use ReserveTexture instead.", name));
-            Console.WriteLine(string.Format("Texture name: {0} is already in use. Use ReserveTexture instead.", name));
-            //todo: write to debug console
+            Logger.WriteToLog("Texture name: {0} is already in use. Use ReserveTexture instead.", name);
+            Console.WriteLine("Texture name: {0} is already in use. Use ReserveTexture instead.", name);
+            DebugConsole.WriteLine("Texture name: {0} is already in use. Use ReserveTexture instead.", name);
 
             return false;
         }
@@ -177,9 +177,9 @@ namespace KirosEngine3.Textures
                 }
                 else if (Instance._reservations[name] < 0)
                 {
-                    Logger.WriteToLog(string.Format("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name));
-                    Console.WriteLine(string.Format("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name));
-                    //todo: write to debug
+                    Logger.WriteToLog("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name);
+                    Console.WriteLine("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name);
+                    DebugConsole.WriteLine("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name);
                 }
             }
 

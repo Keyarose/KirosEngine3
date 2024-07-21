@@ -42,7 +42,7 @@ namespace KirosEngine3.Config
                 {
                     Console.WriteLine("Config variable named: {0} does not exist.", name);
                     Logger.WriteToLog("Config variable named: {0} does not exist.", name);
-                    //todo:write to debug
+                    DebugConsole.WriteLine("Config variable named: {0} does not exist.", name);
                     return string.Empty;
                 }
             }
@@ -152,7 +152,6 @@ namespace KirosEngine3.Config
                 Console.WriteLine(ex.Message);
                 Logger.WriteToLog(string.Format("Failed to load general config file: {0}", xmlFile));
                 Logger.WriteToLog(ex.Message);
-                //todo: write to debug
             }
 
             return false;
@@ -284,8 +283,8 @@ namespace KirosEngine3.Config
                 return true;
             }
 
-            Logger.WriteToLog(string.Format("Variable already registered for the name: {0}", name));
-            //todo: write to debug console
+            Logger.WriteToLog("Variable already registered for the name: {0}", name);
+            DebugConsole.WriteLine("Variable already registered for the name: {0}", name);
             return false;
         }
 

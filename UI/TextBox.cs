@@ -79,10 +79,6 @@ namespace KirosEngine3.UI
         private int _borderVBO;
 
         /// <summary>
-        /// Flag that shows if blend is enabled.
-        /// </summary>
-        protected bool _blendEnabled = true;
-        /// <summary>
         /// The draw mode to use in rendering.
         /// </summary>
         protected PrimitiveType _drawMode = PrimitiveType.Triangles;
@@ -106,6 +102,16 @@ namespace KirosEngine3.UI
         /// Flag that shows if the active text has changed since the last update
         /// </summary>
         protected bool _activeTextChanged = false;
+
+        //settings
+        /// <summary>
+        /// Flag that shows if blend is enabled.
+        /// </summary>
+        protected bool _blendEnabled = true;
+        /// <summary>
+        /// Flag that shows if the textbox should recognize commands and pass them to the command system.
+        /// </summary>
+        protected bool _receivesCommands = false;
         #endregion
 
         #region Properties
@@ -160,6 +166,15 @@ namespace KirosEngine3.UI
         {
             get { return _maxLines; }
             set { _maxLines = value; }
+        }
+
+        /// <summary>
+        /// Whether the textbox should process application commands from the user.
+        /// </summary>
+        public bool ReceivesCommands
+        {
+            get { return _receivesCommands; } 
+            set { _receivesCommands = value;}
         }
         #endregion
 
@@ -249,7 +264,8 @@ namespace KirosEngine3.UI
                 {
                     Logger.WriteToLog("Attempt to draw unloaded TextBox object: {0}", this);
                     Console.WriteLine("Attempt to draw unloaded TextBox object: {0}", this);
-                    //todo: write to debug
+                    DebugConsole.WriteLine("Attempt to draw unloaded TextBox object: {0}", this);
+
                     _warnOnce = true;
                 }
 
@@ -258,11 +274,11 @@ namespace KirosEngine3.UI
 
             //todo: move use font call up to the caller of this method and group elements using the same font to render in a batch
             //if use font fails or font is null
-            if (!_font?.UseFont(tu) ?? false)
+            if (!_font.UseFont(tu))
             {
-                Logger.WriteToLog("Attempt to use non-existent font: {0}", _font);
-                Console.WriteLine("Attempt to use non-existent font: {0}", _font);
-                //todo: write to debug
+                Logger.WriteToLog("Attempt to use font: {0} failed", _font);
+                Console.WriteLine("Attempt to use font: {0} failed", _font);
+                DebugConsole.WriteLine("Attempt to use font: {0} failed", _font);
             }
 
             //if the shader fails to be added to the pipeline it is logged in TryGetShader
@@ -422,6 +438,15 @@ namespace KirosEngine3.UI
         }
 
         /// <summary>
+        /// Force an update to the text data.
+        /// </summary>
+        public void ForceUpdate()
+        {
+            _textChanged = true;
+            _activeTextChanged = true;
+        }
+
+        /// <summary>
         /// Do updates and changes that need to be done when the box or it's parent container have be resized.
         /// </summary>
         public void OnResize()
@@ -429,6 +454,73 @@ namespace KirosEngine3.UI
             //todo:
         }
         #endregion
+
+        /// <summary>
+        /// Add a string to the textbox, which will then fit the string to one or more lines.
+        /// </summary>
+        /// <param name="line">The string to be added.</param>
+        public void AddLine(string line)
+        {
+            string[] lines = FitLine(line);
+            foreach(string l in lines)
+            {
+                _lines.Add(new Tuple<string, TexturedVertex2D[], uint[]>(l, [], []));
+
+                if (_lines.Count > _visibleLines - 1)//if we're over the number of lines visible in the box
+                {
+                    if (_scrollPos < _maxLines)
+                    {
+                        _scrollPos++;
+                    }
+                }
+
+                if (_lines.Count > _maxLines)
+                {
+                    _lines.RemoveAt(0);//remove the first line if we're over the number of allowed lines.
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fit the given line to the width of the textbox.
+        /// </summary>
+        /// <param name="line">The line to fit.</param>
+        /// <returns>The resulting lines of a size that will fit.</returns>
+        public string[] FitLine(string line)
+        {
+            string[] result = [];
+            if (line == string.Empty)//if it's empty string return empty
+                return result;
+
+            if (_font.TextWidth(line) < Width)//if it fits return it
+            {
+                return [line];
+            }
+
+            char[] subs = line.ToCharArray();
+
+
+            for (int i = 0; i < subs.Length;)
+            {
+                string workingLine = "" + subs[i];
+                float lineWidth = _font.TextWidth(workingLine);
+                while (lineWidth < Width)
+                {
+                    lineWidth = _font.TextWidth(workingLine + subs[i]);
+                    if (lineWidth > Width)//if adding the next char is too long break the loop
+                        break;
+                    else //it will fit so add it and check the next
+                    {
+                        workingLine += subs[i];
+                        i++;
+                    }
+                }
+
+                result = [.. result, workingLine];//working line fits add it to result
+            }
+
+            return result;
+        }
 
         #region Input
         /// <summary>
@@ -467,6 +559,16 @@ namespace KirosEngine3.UI
                 if (_lines.Count > _maxLines)
                 {
                     _lines.RemoveAt(0);//remove the first line
+                }
+
+                //if this textbox can receive commands
+                if (_receivesCommands)
+                {
+                    //if the first char of the submitted string is \
+                    if (_lines.Last().Item1[0] == '\\')
+                    {
+                        //CommandManager.Execute(_lines.Last().Item1);
+                    }
                 }
 
                 _textChanged = true;

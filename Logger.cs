@@ -94,8 +94,8 @@ namespace KirosEngine3
             }
             catch (Exception ex) 
             {
-                Console.WriteLine(ex.Message);
-                //todo: write to in game console
+                Console.WriteLine(ex.ToString());
+                DebugConsole.WriteLine(ex.ToString());
                 return;
             }
 
@@ -118,7 +118,7 @@ namespace KirosEngine3
                     catch (IOException ex)
                     {
                         Console.WriteLine(ex.ToString());
-                        //todo: write to in game console
+                        DebugConsole.WriteLine(ex.ToString());
                     }
                 }
                 else
@@ -134,9 +134,11 @@ namespace KirosEngine3
             else 
             {
                 Console.WriteLine("Failure to setup the log file, see the last exception message.");
-                //todo: write to in game console
+                DebugConsole.WriteLine("Failure to setup the log file, see the last exception message.");
             }
         }
+
+        //todo: write to fallback for when config fails to load need info for write to log
 
         /// <summary>
         /// Write a string to the log file
@@ -159,7 +161,7 @@ namespace KirosEngine3
                     catch (IOException ex) 
                     {
                         Console.WriteLine(ex.ToString());
-                        //todo: write to in game console
+                        DebugConsole.WriteLine(ex.ToString());
                     }
                 }
                 else
@@ -176,7 +178,7 @@ namespace KirosEngine3
                     catch (IOException ex)
                     {
                         Console.WriteLine(ex.ToString());
-                        //todo: write to in game console
+                        DebugConsole.WriteLine(ex.ToString());
                     }
                 }
             }
@@ -245,8 +247,8 @@ namespace KirosEngine3
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                //todo: write to in game console
+                Console.WriteLine(ex.ToString());
+                DebugConsole.WriteLine(ex.ToString());
             }
 
             if(_fileInfo != null)
@@ -263,7 +265,7 @@ namespace KirosEngine3
                 catch (IOException ex)
                 {
                     Console.WriteLine(ex.ToString());
-                    //todo: write to in game console
+                    DebugConsole.WriteLine(ex.ToString());
                 }
             }
         }

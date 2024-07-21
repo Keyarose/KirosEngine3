@@ -340,7 +340,7 @@ namespace KirosEngine3.Shaders
             {
                 Console.WriteLine("Shader: {0} does not have a Position attribute name defined.", Name);
                 Logger.WriteToLog("Shader: {0} does not have a Position attribute name defined.", Name);
-                //todo: write to debug
+                DebugConsole.WriteLine("Shader: {0} does not have a Position attribute name defined.", Name);
                 return;
             }
 
@@ -380,7 +380,7 @@ namespace KirosEngine3.Shaders
             {
                 Console.WriteLine("Shader: {0} does not have a Color attribute name defined.", Name);
                 Logger.WriteToLog("Shader: {0} does not have a Color attribute name defined.", Name);
-                //todo: write to debug
+                DebugConsole.WriteLine("Shader: {0} does not have a Color attribute name defined.", Name);
                 return;
             }
 
@@ -409,7 +409,7 @@ namespace KirosEngine3.Shaders
             {
                 Console.WriteLine("Shader: {0} does not have a UV attribute name defined.", Name);
                 Logger.WriteToLog("Shader: {0} does not have a UV attribute name defined.", Name);
-                //todo: write to debug
+                DebugConsole.WriteLine("Shader: {0} does not have a UV attribute name defined.", Name);
                 return;
             }
 
@@ -467,6 +467,8 @@ namespace KirosEngine3.Shaders
             else
             {
                 Console.WriteLine("SetAttribsGL<T> does not support vertex type of: {0}", typeof(T));
+                Logger.WriteToLog("SetAttribsGL<T> does not support vertex type of: {0}", typeof(T));
+                DebugConsole.WriteLine("SetAttribsGL<T> does not support vertex type of: {0}", typeof(T));
             }
         }
 
@@ -516,9 +518,9 @@ namespace KirosEngine3.Shaders
                 return;
             }
 
-            Console.WriteLine(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, _name));
-            Logger.WriteToLog(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, _name));
-            //todo: write to debug
+            Console.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            Logger.WriteToLog("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            DebugConsole.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
         }
 
         /// <summary>
@@ -551,9 +553,9 @@ namespace KirosEngine3.Shaders
                 return;
             }
 
-            Console.WriteLine(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, _name));
-            Logger.WriteToLog(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, _name));
-            //todo: write to debug
+            Console.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            Logger.WriteToLog("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            DebugConsole.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
         }
 
         /// <summary>
@@ -574,9 +576,9 @@ namespace KirosEngine3.Shaders
                 return;
             }
 
-            Console.WriteLine(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, _name));
-            Logger.WriteToLog(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, _name));
-            //todo: write to debug
+            Console.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            Logger.WriteToLog("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            DebugConsole.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
         }
 
         /// <summary>
@@ -611,9 +613,9 @@ namespace KirosEngine3.Shaders
                 return;
             }
 
-            Console.WriteLine(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, _name));
-            Logger.WriteToLog(string.Format("Failed to acquire attribute location named: {0} in shader: {1}", name, _name));
-            //todo: write to debug
+            Console.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            Logger.WriteToLog("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            DebugConsole.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
         }
         #endregion
 
@@ -635,7 +637,7 @@ namespace KirosEngine3.Shaders
             {
                 Logger.WriteToLog("No uniform named: {0} found in shader: {1}", name, _name);
                 Console.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
-                //write debug
+                DebugConsole.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
             }
         }
 
@@ -655,7 +657,7 @@ namespace KirosEngine3.Shaders
             {
                 Logger.WriteToLog("No uniform named: {0} found in shader: {1}", name, _name);
                 Console.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
-                //write debug
+                DebugConsole.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
             }
         }
 
@@ -675,7 +677,7 @@ namespace KirosEngine3.Shaders
             {
                 Logger.WriteToLog("No uniform named: {0} found in shader: {1}", name, _name);
                 Console.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
-                //write debug
+                DebugConsole.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
             }
         }
 
@@ -696,7 +698,7 @@ namespace KirosEngine3.Shaders
             {
                 Logger.WriteToLog("No uniform named: {0} found in shader: {1}", name, _name);
                 Console.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
-                //write debug
+                DebugConsole.WriteLine("No uniform named: {0} found in shader: {1}", name, _name);
             }
         }
         #endregion
@@ -1009,7 +1011,7 @@ namespace KirosEngine3.Shaders
             {
                 Console.WriteLine("Shader named: " + _name + ", not properly disposed of.");
                 Logger.WriteToLog("Shader named: " + _name + ", not properly disposed of.");
-                //todo: write to debug
+                DebugConsole.WriteLine("Shader named: " + _name + ", not properly disposed of.");
             }
         }
         #endregion

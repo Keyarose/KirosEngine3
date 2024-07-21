@@ -124,7 +124,7 @@ namespace KirosEngine3.Textures
             {
                 Console.WriteLine("Font failed to load with given file name: {0}", filePath);
                 Logger.WriteToLog("Font failed to load with given file name: {0}", filePath);
-                //todo: write to debug
+                DebugConsole.WriteLine("Font failed to load with given file name: {0}", filePath);
             }
         }
 
@@ -148,7 +148,7 @@ namespace KirosEngine3.Textures
                 {
                     Console.WriteLine("Font failed to load with given file name: {0}", filePath);
                     Logger.WriteToLog("Font failed to load with given file name: {0}", filePath);
-                    //todo: write to debug
+                    DebugConsole.WriteLine("Font failed to load with given file name: {0}", filePath);
                 }
             }
             else
@@ -264,9 +264,9 @@ namespace KirosEngine3.Textures
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Logger.WriteToLog(string.Format("Font {0} failed to load.", _name));
+                Logger.WriteToLog("Font {0} failed to load.", _name);
                 Logger.WriteToLog(ex.Message);
-                //todo: write to debug
+                DebugConsole.WriteLine("Font {0} failed to load.", _name);
             }
 
             return false;

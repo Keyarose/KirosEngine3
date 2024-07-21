@@ -96,7 +96,8 @@ namespace KirosEngine3.Textures
                 {
                     Console.WriteLine("Failed to read the image from file: {0}", _path);
                     Logger.WriteToLog("Failed to read the image from file: {0}", _path);
-                    //todo: write to debug
+                    DebugConsole.WriteLine("Failed to read the image from file: {0}", _path);
+
                     return;
                 }
 
@@ -121,9 +122,9 @@ namespace KirosEngine3.Textures
         {
             if (!_loaded)
             {
-                Console.WriteLine("Attempting to use texture:" + _name + "without first loading it!");
-                Logger.WriteToLog(string.Format("Attempt to use texture: {0} without first loading it.", _name));
-                //todo: write to debug console
+                Console.WriteLine("Attempt to use texture: {0} without first loading it.", _name);
+                Logger.WriteToLog("Attempt to use texture: {0} without first loading it.", _name);
+                DebugConsole.WriteLine("Attempt to use texture: {0} without first loading it.", _name);
             }
             GL.ActiveTexture(unit);
             GL.BindTexture(TextureTarget.Texture2D, _handle);

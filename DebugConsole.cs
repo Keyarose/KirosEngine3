@@ -19,6 +19,8 @@ namespace KirosEngine3
 
         protected TextBox _textBox;
 
+        private static readonly Queue<string> _preloadBuffer = new Queue<string>();
+
         /// <summary>
         /// A label that displays the current mouse position in screen coordinates.
         /// </summary>
@@ -116,6 +118,42 @@ namespace KirosEngine3
             }
         }
 
+        /// <summary>
+        /// Write a string to the debug console.
+        /// </summary>
+        /// <param name="message">The string to be written.</param>
+        public static void WriteLine(string message)
+        {
+            if (Instance == null)
+            {
+                _preloadBuffer.Enqueue(message);
+            }
+            else
+            {
+                Instance._textBox.AddLine(message);
+            }
+        }
+
+        /// <summary>
+        /// Write a formatted string to the debug console.
+        /// </summary>
+        /// <param name="message">The string format to write.</param>
+        /// <param name="arg0">The data to be inserted into the format.</param>
+        public static void WriteLine(string message, object? arg0)
+        {
+            WriteLine(string.Format(message, arg0));
+        }
+
+        /// <summary>
+        /// Write a formatted string to the debug console.
+        /// </summary>
+        /// <param name="message">The string format to write.</param>
+        /// <param name="args">The data to be inserted into the format.</param>
+        public static void WriteLine(string message, params object?[] args)
+        {
+            WriteLine(string.Format(message, args));
+        }
+
         #region Load
         /// <summary>
         /// Load the debug console
@@ -124,7 +162,15 @@ namespace KirosEngine3
         {
             _mousePosLabel.Init();
             _textBox.Init();
+            
+            for (int i = 0; i < _preloadBuffer.Count; i++) //add all buffered messages to the textbox
+            {
+                _textBox.AddLine(_preloadBuffer.Dequeue());
+            }
+
+
             _textBox.Border = true;
+            _textBox.ReceivesCommands = true;
         }
         #endregion
 
@@ -162,6 +208,7 @@ namespace KirosEngine3
                 if (_visible ) 
                 {
                     KeyboardEventManager.SetContext(_textBox.InputContext);
+                    _textBox.ForceUpdate();
                 }
                 else
                 {
@@ -177,5 +224,7 @@ namespace KirosEngine3
             _mousePosLabel.LabelText = [position.ToString()];
         }
         #endregion
+
+        //todo: disposal and cleanup
     }
 }

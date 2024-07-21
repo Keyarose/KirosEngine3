@@ -81,8 +81,8 @@ namespace KirosEngine3.Scenes
                 return true;
             }
 
-            Logger.WriteToLog(string.Format("Scene name: {0} is already in use.", scene.Name));
-            //todo: write to debug console
+            Logger.WriteToLog("Scene name: {0} is already in use.", scene.Name);
+            DebugConsole.WriteLine("Scene name: {0} is already in use.", scene.Name);
             return false;
         }
 
@@ -99,8 +99,8 @@ namespace KirosEngine3.Scenes
                 return true;
             }
 
-            Logger.WriteToLog(string.Format("Scene name: {0} is already in use.", name));
-            //todo: write to debug console
+            Logger.WriteToLog("Scene name: {0} is already in use.", name);
+            DebugConsole.WriteLine("Scene name: {0} is already in use.", name);
             return false;
         }
 
@@ -117,8 +117,8 @@ namespace KirosEngine3.Scenes
                 return true;
             }
 
-            Logger.WriteToLog(string.Format("Scene name: {0} is already in use.", name));
-            //todo: write to debug console
+            Logger.WriteToLog("Scene name: {0} is already in use.", name);
+            DebugConsole.WriteLine("Scene name: {0} is already in use.", name);
             return false;
         }
 

@@ -239,8 +239,9 @@ namespace KirosEngine3.Shaders
             if (Instance._shaders.TryAdd(name, shader))
             { return true; }
 
-            Logger.WriteToLog(string.Format("Shader name: {0} is already in use.", name));
-            //todo: write to debug console
+            Console.WriteLine("Shader name: {0} is already in use.", name);
+            Logger.WriteToLog("Shader name: {0} is already in use.", name);
+            DebugConsole.WriteLine("Shader name: {0} is already in use.", name);
             return false;
         }
 
@@ -275,9 +276,9 @@ namespace KirosEngine3.Shaders
                 return true;
             }
 
-            Logger.WriteToLog("Failed to set shader named: {0} for use", name);
-            Console.WriteLine("Failed to set shader named: {0} for use", name);
-            //todo: write to debug console
+            Logger.WriteToLog("Shader named: {0} not found.", name);
+            Console.WriteLine("Shader named: {0} not found.", name);
+            DebugConsole.WriteLine("Shader named: {0} not found.", name);
 
             shader = null;
             return false;
