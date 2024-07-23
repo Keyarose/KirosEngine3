@@ -3,7 +3,6 @@ using KirosEngine3.Math.Data;
 using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
-using KirosEngine3.Mesh.Primitives;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
 using OpenTK.Graphics.OpenGL4;
@@ -69,14 +68,6 @@ namespace KirosEngine3.UI
         /// The maximum number of lines in the textbox.
         /// </summary>
         protected int _maxLines;
-
-        private Vertex2D[] _borderVerts = new Vertex2D[6];
-        private uint[] _borderIndices = new uint[14];
-
-        private int _VAO;
-        private int[] _VBO = [];
-        private int[] _EBO = [];
-        private int _borderVBO;
 
         /// <summary>
         /// The draw mode to use in rendering.
@@ -173,8 +164,8 @@ namespace KirosEngine3.UI
         /// </summary>
         public bool ReceivesCommands
         {
-            get { return _receivesCommands; } 
-            set { _receivesCommands = value;}
+            get { return _receivesCommands; }
+            set { _receivesCommands = value; }
         }
         #endregion
 
@@ -216,25 +207,19 @@ namespace KirosEngine3.UI
         /// <returns>True if successful.</returns>
         public override bool Init()
         {
-            _VBO = new int[_visibleLines];//one for each line
-            _EBO = new int[_visibleLines];
+            if (!base.Init()) return false; //perform base class init and fail if it fails
 
-            _VAO = GL.GenVertexArray();
-            GL.BindVertexArray(_VAO);
+            _borderVerts = new Vertex2D[6];
+            //_borderIndices = new uint[14];
 
-            GL.GenBuffers(_VBO.Length, _VBO);
-            GL.GenBuffers(_EBO.Length, _EBO);
-            _borderVBO = GL.GenBuffer();
-
-            GL.BindVertexArray(0);
 
             //define border verts
             float abvLL = _font.Size * (_visibleLines - 1) - 1;//one px above last line
-            _borderVerts[0] = new Vertex2D { Position = _position};
-            _borderVerts[1] = new Vertex2D { Position = new Vec2(Width, _position.Y) };
-            _borderVerts[2] = new Vertex2D { Position = new Vec2(Width, abvLL + _position.Y) };
+            _borderVerts[0] = new Vertex2D { Position = _position };
+            _borderVerts[1] = new Vertex2D { Position = _position + new Vec2(Width, 0f) };
+            _borderVerts[2] = new Vertex2D { Position = _position + new Vec2(Width, abvLL) };
             _borderVerts[3] = new Vertex2D { Position = _position + new Vec2(0f, abvLL) };
-            _borderVerts[4] = new Vertex2D { Position = new Vec2(_position.X, Height + _position.Y) };
+            _borderVerts[4] = new Vertex2D { Position = _position + new Vec2(0f, Height) };
             _borderVerts[5] = new Vertex2D { Position = _size + _position };
 
             _borderIndices = [0, 1, 1, 2, 2, 3, 3, 0, 3, 4, 4, 5, 5, 2];
@@ -271,6 +256,7 @@ namespace KirosEngine3.UI
 
                 return;
             }
+            base.DrawGL(vm, tu);
 
             //todo: move use font call up to the caller of this method and group elements using the same font to render in a batch
             //if use font fails or font is null
@@ -305,7 +291,6 @@ namespace KirosEngine3.UI
 
             if (_blendEnabled)
             {
-                
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
                 GL.DepthFunc(DepthFunction.Lequal);
@@ -314,10 +299,10 @@ namespace KirosEngine3.UI
             for (int i = 0; i < int.Min(_visibleLines - 1, _lines.Count - _scrollPos); i++) //for each visible line, or all existing lines if fewer than vis lines
             {
                 Tuple<string, TexturedVertex2D[], uint[]> line = _lines[_scrollPos + i];
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO[i]);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
                 GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex2D.SizeInBytesU * line.Item2.Length, line.Item2, BufferUsageHint.DynamicDraw);
 
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO[i]);
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
                 GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * line.Item3.Length, line.Item3, BufferUsageHint.DynamicDraw);
 
 
@@ -327,10 +312,10 @@ namespace KirosEngine3.UI
             }
 
             //draw the active line
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO[_visibleLines - 1]);//use the last vert buffer
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);//use the last vert buffer
             GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex2D.SizeInBytesU * _aLVerts.Length, _aLVerts, BufferUsageHint.DynamicDraw);
 
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO[_visibleLines - 1]);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
             GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _aLIndices.Length, _aLIndices, BufferUsageHint.DynamicDraw);
 
             sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = TexturedVertex2D.SizeInBytesU });
@@ -338,10 +323,10 @@ namespace KirosEngine3.UI
             GL.DrawElements(_drawMode, _aLIndices.Length, DrawElementsType.UnsignedInt, 0);
 
             //draw the border if enabled
-            if (_border)
+            /*if (_border)
             {
-                DrawBorder(vm);
-            }
+                DrawBorderGL(vm);
+            }*/
 
             if (_blendEnabled)
             {
@@ -358,13 +343,15 @@ namespace KirosEngine3.UI
             throw new NotImplementedException();
         }
 
-        private void DrawBorder(ViewMatrixes vm)
+        /// <inheritdoc/>
+        protected override void DrawBorderGL(ViewMatrixes vm)
         {
             //get the color shader
             if (!ShaderManager.TryGetShader(ShaderManager.DefaultColor2DShaderName, out Shader? sh))
             {
                 Console.WriteLine("Cannot draw border for {0} when default color shader is null.", nameof(TextBox));
                 Logger.WriteToLog("Cannot draw border for {0} when default color shader is null.", nameof(TextBox));
+                DebugConsole.WriteLine("Cannot draw border for {0} when default color shader is null.", nameof(TextBox));
                 return;
             }
 
@@ -374,10 +361,10 @@ namespace KirosEngine3.UI
             sh.SetUniformVec4GL("aColor", (Vec4)_borderColor);
 
             //buffer border
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _borderVBO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, Vertex2D.SizeInBytesU * _borderVerts.Length, _borderVerts, BufferUsageHint.StaticDraw);
 
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO[_visibleLines - 1]);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
             GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _borderIndices.Length, _borderIndices, BufferUsageHint.StaticDraw);
 
             sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vertex2D.SizeInBytesU });
@@ -462,7 +449,7 @@ namespace KirosEngine3.UI
         public void AddLine(string line)
         {
             string[] lines = FitLine(line);
-            foreach(string l in lines)
+            foreach (string l in lines)
             {
                 _lines.Add(new Tuple<string, TexturedVertex2D[], uint[]>(l, [], []));
 
@@ -533,7 +520,7 @@ namespace KirosEngine3.UI
             char nChar;
             if (args.Key == Keys.Backspace)
             {
-                if (_activeLine.Length > 0) 
+                if (_activeLine.Length > 0)
                 {
                     _activeLine = _activeLine.Remove(_activeLine.Length - 1);//remove the last char
                 }

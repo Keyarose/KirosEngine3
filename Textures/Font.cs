@@ -17,6 +17,7 @@ namespace KirosEngine3.Textures
         private readonly string _filePath;
 
         private string[] _fontTextures;
+        private string _face = "";
         private int _size;
         private int _tabSize = 8;//defaults to 8 spaces
         private float _charPaddingX = 0.0f;
@@ -32,6 +33,14 @@ namespace KirosEngine3.Textures
         public string Name
         {
             get { return _name; }
+        }
+
+        /// <summary>
+        /// The face name of the font.
+        /// </summary>
+        public string Face
+        {
+            get { return _face; }
         }
 
         /// <summary>
@@ -235,6 +244,7 @@ namespace KirosEngine3.Textures
                 {
                     data = (FontData)serialize.Deserialize(sr)!;
 
+                    _face = data.Info.Face;
                     _size = data.Info.Size;
                     _bitmapScale = new Vec2(data.Common.ScaleW, data.Common.ScaleH);
 

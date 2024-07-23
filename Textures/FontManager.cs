@@ -137,5 +137,19 @@ namespace KirosEngine3.Textures
             font = null;
             return false;
         }
+
+        /// <summary>
+        /// Get all the fonts of the given face.
+        /// </summary>
+        /// <param name="face">The face of fonts to look for.</param>
+        /// <returns>An array of fonts of the given face, or empty array if not found.</returns>
+        public static Font[] GetFontsOfFace(string face)
+        {
+            Font[] faces = [];
+
+            faces = Instance._fonts.Select((x) => x.Value).Where((x) => x.Face.Equals(face)).ToArray();
+
+            return faces;
+        }
     }
 }

@@ -1,5 +1,8 @@
 ﻿using KirosEngine3.Math.Data;
+using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
+using KirosEngine3.Mesh;
+using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
@@ -24,6 +27,7 @@ namespace KirosEngine3.UI
         /// </summary>
         protected Vec2 _size;
 
+        #region Border Fields
         /// <summary>
         /// Enable or disable the drawing of the element's border.
         /// </summary>
@@ -38,6 +42,32 @@ namespace KirosEngine3.UI
         /// The color of the border, defaults to black.
         /// </summary>
         protected Color4 _borderColor = Color4.Black;
+
+        /// <summary>
+        /// The vertices for the element's border.
+        /// </summary>
+        protected Vertex2D[] _borderVerts = [];
+
+        /// <summary>
+        /// The indices for the element's border.
+        /// </summary>
+        protected uint[] _borderIndices = [];
+        #endregion
+
+        /// <summary>
+        /// The vertex array object.
+        /// </summary>
+        protected int _VAO;
+
+        /// <summary>
+        /// The vertex buffer object.
+        /// </summary>
+        protected int _VBO;
+
+        /// <summary>
+        /// The index buffer object.
+        /// </summary>
+        protected int _EBO;
 
         /// <summary>
         /// The element that contains this one.
@@ -84,12 +114,33 @@ namespace KirosEngine3.UI
         /// </summary>
         public virtual UIElement? Parent { get { return _containingElement; } set { _containingElement = value; } }
 
+        #region Load
         /// <summary>
         /// Load the UI element and prepare it for rendering.
         /// </summary>
-        /// <returns></returns>
-        public abstract bool Init();
+        /// <returns>True if successful.</returns>
+        public virtual bool Init()
+        {
+            _VAO = GL.GenVertexArray();
+            GL.BindVertexArray(_VAO);
 
+            _VBO = GL.GenBuffer();
+            _EBO = GL.GenBuffer();
+
+            GL.BindVertexArray(0);
+
+            _borderVerts = new Vertex2D[4];
+            _borderVerts[0] = new Vertex2D { Position = Position };
+            _borderVerts[1] = new Vertex2D { Position = Position + new Vec2(Width, 0f)};
+            _borderVerts[2] = new Vertex2D { Position = Position + Size};
+            _borderVerts[3] = new Vertex2D { Position = Position + new Vec2(0f, Height) };
+
+            _borderIndices = [0, 1, 1, 2, 2, 3, 3, 0];
+            return true;
+        }
+        #endregion
+
+        #region Draw
         /// <summary>
         /// Draw the UI element.
         /// </summary>
@@ -100,11 +151,54 @@ namespace KirosEngine3.UI
         /// </summary>
         /// <param name="vm">The view matrices to use in rendering.</param>
         /// <param name="tu">The texture units to use for rendering.</param>
-        public abstract void DrawGL(ViewMatrixes vm, params TextureUnit[] tu);
+        public virtual void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
+        {
+            GL.BindVertexArray(_VAO);
+            if (_border)
+            {
+                DrawBorderGL(vm);
+            }
+            GL.BindVertexArray(0);
+        }
 
         /// <summary>
         /// Draw the UI element using the DirectX API.
         /// </summary>
         public abstract void DrawDX();
+
+        /// <summary>
+        /// Method for drawing the border of the UI Element.
+        /// </summary>
+        /// <param name="vm">The view matrices to use in rendering.</param>
+        protected virtual void DrawBorderGL(ViewMatrixes vm)
+        {
+            if (!ShaderManager.TryGetShader(ShaderManager.DefaultColor2DShaderName, out Shader? sh))
+            {
+                Console.WriteLine("Cannot draw border for {0} when default color shader is null.", GetType().Name);
+                Logger.WriteToLog("Cannot draw border for {0} when default color shader is null.", GetType().Name);
+                DebugConsole.WriteLine("Cannot draw border for {0} when default color shader is null.", GetType().Name);
+
+                return;
+            }
+
+            GL.BindVertexArray(_VAO);
+
+            sh.UseGL();
+            sh.SetUniformMat4GL("model", vm.Model);
+            sh.SetUniformMat4GL("proj", vm.UIOrtho);
+            sh.SetUniformVec4GL("aColor", (Vec4)_borderColor);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, Vertex2D.SizeInBytesU * _borderVerts.Length, _borderVerts, BufferUsageHint.StaticDraw);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * _borderIndices.Length, _borderIndices, BufferUsageHint.StaticDraw);
+
+            sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vertex2D.SizeInBytesU });
+            GL.DrawElements(PrimitiveType.Lines, _borderIndices.Length, DrawElementsType.UnsignedInt, 0);
+
+            GL.BindVertexArray(0);
+        }
+        #endregion
     }
 }

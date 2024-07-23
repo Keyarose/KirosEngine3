@@ -146,6 +146,9 @@ namespace KirosEngine3.UI
         /// <returns>True if successful, false otherwise.</returns>
         public override bool Init()
         {
+            //perform base init
+            if (!base.Init()) return false;
+
             _labelText.Init();
 
             return true;
@@ -168,6 +171,8 @@ namespace KirosEngine3.UI
         /// <inheritdoc/>
         public override void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
         {
+            base.DrawGL(vm, tu);
+
             if (tu != null && tu.Length > 0)
             {
                 _labelText.DrawGL(vm, tu);
@@ -177,6 +182,9 @@ namespace KirosEngine3.UI
                 Console.WriteLine("Warning: Label requires a texture unit for the font.");
             }
         }
+
+        //todo: on resize
+
         #endregion
 
     }

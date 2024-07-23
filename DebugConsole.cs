@@ -87,7 +87,7 @@ namespace KirosEngine3
             _textBox = new TextBox(new Vec2(xPos, yPos), new Vec2(width, height), "debug", font, maxLines);
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.GraveAccent, KeyboardEventType.KeyPressed, OnKeyPress);
 
-            _mousePosLabel = new Label(new Vec2(1, 1), new Vec2(50, 20), font, "()");
+            _mousePosLabel = new Label(new Vec2(1, 1), new Vec2(65, 20), font, "()");
             MouseEventManager.SubscribeMouseEvent(MouseEventManager.GLOBAL_CONTEXT, Input.MouseButton.None, MouseEventType.Moved, OnMouseMove);
 
             _visible = false;
