@@ -34,7 +34,7 @@ namespace KirosEngine3
         BaseCamera? camera;
 
         ScreenButton? testSButton;
-        TextBox? testTextBox;
+        ChatBox? testChatBox;
 
         public TestClient(int width, int height) : base(width, height, "Test Client")
         {
@@ -99,10 +99,10 @@ namespace KirosEngine3
             testSButton = new ScreenButton(new Vec2(100.0f, 0.0f), Color4.Yellow, new Vec2(200f, 300f), "color");
             testSButton.Init();
 
-            testTextBox = new TextBox(new Vec2(2.0f, 0f), new Vec2(798f, 300f), "inputbox", FontManager.GetFont("arial16"), 50);
-            testTextBox.Init();
+            testChatBox = new ChatBox(new Vec2(2.0f, 0f), new Vec2(798f, 300f), "inputbox", FontManager.GetFont("arial16"), 50);
+            testChatBox.Init();
 
-            KeyboardEventManager.CurrentContext = testTextBox.InputContext;
+            KeyboardEventManager.CurrentContext = testChatBox.InputContext;
 
             //testTexQ = new TexturedQuad(Quad.UnitQuad, "wall");
             testTexQ = new TexturedQuad([new(0f, 0f, 0f), new(200f, 0f, 0f), new(200f, 200f, 0f), new(0f, 200f, 0f)], [0, 1, 2, 2, 3, 0], "defaultFont");
@@ -121,7 +121,7 @@ namespace KirosEngine3
             KeyboardEventManager.Update(KeyboardState, args.Time);
             MouseEventManager.Update(MouseState, args.Time);
 
-            testTextBox?.Update();
+            testChatBox?.Update();
             DebugConsole.Instance?.Update();
         }
 
@@ -154,7 +154,7 @@ namespace KirosEngine3
             DebugConsole.Instance?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             testLabel?.DrawGL(viewMatrixes, TextureUnit.Texture0);
-            //testTextBox?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            //testChatBox?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //end hud and 2d
 
             SwapBuffers();

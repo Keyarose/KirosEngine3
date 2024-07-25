@@ -27,6 +27,11 @@ namespace KirosEngine3.UI
         /// </summary>
         protected Vec2 _size;
 
+        /// <summary>
+        /// The name of the UI Element.
+        /// </summary>
+        protected string _name = "";
+
         #region Border Fields
         /// <summary>
         /// Enable or disable the drawing of the element's border.
@@ -93,6 +98,11 @@ namespace KirosEngine3.UI
         /// The height of the UI element.
         /// </summary>
         public virtual float Height { get { return _size.Y; } set { _size.Y = value; } }
+
+        /// <summary>
+        /// The name of the UI Element.
+        /// </summary>
+        public virtual string Name { get { return _name; } set { _name = value; } }
 
         /// <summary>
         /// Enable or disable the drawing of a border around the UIElement.

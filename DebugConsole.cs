@@ -17,7 +17,7 @@ namespace KirosEngine3
     {
         private static DebugConsole? _instance;
 
-        protected TextBox _textBox;
+        protected ChatBox _chatBox;
 
         private static readonly Queue<string> _preloadBuffer = new Queue<string>();
 
@@ -30,14 +30,14 @@ namespace KirosEngine3
         //todo: preload line buffer for messages before the _instance is created
         public Vec2 Position
         {
-            get { return _textBox.Position; }
-            set { _textBox.Position = value; }
+            get { return _chatBox.Position; }
+            set { _chatBox.Position = value; }
         }
 
         public Vec2 Size
         {
-            get { return _textBox.Size; }
-            set { _textBox.Size = value; }
+            get { return _chatBox.Size; }
+            set { _chatBox.Size = value; }
         }
 
         /// <summary>
@@ -45,8 +45,8 @@ namespace KirosEngine3
         /// </summary>
         public int MaxLines
         {
-            get { return _textBox.MaxLines; }
-            set { _textBox.MaxLines = value; }
+            get { return _chatBox.MaxLines; }
+            set { _chatBox.MaxLines = value; }
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace KirosEngine3
 
         private DebugConsole(int xPos, int yPos, int width, int height, int maxLines, Font? font)
         {
-            _textBox = new TextBox(new Vec2(xPos, yPos), new Vec2(width, height), "debug", font, maxLines);
+            _chatBox = new ChatBox(new Vec2(xPos, yPos), new Vec2(width, height), "debug", font, maxLines);
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.GraveAccent, KeyboardEventType.KeyPressed, OnKeyPress);
 
             _mousePosLabel = new Label(new Vec2(1, 1), new Vec2(65, 20), font, "()");
@@ -130,7 +130,7 @@ namespace KirosEngine3
             }
             else
             {
-                Instance._textBox.AddLine(message);
+                Instance._chatBox.AddLine(message);
             }
         }
 
@@ -161,16 +161,16 @@ namespace KirosEngine3
         public void Init()
         {
             _mousePosLabel.Init();
-            _textBox.Init();
+            _chatBox.Init();
             
             for (int i = 0; i < _preloadBuffer.Count; i++) //add all buffered messages to the textbox
             {
-                _textBox.AddLine(_preloadBuffer.Dequeue());
+                _chatBox.AddLine(_preloadBuffer.Dequeue());
             }
 
 
-            _textBox.Border = true;
-            _textBox.ReceivesCommands = true;
+            _chatBox.Border = true;
+            _chatBox.ReceivesCommands = true;
         }
         #endregion
 
@@ -183,7 +183,7 @@ namespace KirosEngine3
             if(_visible) 
             {
                 _mousePosLabel.DrawGL(vm, tu);
-                _textBox.DrawGL(vm, tu);
+                _chatBox.DrawGL(vm, tu);
             }
         }
         #endregion
@@ -194,7 +194,7 @@ namespace KirosEngine3
         /// </summary>
         public void Update()
         {
-            _textBox.Update();
+            _chatBox.Update();
         }
         #endregion
 
@@ -207,8 +207,8 @@ namespace KirosEngine3
                 
                 if (_visible ) 
                 {
-                    KeyboardEventManager.SetContext(_textBox.InputContext);
-                    _textBox.ForceUpdate();
+                    KeyboardEventManager.SetContext(_chatBox.InputContext);
+                    _chatBox.ForceUpdate();
                 }
                 else
                 {
