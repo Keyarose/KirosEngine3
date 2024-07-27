@@ -57,8 +57,8 @@ namespace KirosEngine3.UI
         /// </summary>
         public override Vec2 Position 
         { 
-            get => _labelText.Position; 
-            set => _labelText.Position = value;
+            get { return _labelText.Position; } 
+            set { _labelText.Position = value; _position = value; }
         }
 
         /// <summary>
@@ -110,6 +110,7 @@ namespace KirosEngine3.UI
         /// <param name="attached">The UIElement described by the Label.</param>
         public Label(Vec2 pos, Vec2 size, string text, UIElement? attached)
         {
+            _position = pos;
             _size = size;
             _labelText = new Text(pos, text);
             _attached = attached;
@@ -134,6 +135,7 @@ namespace KirosEngine3.UI
         /// <param name="attached">The UIElement described by the Label.</param>
         public Label(Vec2 pos, Vec2 size, Font? font, string text, UIElement? attached)
         {
+            _position = pos;
             _size = size;
             _labelText = new Text(pos, font, text);
             _attached = attached;
@@ -144,10 +146,10 @@ namespace KirosEngine3.UI
         /// Prepare the Label for rendering.
         /// </summary>
         /// <returns>True if successful, false otherwise.</returns>
-        public override bool Init()
+        public override bool Init(int VAO = 0)
         {
             //perform base init
-            if (!base.Init()) return false;
+            if (!base.Init(VAO)) return false;
 
             _labelText.Init();
 

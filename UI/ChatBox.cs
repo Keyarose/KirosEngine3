@@ -16,11 +16,7 @@ namespace KirosEngine3.UI
     public class ChatBox : UIElement
     {
         //origin at upper left
-
-        /// <summary>
-        /// The name of the shader to be used in rendering.
-        /// </summary>
-        protected string _shaderName = ShaderManager.DefaultTextShaderName ?? "";
+        //todo: split into two sub components: TextBox, ScrollableTextLog
 
         /// <summary>
         /// The font to be used in the textbox.
@@ -70,15 +66,6 @@ namespace KirosEngine3.UI
         protected PrimitiveType _drawMode = PrimitiveType.Triangles;
 
         #region Flags
-        /// <summary>
-        /// Flag that shows if the textbox has been loaded
-        /// </summary>
-        protected bool _loaded = false;
-        /// <summary>
-        /// Flag that shows if the textbox is being disposed of.
-        /// </summary>
-        protected bool _disposed = false;
-        private bool _warnOnce = false;
 
         /// <summary>
         /// Flag that shows if the text has changed since the last update
@@ -177,6 +164,7 @@ namespace KirosEngine3.UI
             _position = position;
             _size = size;
             _name = name;
+            _shaderName = ShaderManager.DefaultTextShaderName ?? "";
             //todo: clamp size to fit on screen
 
             _font = font ?? FontManager.Default;
@@ -200,9 +188,9 @@ namespace KirosEngine3.UI
         /// Initialize the textbox.
         /// </summary>
         /// <returns>True if successful.</returns>
-        public override bool Init()
+        public override bool Init(int VAO = 0)
         {
-            if (!base.Init()) return false; //perform base class init and fail if it fails
+            if (!base.Init(VAO)) return false; //perform base class init and fail if it fails
 
             _borderVerts = new Vertex2D[6];
             //_borderIndices = new uint[14];
@@ -307,7 +295,7 @@ namespace KirosEngine3.UI
             }
 
             //draw the active line
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);//use the last vert buffer
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, TexturedVertex2D.SizeInBytesU * _aLVerts.Length, _aLVerts, BufferUsageHint.DynamicDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
@@ -404,7 +392,7 @@ namespace KirosEngine3.UI
         }
 
         /// <summary>
-        /// Update the textbox for changes in the last frame.
+        /// Update the chat box for changes in the last frame.
         /// </summary>
         public void Update()
         {

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace KirosEngine3
 {
@@ -86,6 +87,41 @@ namespace KirosEngine3
         public static void DisableGLDebugNotify()
         {
             _showGLDebugNotify = false;
+        }
+
+        /// <summary>
+        /// Write a report message to all relevant receivers
+        /// </summary>
+        /// <param name="msg">The message to write.</param>
+        public static void Report(string msg)
+        {
+            Console.WriteLine(msg);
+            Logger.WriteToLog(msg);
+            DebugConsole.WriteLine(msg);
+        }
+
+        /// <summary>
+        /// Write a report message to all relevant receivers
+        /// </summary>
+        /// <param name="msg">The message format to write.</param>
+        /// <param name="arg0">The arguments for the format.</param>
+        public static void Report(string msg, object? arg0)
+        {
+            Console.WriteLine(msg, arg0);
+            Logger.WriteToLog(msg, arg0);
+            DebugConsole.WriteLine(msg, arg0);
+        }
+
+        /// <summary>
+        /// Write a report message to all relevant receivers
+        /// </summary>
+        /// <param name="msg">The message format to write.</param>
+        /// <param name="args">The arguments for the format.</param>
+        public static void Report(string msg, params object[] args)
+        {
+            Console.WriteLine(msg, args);
+            Logger.WriteToLog(msg, args);
+            DebugConsole.WriteLine(msg, args);
         }
 
         /// <summary>

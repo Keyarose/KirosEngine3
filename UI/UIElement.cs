@@ -4,11 +4,6 @@ using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
 using KirosEngine3.Shaders;
 using OpenTK.Graphics.OpenGL4;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.UI
 {
@@ -31,6 +26,11 @@ namespace KirosEngine3.UI
         /// The name of the UI Element.
         /// </summary>
         protected string _name = "";
+
+        /// <summary>
+        /// The name of the shader to use in rendering the UI Element.
+        /// </summary>
+        protected string _shaderName = "";
 
         #region Border Fields
         /// <summary>
@@ -80,6 +80,21 @@ namespace KirosEngine3.UI
         protected UIElement? _containingElement;
 
         /// <summary>
+        /// Flag that shows if the UIElement has been loaded.
+        /// </summary>
+        protected bool _loaded = false;
+        /// <summary>
+        /// Flag that prevents unloaded warning from being sent more than once
+        /// </summary>
+        protected bool _warnOnce = false;
+
+        /// <summary>
+        /// Flag that shows if the textbox is being disposed of.
+        /// </summary>
+        protected bool _disposed = false;
+
+        #region Properties
+        /// <summary>
         /// The UI element's position.
         /// </summary>
         public virtual Vec2 Position { get { return _position; } set { _position = value; } }
@@ -123,15 +138,25 @@ namespace KirosEngine3.UI
         /// The parent UI Element to this one.
         /// </summary>
         public virtual UIElement? Parent { get { return _containingElement; } set { _containingElement = value; } }
+        #endregion
 
         #region Load
         /// <summary>
         /// Load the UI element and prepare it for rendering.
         /// </summary>
+        /// <param name="VAO">The Vertex Array Object of the parent element if there is one.</param>
         /// <returns>True if successful.</returns>
-        public virtual bool Init()
+        public virtual bool Init(int VAO = 0)
         {
-            _VAO = GL.GenVertexArray();
+            if (VAO == 0)
+            {
+                _VAO = GL.GenVertexArray();
+            }
+            else
+            {
+                _VAO = VAO;
+            }
+
             GL.BindVertexArray(_VAO);
 
             _VBO = GL.GenBuffer();
@@ -140,10 +165,10 @@ namespace KirosEngine3.UI
             GL.BindVertexArray(0);
 
             _borderVerts = new Vertex2D[4];
-            _borderVerts[0] = new Vertex2D { Position = Position };
-            _borderVerts[1] = new Vertex2D { Position = Position + new Vec2(Width, 0f)};
-            _borderVerts[2] = new Vertex2D { Position = Position + Size};
-            _borderVerts[3] = new Vertex2D { Position = Position + new Vec2(0f, Height) };
+            _borderVerts[0] = new Vertex2D { Position = Vec2.Zero };
+            _borderVerts[1] = new Vertex2D { Position = new Vec2(Width, 0f) };
+            _borderVerts[2] = new Vertex2D { Position = Size };
+            _borderVerts[3] = new Vertex2D { Position = new Vec2(0f, Height) };
 
             _borderIndices = [0, 1, 1, 2, 2, 3, 3, 0];
             return true;
@@ -194,7 +219,7 @@ namespace KirosEngine3.UI
             GL.BindVertexArray(_VAO);
 
             sh.UseGL();
-            sh.SetUniformMat4GL("model", vm.Model);
+            sh.SetUniformMat4GL("model", vm.Model * Matrix4.CreateTranslation(_position.AsVec3()));
             sh.SetUniformMat4GL("proj", vm.UIOrtho);
             sh.SetUniformVec4GL("aColor", (Vec4)_borderColor);
 

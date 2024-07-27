@@ -1,10 +1,5 @@
 ﻿using KirosEngine3.Math.Vector;
 using KirosEngine3.Textures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KirosEngine3.UI
 {
@@ -89,8 +84,46 @@ namespace KirosEngine3.UI
             _cbLabel = new Label(new Vec2(), new Vec2(), font, labelText, this);//todo: pos and size for label
         }
 
-        #region Load
+        /// <summary>
+        /// Basic constructor accepting a Label element.
+        /// </summary>
+        /// <param name="position">The position in screen coordinates.</param>
+        /// <param name="size">The size in screen coordinates.</param>
+        /// <param name="name">The name of the checkbox component.</param>
+        /// <param name="ucTextureName">The name of the texture to use when unchecked.</param>
+        /// <param name="cTextureName">The name of the texture to use when checked.</param>
+        /// <param name="cbLabel">The label for the checkbox.</param>
+        public CheckBox(Vec2 position, Vec2 size, string name, string ucTextureName, string cTextureName, Label cbLabel)
+        {
+            _position = position;
+            _size = size;
+            _name = name;
+            _uncheckedTexture = ucTextureName;
+            _checkedTexture = cTextureName;
+            _cbLabel = cbLabel;
+        }
 
+        #region Load
+        /// <inheritdoc/>
+        public override bool Init(int VAO = 0)
+        {
+            if (!base.Init(VAO)) return false;
+
+            //check if the textures exist and are loaded
+            if (!TextureManager.LoadTexture(CheckedTexture))
+            {
+                Client.Report("Missing texture for CheckBox: {0}, named: {1}", Name, CheckedTexture);
+            }
+            if (!TextureManager.LoadTexture(UncheckedTexture))
+            {
+                Client.Report("Missing texture for CheckBox: {0}, named: {1}", Name, CheckedTexture);
+            }
+
+            //init the label if there is one
+            _cbLabel?.Init(VAO);
+
+            return true;
+        }
         #endregion
 
         #region Draw
