@@ -3,7 +3,6 @@ using KirosEngine3.Math.Data;
 using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
-using KirosEngine3.Mesh.Primitives;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
 using OpenTK.Graphics.OpenGL4;
@@ -25,6 +24,18 @@ namespace KirosEngine3.UI
         /// The context in which the textbox should receive keyboard input.
         /// </summary>
         protected string _inputContext = "";
+
+        /// <summary>
+        /// Method signature for text submission events.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="text">The text submitted.</param>
+        public delegate void TextSubmissionAction(object sender, string text);
+
+        /// <summary>
+        /// The action to be taken upon the submission of the text in the textbox.
+        /// </summary>
+        protected TextSubmissionAction? _actionOnEnter;
 
         /// <summary>
         /// The current position along the text string of the cursor.
@@ -86,10 +97,20 @@ namespace KirosEngine3.UI
         /// </summary>
         public bool BlendEnabled
         {
-            get { return _blendEnabled; } 
+            get { return _blendEnabled; }
             set { _blendEnabled = value; }
         }
+
+        /// <summary>
+        /// The action to be performed on the submission of the textbox's text.
+        /// </summary>
+        public TextSubmissionAction? ActionOnEnter
+        {
+            get { return _actionOnEnter; }
+            set { _actionOnEnter = value; }
+        }
         #endregion
+        //todo: max char modes, given number and num calculated from (width / widest char in font)
 
         /// <summary>
         /// Basic constructor.
@@ -98,7 +119,7 @@ namespace KirosEngine3.UI
         /// <param name="size">The size of the textbox.</param>
         /// <param name="name">The name of the textbox element.</param>
         /// <param name="font">The font to use for the textbox, or null for default font.</param>
-        public TextBox(Vec2 pos, Vec2 size, string name, Font? font) : this(pos, size, name, font, null, "textbox-" + name) { }
+        public TextBox(Vec2 pos, Vec2 size, string name, Font? font) : this(pos, size, name, font, null, null, "") { }
 
         /// <summary>
         /// Basic constructor with element parent.
@@ -107,9 +128,10 @@ namespace KirosEngine3.UI
         /// <param name="size">The size of the textbox.</param>
         /// <param name="name">The name of the textbox element.</param>
         /// <param name="font">The font to use for the textbox, or null for default font.</param>
+        /// <param name="subAction">The action to be performed on text submission.</param>
         /// <param name="parent">The containing UI Element.</param>
         /// <param name="inputContext">The input context to use for the textbox.</param>
-        public TextBox(Vec2 pos, Vec2 size, string name, Font? font, UIElement? parent, string inputContext)
+        public TextBox(Vec2 pos, Vec2 size, string name, Font? font, TextSubmissionAction? subAction, UIElement? parent, string inputContext)
         {
             _position = pos;
             _size = size;
@@ -118,6 +140,8 @@ namespace KirosEngine3.UI
             //todo: clamp size to container
 
             _font = font ?? FontManager.Default;
+
+            _actionOnEnter = subAction;
 
             _containingElement = parent;
 
@@ -176,13 +200,16 @@ namespace KirosEngine3.UI
             {
                 if (!_warnOnce)
                 {
-                    Client.Report("Attempt to draw unloaded ChatBox object: {0}", this);
+                    Client.Report("Attempt to draw unloaded TextBox object: {0}", this);
 
                     _warnOnce = true;
                 }
 
                 return;
             }
+
+            //apply transform to the view matrix model so sub methods don't need to calculate as well
+            vm.Model *= Matrix4.CreateTranslation(_position.AsVec3());
             base.DrawGL(vm, tu);
 
             if (!_font.UseFont(tu))
@@ -195,6 +222,7 @@ namespace KirosEngine3.UI
                 return;
             }
 
+
             sh.UseGL();
 
             string[] shTexUniforms = sh.TextureUniforms;
@@ -203,7 +231,7 @@ namespace KirosEngine3.UI
                 sh.SetUniformIntGL(shTexUniforms[i], Texture.TextureUnitToInt(tu[i]));
             }
 
-            sh.SetUniformMat4GL("model", vm.Model * Matrix4.CreateTranslation(_position.AsVec3()));
+            sh.SetUniformMat4GL("model", vm.Model);
             sh.SetUniformMat4GL("proj", vm.UIOrtho);
 
             sh.SetUniformVec4GL("aTextColor", (Vec4)_textColor);
@@ -227,6 +255,8 @@ namespace KirosEngine3.UI
             sh.SetUVAttribGL(new ShaderAttribSettings { Offset = TexturedVertex2D.UVOffset, Size = 2, Stride = TexturedVertex2D.SizeInBytesU });
             GL.DrawElements(_drawMode, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
+            DrawCursor(vm);
+
             //done using blend, disable it
             if (_blendEnabled)
             {
@@ -236,6 +266,48 @@ namespace KirosEngine3.UI
 
             GL.BindVertexArray(0);
         }
+
+        /// <summary>
+        /// Draw the cursor at the current position.
+        /// </summary>
+        /// <param name="vm">The view matrices.</param>
+        private void DrawCursor(ViewMatrixes vm)
+        {
+            if (!ShaderManager.TryGetShader(ShaderManager.DefaultColor2DShaderName, out Shader? sh))
+            {
+                return;
+            }
+
+            sh.UseGL();
+
+            sh.SetUniformMat4GL("model", vm.Model);
+            sh.SetUniformMat4GL("proj", vm.UIOrtho);
+            sh.SetUniformVec4GL("aColor", (Vec4)_borderColor);
+
+            Vertex2D[] cursorVerts;
+            //calc cursor verts
+            if (_cursorPos == 0)
+            {
+                cursorVerts = [new Vertex2D { Position = new Vec2(0f, 0f) }, new Vertex2D { Position = new Vec2(0f, _font.Size) }];
+            }
+            else
+            {
+                Vertex2D v1 = _verts[(_cursorPos - 1) * 4 + 1].AsVertex2D();
+                v1.SetX(v1.Position.X + 1);
+                v1.SetY(0f);
+
+                Vertex2D v2 = _verts[(_cursorPos - 1) * 4 + 2].AsVertex2D();
+                v2.SetX(v2.Position.X + 1);
+                v2.SetY(_font.Size);
+                cursorVerts = [v1, v2];
+            }
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, Vertex2D.SizeInBytesU * cursorVerts.Length, cursorVerts, BufferUsageHint.DynamicDraw);
+
+            sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vertex2D.SizeInBytesU });
+            GL.DrawArrays(PrimitiveType.Lines, 0, cursorVerts.Length);
+        }
         #endregion
 
         #region Update
@@ -244,7 +316,7 @@ namespace KirosEngine3.UI
         /// </summary>
         private void UpdateText()
         {
-            if (_font != null) 
+            if (_font != null)
             {
                 Tuple<TexturedVertex2D[], uint[]> txtData = _font.QuadsForString(_text, Vec2.Zero);
 
@@ -290,51 +362,138 @@ namespace KirosEngine3.UI
         /// <param name="sender">The sender.</param>
         /// <param name="args">The event arguments.</param>
         public void OnKeyPress(object sender, KeyboardEventArgs args)
-        {
+        {//todo: reorder to check modifierKeys first
             char nChar;
             if (args.Key == Keys.Backspace)
             {
                 if (_text.Length > 0)
                 {
-                    _text = _text.Remove(_text.Length - 1);//remove the last char
+                    _text = _text.Remove(_cursorPos - 1, 1);//remove the last char
                     _cursorPos--;
                     _textChanged = true;
                 }
             }
             else if (args.Key == Keys.Enter)
             {
-                //pass the text to where it needs to go.
-
-                //if this textbox can receive commands
-                if (_receivesCommands)
+                //if there is an action do it and clear the textbox, else do nothing.
+                if (_actionOnEnter != null)
                 {
-                    //if the first char of the submitted string is \
-                    if (_text[0] == '\\')
-                    {
-                        //CommandManager.Execute(_lines.Last().Item1);
-                    }
+                    _actionOnEnter.Invoke(this, _text);
+
+                    _text = "";
+                    _cursorPos = 0;
+                    _textChanged = true;
                 }
-                _cursorPos = 0;
-                _textChanged = true;
             }
             else if (args.Key == Keys.Left)
             {
-                if (_cursorPos > 0)
+                if (_cursorPos >= 0)
                     _cursorPos--;
             }
             else if (args.Key == Keys.Right)
             {
-                if (_cursorPos < _text.Length - 1)
+                if (_cursorPos < _text.Length)
                     _cursorPos++;
             }
             else
             {
-                if (KeyboardEventManager.AlphaNum.Contains(args.Key))
+                if (KeyboardEventManager.Letters.Contains(args.Key))
                 {
                     if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
                         nChar = (char)args.Key;
                     else
                         nChar = char.ToLower((char)args.Key);
+                }
+                else if (args.Key == Keys.D1)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '!';
+                    else
+                        nChar = '1';
+                }
+                else if (args.Key == Keys.D2)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '@';
+                    else
+                        nChar = '2';
+                }
+                else if (args.Key == Keys.D3)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '#';
+                    else
+                        nChar = '3';
+                }
+                else if (args.Key == Keys.D4)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '$';
+                    else
+                        nChar = '4';
+                }
+                else if (args.Key == Keys.D5)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '%';
+                    else
+                        nChar = '5';
+                }
+                else if (args.Key == Keys.D6)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '^';
+                    else
+                        nChar = '6';
+                }
+                else if (args.Key == Keys.D7)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '&';
+                    else
+                        nChar = '7';
+                }
+                else if (args.Key == Keys.D8)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '*';
+                    else
+                        nChar = '8';
+                }
+                else if (args.Key == Keys.D9)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '(';
+                    else
+                        nChar = '9';
+                }
+                else if (args.Key == Keys.D0)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = ')';
+                    else
+                        nChar = '0';
+                }
+                else if (args.Key == Keys.Minus)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '_';
+                    else
+                        nChar = '-';
+                }
+                else if (args.Key == Keys.Equal)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = '+';
+                    else
+                        nChar = '=';
+                }
+                else if (args.Key == Keys.Semicolon)
+                {
+                    if (args.ModifierKeys.HasFlag(ActiveModifierKeys.Shift))
+                        nChar = ':';
+                    else
+                        nChar = ';';
                 }
                 else if (args.Key == Keys.Apostrophe)
                 {
@@ -408,7 +567,7 @@ namespace KirosEngine3.UI
                 float lineLength = _font.TextWidth(_text + nChar);
                 if (lineLength < Width)//if the line fits
                 {
-                    _text += nChar;
+                    _text = _text.Insert(_cursorPos, nChar.ToString());
                     _cursorPos++;
                     _textChanged = true;
                 }
@@ -423,6 +582,17 @@ namespace KirosEngine3.UI
         public void OnKeyHeld(object sender, KeyboardEventArgs args)
         {
             //todo:OnHeld
+        }
+
+        #endregion
+
+        #region Dispose
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
+        ~TextBox()
+        {
+            Dispose(false);
         }
         #endregion
     }

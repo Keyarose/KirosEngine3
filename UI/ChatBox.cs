@@ -11,7 +11,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 namespace KirosEngine3.UI
 {
     /// <summary>
-    /// A textbox UI element.
+    /// A Chat Box UI element.
     /// </summary>
     public class ChatBox : UIElement
     {

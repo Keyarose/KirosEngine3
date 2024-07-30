@@ -102,6 +102,7 @@ namespace KirosEngine3
 
             testTextBox = new TextBox(new Vec2(200.0f, 200f), new Vec2(400f, 30f), "inputbox", null);
             testTextBox.Init();
+            testTextBox.Border = true;
 
             KeyboardEventManager.CurrentContext = testTextBox.InputContext;
 

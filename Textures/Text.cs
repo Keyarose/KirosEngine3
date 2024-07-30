@@ -132,7 +132,7 @@ namespace KirosEngine3.Textures
         /// <summary>
         /// The text itself
         /// </summary>
-        public string[] Lines { get { return _text; } set { _text = value; _textChanged = true; Update(); } }
+        public string[] Lines { get { return _text; } set { _text = value; _textChanged = true; } }
 
         /// <summary>
         /// Get the number of lines the text spans.

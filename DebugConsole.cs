@@ -194,7 +194,11 @@ namespace KirosEngine3
         /// </summary>
         public void Update()
         {
-            _chatBox.Update();
+            if (_visible)
+            {
+                _mousePosLabel.Update();
+                _chatBox.Update();
+            }
         }
         #endregion
 

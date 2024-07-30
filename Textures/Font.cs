@@ -298,7 +298,7 @@ namespace KirosEngine3.Textures
             {
                 CharInfo ci = _charData[c];
 
-                result += ci.Width;
+                result += ci.XOffset + ci.XAdvance;//xAdvance instead of width to get accurate calc
             }
 
             return result;

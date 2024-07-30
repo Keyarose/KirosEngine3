@@ -10,7 +10,7 @@ namespace KirosEngine3.UI
     /// <summary>
     /// Base class for UI elements.
     /// </summary>
-    public abstract class UIElement
+    public abstract class UIElement : IDisposable
     {
         /// <summary>
         /// The position of the element on screen.
@@ -93,6 +93,11 @@ namespace KirosEngine3.UI
         /// </summary>
         protected bool _disposed = false;
 
+        /// <summary>
+        /// Flag that shows if the vertex array object is from the parent.
+        /// </summary>
+        protected bool _parentVAO = false;
+
         #region Properties
         /// <summary>
         /// The UI element's position.
@@ -151,10 +156,12 @@ namespace KirosEngine3.UI
             if (VAO == 0)
             {
                 _VAO = GL.GenVertexArray();
+                _parentVAO = false;
             }
             else
             {
                 _VAO = VAO;
+                _parentVAO = true;
             }
 
             GL.BindVertexArray(_VAO);
@@ -219,7 +226,7 @@ namespace KirosEngine3.UI
             GL.BindVertexArray(_VAO);
 
             sh.UseGL();
-            sh.SetUniformMat4GL("model", vm.Model * Matrix4.CreateTranslation(_position.AsVec3()));
+            sh.SetUniformMat4GL("model", vm.Model);
             sh.SetUniformMat4GL("proj", vm.UIOrtho);
             sh.SetUniformVec4GL("aColor", (Vec4)_borderColor);
 
@@ -233,6 +240,40 @@ namespace KirosEngine3.UI
             GL.DrawElements(PrimitiveType.Lines, _borderIndices.Length, DrawElementsType.UnsignedInt, 0);
 
             GL.BindVertexArray(0);
+        }
+        #endregion
+
+        #region Dispose
+        /// <summary>
+        /// Dispose of unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">If true program is calling dispose, if false GC is.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    //clear managed items
+                }
+
+                GL.DeleteBuffer(_VBO);
+                GL.DeleteBuffer(_EBO);
+
+                if (!_parentVAO)
+                    GL.DeleteVertexArray(_VAO);
+
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Release the textbox's resources for unloading.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

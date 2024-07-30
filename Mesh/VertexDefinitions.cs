@@ -189,6 +189,28 @@ namespace KirosEngine3.Mesh
         /// The size of the vertex in bytes.
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<Vertex2D>();
+
+        /// <summary>
+        /// Set the X component of the position.
+        /// </summary>
+        /// <param name="x">The new X value.</param>
+        public void SetX(float x)
+        {
+            Vec2 pos = Position;
+            pos.X = x;
+            Position = pos;
+        }
+
+        /// <summary>
+        /// Set the Y component of the position.
+        /// </summary>
+        /// <param name="y">The new Y value.</param>
+        public void SetY(float y)
+        {
+            Vec2 pos = Position;
+            pos.Y = y;
+            Position = pos;
+        }
     }
 
     /// <summary>
@@ -242,6 +264,15 @@ namespace KirosEngine3.Mesh
         /// The size of the vertex in bytes.
         /// </summary>
         public static readonly int SizeInBytesU = Unsafe.SizeOf<TexturedVertex2D>();
+
+        /// <summary>
+        /// Converts the TexturedVertex2D into Vertex2D.
+        /// </summary>
+        /// <returns>The resulting Vertex2D.</returns>
+        public Vertex2D AsVertex2D()
+        {
+            return new Vertex2D { Position = Position };
+        }
 
         #region ToString
         /// <inheritdoc/>

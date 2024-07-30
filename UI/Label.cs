@@ -1,5 +1,6 @@
 ﻿using KirosEngine3.Config;
 using KirosEngine3.Exceptions;
+using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
 using KirosEngine3.Textures;
@@ -57,8 +58,8 @@ namespace KirosEngine3.UI
         /// </summary>
         public override Vec2 Position 
         { 
-            get { return _labelText.Position; } 
-            set { _labelText.Position = value; _position = value; }
+            get { return _position; } 
+            set { _position = value; }
         }
 
         /// <summary>
@@ -112,7 +113,7 @@ namespace KirosEngine3.UI
         {
             _position = pos;
             _size = size;
-            _labelText = new Text(pos, text);
+            _labelText = new Text(Vec2.Zero, text);
             _attached = attached;
         }
 
@@ -137,7 +138,7 @@ namespace KirosEngine3.UI
         {
             _position = pos;
             _size = size;
-            _labelText = new Text(pos, font, text);
+            _labelText = new Text(Vec2.Zero, font, text);
             _attached = attached;
         }
 
@@ -173,6 +174,8 @@ namespace KirosEngine3.UI
         /// <inheritdoc/>
         public override void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
         {
+            vm.Model *= Matrix4.CreateTranslation(_position.AsVec3());
+
             base.DrawGL(vm, tu);
 
             if (tu != null && tu.Length > 0)
@@ -189,5 +192,14 @@ namespace KirosEngine3.UI
 
         #endregion
 
+        #region Update
+        /// <summary>
+        /// Update the Label.
+        /// </summary>
+        public void Update()
+        {
+            _labelText?.Update();
+        }
+        #endregion
     }
 }
