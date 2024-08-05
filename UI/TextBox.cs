@@ -210,7 +210,6 @@ namespace KirosEngine3.UI
 
             //apply transform to the view matrix model so sub methods don't need to calculate as well
             vm.Model *= Matrix4.CreateTranslation(_position.AsVec3());
-            base.DrawGL(vm, tu);
 
             if (!_font.UseFont(tu))
             {
@@ -222,11 +221,21 @@ namespace KirosEngine3.UI
                 return;
             }
 
+            if (!_parentVAO)
+                GL.BindVertexArray(_VAO);
+
+            base.DrawGL(vm, tu);
 
             sh.UseGL();
 
             string[] shTexUniforms = sh.TextureUniforms;
-            for (int i = 0; i < shTexUniforms.Length; i++)//todo: handle too few textureUnits
+            if (shTexUniforms.Length != tu.Length)
+            {
+                Client.Report("Too few texture units provided to {0}, {1} are needed.", this, shTexUniforms.Length);
+                return;
+            }
+
+            for (int i = 0; i < shTexUniforms.Length; i++)
             {
                 sh.SetUniformIntGL(shTexUniforms[i], Texture.TextureUnitToInt(tu[i]));
             }
@@ -235,8 +244,6 @@ namespace KirosEngine3.UI
             sh.SetUniformMat4GL("proj", vm.UIOrtho);
 
             sh.SetUniformVec4GL("aTextColor", (Vec4)_textColor);
-
-            GL.BindVertexArray(_VAO);
 
             if (_blendEnabled)
             {
@@ -264,7 +271,8 @@ namespace KirosEngine3.UI
                 GL.Disable(EnableCap.Blend);
             }
 
-            GL.BindVertexArray(0);
+            if (!_parentVAO)
+                GL.BindVertexArray(0);
         }
 
         /// <summary>
@@ -286,7 +294,7 @@ namespace KirosEngine3.UI
 
             Vertex2D[] cursorVerts;
             //calc cursor verts
-            if (_cursorPos == 0)
+            if (_verts.Length == 0)
             {
                 cursorVerts = [new Vertex2D { Position = new Vec2(0f, 0f) }, new Vertex2D { Position = new Vec2(0f, _font.Size) }];
             }
@@ -570,6 +578,8 @@ namespace KirosEngine3.UI
                     _text = _text.Insert(_cursorPos, nChar.ToString());
                     _cursorPos++;
                     _textChanged = true;
+
+                    UpdateText();//update text to ensure vertex data is updated before the next draw call
                 }
             }
         }

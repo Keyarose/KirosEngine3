@@ -122,9 +122,12 @@ namespace KirosEngine3.UI
             _lines = new List<Tuple<string, TexturedVertex2D[], uint[]>>(maxLines);
 
             if (inputContext == "")
-                _inputContext = "textlog-" + name;
+                _inputContext = "textLog-" + name;
             else
                 _inputContext = inputContext;
+
+            KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Up, KeyboardEventType.KeyPressed, OnKeyPress);
+            KeyboardEventManager.SubscribeKeyboardEvent(_inputContext, Keys.Down, KeyboardEventType.KeyPressed, OnKeyPress);
         }
 
         #region Load
@@ -171,7 +174,6 @@ namespace KirosEngine3.UI
                 return;
             }
             vm.Model *= Matrix4.CreateTranslation(_position.AsVec3());
-            base.DrawGL(vm, tu);
 
             if (!_font.UseFont(tu))
             {
@@ -183,11 +185,22 @@ namespace KirosEngine3.UI
                 return;
             }
 
+            if (!_parentVAO)
+                GL.BindVertexArray(_VAO);
+
+            base.DrawGL(vm, tu);
+
             sh.UseGL();
 
             //set the shader uniforms
             string[] shTexUniforms = sh.TextureUniforms;
-            for (int i = 0; i < shTexUniforms.Length; i++)//todo: handle too few textureUnits
+            if (shTexUniforms.Length != tu.Length)
+            {
+                Client.Report("Too few texture units provided to {0}, {1} are needed.", this, shTexUniforms.Length);
+                return;
+            }
+
+            for (int i = 0; i < shTexUniforms.Length; i++)
             {
                 sh.SetUniformIntGL(shTexUniforms[i], Texture.TextureUnitToInt(tu[i]));
             }
@@ -196,8 +209,6 @@ namespace KirosEngine3.UI
             sh.SetUniformMat4GL("proj", vm.UIOrtho);
 
             sh.SetUniformVec4GL("aTextColor", (Vec4)_textColor);
-
-            GL.BindVertexArray(_VAO);
 
             if (_blendEnabled)
             {
@@ -227,7 +238,8 @@ namespace KirosEngine3.UI
                 GL.Disable(EnableCap.Blend);
             }
 
-            GL.BindVertexArray(0);
+            if (!_parentVAO)
+                GL.BindVertexArray(0);
         }
         #endregion
 
@@ -328,8 +340,11 @@ namespace KirosEngine3.UI
             for (int i = 0; i < subs.Length;)
             {
                 string workingLine = "" + subs[i];
+                i++;//index i was used so go to the next
+
                 float lineWidth = _font.TextWidth(workingLine);
-                while (lineWidth < Width)
+
+                while (lineWidth < Width && i < subs.Length)
                 {
                     lineWidth = _font.TextWidth(workingLine + subs[i]);
                     if (lineWidth > Width)//if adding the next char is too long break the loop

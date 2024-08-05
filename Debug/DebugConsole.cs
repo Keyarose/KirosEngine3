@@ -11,12 +11,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KirosEngine3
+namespace KirosEngine3.Debug
 {
-    internal class DebugConsole
+    /// <summary>
+    /// The application debug console for development and testing.
+    /// </summary>
+    public class DebugConsole : IDisposable
     {
         private static DebugConsole? _instance;
 
+        /// <summary>
+        /// The chat box that displays the debug log and allows input.
+        /// </summary>
         protected ChatBox _chatBox;
 
         private static readonly Queue<string> _preloadBuffer = new Queue<string>();
@@ -26,14 +32,33 @@ namespace KirosEngine3
         /// </summary>
         protected Label _mousePosLabel;
 
-        protected bool _visible;
-        //todo: preload line buffer for messages before the _instance is created
+        /// <summary>
+        /// Whether the DebugConsole is currently visible.
+        /// </summary>
+        protected bool _visible = false;
+
+        /// <summary>
+        /// Flag that shows if the DebugConsole has been loaded.
+        /// </summary>
+        protected bool _loaded = false;
+
+        /// <summary>
+        /// Flag that shows if the DebugConsole is being disposed of.
+        /// </summary>
+        protected bool _disposed = false;
+
+        /// <summary>
+        /// The position on the screen of the DebugConsole.
+        /// </summary>
         public Vec2 Position
         {
             get { return _chatBox.Position; }
             set { _chatBox.Position = value; }
         }
 
+        /// <summary>
+        /// The size of the DebugConsole.
+        /// </summary>
         public Vec2 Size
         {
             get { return _chatBox.Size; }
@@ -58,16 +83,19 @@ namespace KirosEngine3
             set { _visible = value; }
         }
 
+        /// <summary>
+        /// The DebugConsole Instance.
+        /// </summary>
         public static DebugConsole? Instance
         {
-            get 
+            get
             {
                 if (_instance == null)
                 {
                     Logger.WriteToLog("Call to Debug Console before it was created.");
                     Console.WriteLine("Call to Debug Console before it was created.");
                 }
-                return _instance; 
+                return _instance;
             }
         }
 
@@ -79,7 +107,7 @@ namespace KirosEngine3
             this((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y, maxLines, font)
         { }
 
-        private DebugConsole(int xPos,  int yPos, int width, int height, int maxLines) : this(xPos, yPos, width, height, maxLines, FontManager.Default)
+        private DebugConsole(int xPos, int yPos, int width, int height, int maxLines) : this(xPos, yPos, width, height, maxLines, FontManager.Default)
         { }
 
         private DebugConsole(int xPos, int yPos, int width, int height, int maxLines, Font? font)
@@ -112,9 +140,7 @@ namespace KirosEngine3
             }
             else
             {
-                Console.WriteLine("Debug Console already created.");
-                Logger.WriteToLog("Debug Console already created.");
-                //write to debug
+                Client.Report("Debug Console already created.");
             }
         }
 
@@ -130,7 +156,7 @@ namespace KirosEngine3
             }
             else
             {
-                Instance._chatBox.AddLine(message);
+                Instance._chatBox.AddToTextLog("debugWrite", message);
             }
         }
 
@@ -162,12 +188,12 @@ namespace KirosEngine3
         {
             _mousePosLabel.Init();
             _chatBox.Init();
-            
-            for (int i = 0; i < _preloadBuffer.Count; i++) //add all buffered messages to the textbox
-            {
-                _chatBox.AddLine(_preloadBuffer.Dequeue());
-            }
 
+            int pbCount = _preloadBuffer.Count;
+            for (int i = 0; i < pbCount; i++) //add all buffered messages to the textbox
+            {
+                _chatBox.AddToTextLog("preloadBuffer", _preloadBuffer.Dequeue());
+            }
 
             _chatBox.Border = true;
             _chatBox.ReceivesCommands = true;
@@ -180,7 +206,7 @@ namespace KirosEngine3
         /// </summary>
         public void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
         {
-            if(_visible) 
+            if (_visible)
             {
                 _mousePosLabel.DrawGL(vm, tu);
                 _chatBox.DrawGL(vm, tu);
@@ -203,13 +229,18 @@ namespace KirosEngine3
         #endregion
 
         #region Input
+        /// <summary>
+        /// On Key pressed event input processing.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="args">The event arguments.</param>
         public void OnKeyPress(object sender, KeyboardEventArgs args)
         {
             if (args.Key == Keys.GraveAccent)//if the grave key is pressed toggle visibility and current input context 
             {
                 _visible = !_visible;
-                
-                if (_visible ) 
+
+                if (_visible)
                 {
                     KeyboardEventManager.SetContext(_chatBox.InputContext);
                     _chatBox.ForceUpdate();
@@ -221,6 +252,11 @@ namespace KirosEngine3
             }
         }
 
+        /// <summary>
+        /// On mouse move event processing.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The arguments.</param>
         public void OnMouseMove(object sender, MouseEventArgs args)
         {
             Vec2 position = args.ScreenPosition;
@@ -229,6 +265,43 @@ namespace KirosEngine3
         }
         #endregion
 
-        //todo: disposal and cleanup
+        #region Dispose
+        /// <summary>
+        /// Dispose of unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">If true the program is calling, false is the GC.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                if (disposing)
+                {
+                    //clear managed items
+                }
+
+                _chatBox.Dispose();
+                _mousePosLabel.Dispose();
+
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Release the DebugConsole's resources for unloading.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Deconstructor.
+        /// </summary>
+        ~DebugConsole()
+        {
+            Dispose(false);
+        }
+        #endregion
     }
 }

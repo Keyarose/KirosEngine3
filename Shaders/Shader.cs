@@ -15,6 +15,7 @@ using System.Xml.Schema;
 using System.Xml;
 using KirosEngine3.Config;
 using KirosEngine3.Exceptions;
+using KirosEngine3.Debug;
 
 namespace KirosEngine3.Shaders
 {

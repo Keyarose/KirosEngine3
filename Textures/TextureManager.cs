@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using KirosEngine3.Debug;
 using KirosEngine3.Exceptions;
 using OpenTK.Graphics.OpenGL4;
 

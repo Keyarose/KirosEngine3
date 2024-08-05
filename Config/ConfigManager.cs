@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Exceptions;
+﻿using KirosEngine3.Debug;
+using KirosEngine3.Exceptions;
 using KirosEngine3.Shaders;
 using KirosEngine3.Textures;
 using KirosEngine3.XML;

@@ -1,4 +1,5 @@
 ﻿using KirosEngine3.Config;
+using KirosEngine3.Debug;
 using KirosEngine3.Exceptions;
 using OpenTK.Graphics.OpenGL4;
 using StbImageSharp;

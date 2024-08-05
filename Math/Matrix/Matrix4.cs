@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using KirosEngine3.Debug;
 
 namespace KirosEngine3.Math.Matrix
 {

@@ -1,4 +1,5 @@
-﻿using OpenTK.Windowing.GraphicsLibraryFramework;
+﻿using KirosEngine3.Debug;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace KirosEngine3.Input
 {
@@ -42,7 +43,7 @@ namespace KirosEngine3.Input
         /// <param name="sender">The sending object</param>
         /// <param name="e">The keyboard event arguments</param>
         public delegate void KeyboardEventHandler(object sender, KeyboardEventArgs e);
-        private Dictionary<string, Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>> _eventRegistry = [];
+        private readonly Dictionary<string, Dictionary<Tuple<Keys, KeyboardEventType>, KeyboardEventHandler>> _eventRegistry = [];
 
         /// <summary>
         /// Grouped collection of alpha numeric keys for registration.

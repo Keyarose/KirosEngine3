@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Math.Vector;
+﻿using KirosEngine3.Debug;
+using KirosEngine3.Math.Vector;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 

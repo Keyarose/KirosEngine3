@@ -1,4 +1,5 @@
 ﻿using KirosEngine3.Config;
+using KirosEngine3.Debug;
 using KirosEngine3.Exceptions;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
@@ -282,6 +283,29 @@ namespace KirosEngine3.Textures
             return false;
         }
 
+        private CharInfo GetCharInfo(char c)
+        {
+            CharInfo ci;
+
+            try
+            {
+                ci = _charData[c];
+            }
+            catch (KeyNotFoundException)
+            {
+                ci = UnknownChar;//the character is not supported by the current font
+            }
+
+            if (c == '\t')//handle tab char as TabSize number of spaces
+            {
+                ci = _charData[' '];
+                ci.Width *= TabSize;
+                ci.XAdvance *= TabSize;
+            }
+
+            return ci;
+        }
+
         /// <summary>
         /// Get the width the text would have when rendered.
         /// </summary>
@@ -296,7 +320,7 @@ namespace KirosEngine3.Textures
 
             foreach (char c in text)
             {
-                CharInfo ci = _charData[c];
+                CharInfo ci = GetCharInfo(c);//todo: need to handle escape chars.
 
                 result += ci.XOffset + ci.XAdvance;//xAdvance instead of width to get accurate calc
             }

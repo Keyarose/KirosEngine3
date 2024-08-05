@@ -1,4 +1,5 @@
-﻿using KirosEngine3.Math.Data;
+﻿using KirosEngine3.Debug;
+using KirosEngine3.Math.Data;
 using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
@@ -89,7 +90,7 @@ namespace KirosEngine3.UI
         protected bool _warnOnce = false;
 
         /// <summary>
-        /// Flag that shows if the textbox is being disposed of.
+        /// Flag that shows if the UIElement is being disposed of.
         /// </summary>
         protected bool _disposed = false;
 
@@ -195,12 +196,10 @@ namespace KirosEngine3.UI
         /// <param name="tu">The texture units to use for rendering.</param>
         public virtual void DrawGL(ViewMatrixes vm, params TextureUnit[] tu)
         {
-            GL.BindVertexArray(_VAO);
             if (_border)
             {
                 DrawBorderGL(vm);
             }
-            GL.BindVertexArray(0);
         }
 
         /// <summary>
@@ -223,7 +222,8 @@ namespace KirosEngine3.UI
                 return;
             }
 
-            GL.BindVertexArray(_VAO);
+            //vertex array binding should happen in the sub class
+            //GL.BindVertexArray(_VAO);
 
             sh.UseGL();
             sh.SetUniformMat4GL("model", vm.Model);
@@ -239,7 +239,7 @@ namespace KirosEngine3.UI
             sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vertex2D.SizeInBytesU });
             GL.DrawElements(PrimitiveType.Lines, _borderIndices.Length, DrawElementsType.UnsignedInt, 0);
 
-            GL.BindVertexArray(0);
+            //GL.BindVertexArray(0);
         }
         #endregion
 
@@ -268,7 +268,7 @@ namespace KirosEngine3.UI
         }
 
         /// <summary>
-        /// Release the textbox's resources for unloading.
+        /// Release the UIElement's resources for unloading.
         /// </summary>
         public void Dispose()
         {

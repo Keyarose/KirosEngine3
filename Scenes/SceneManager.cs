@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using KirosEngine3.Debug;
 using KirosEngine3.Exceptions;
 
 namespace KirosEngine3.Scenes
