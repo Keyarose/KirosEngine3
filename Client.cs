@@ -1,4 +1,6 @@
-﻿using KirosEngine3.Math.Matrix;
+﻿using KirosEngine3.Debug;
+using KirosEngine3.Input;
+using KirosEngine3.Math.Matrix;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -38,6 +40,11 @@ namespace KirosEngine3
         private static bool _showGLDebugNotify = false;
 
         /// <summary>
+        /// Flag for if the debug notify messages should be output.
+        /// </summary>
+        public static bool ShowDebugNotify => _showGLDebugNotify;
+
+        /// <summary>
         /// Basic constructor.
         /// </summary>
         /// <param name="width">The width of the client window.</param>
@@ -62,10 +69,10 @@ namespace KirosEngine3
             if (severity == DebugSeverity.DebugSeverityNotification)
             {
                 if (_showGLDebugNotify)
-                    Console.WriteLine("[{0} type={1} id={2}] {3}", severity, type, id, message);
+                    Report("[{0} type={1} id={2}] {3}", severity, type, id, message);
             }
             else
-                Console.WriteLine("[{0} type={1} id={2}] {3}", severity, type, id, message);
+                Report("[{0} type={1} id={2}] {3}", severity, type, id, message);
         }
 
         /// <summary>
@@ -117,7 +124,7 @@ namespace KirosEngine3
         /// </summary>
         /// <param name="msg">The message format to write.</param>
         /// <param name="args">The arguments for the format.</param>
-        public static void Report(string msg, params object[] args)
+        public static void Report(string msg, params object?[] args)
         {
             Console.WriteLine(msg, args);
             Logger.WriteToLog(msg, args);
@@ -133,6 +140,8 @@ namespace KirosEngine3
 
             //OpenGL debug messaging
             GL.DebugMessageCallback(DebugDelegate, 0);
+
+            CommandManager.RegisterCommand("get", new Action<string, string>(GetValue));
         }
 
         /// <summary>
@@ -142,6 +151,14 @@ namespace KirosEngine3
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             base.OnUpdateFrame(args);
+
+            if (!IsFocused) { return; }
+
+            //check keyboard state and notify subscribers
+            KeyboardEventManager.Update(KeyboardState, args.Time);
+            MouseEventManager.Update(MouseState, args.Time);
+
+            DebugConsole.Instance?.Update();
         }
 
         /// <summary>
@@ -152,6 +169,29 @@ namespace KirosEngine3
         {
             base.OnRenderFrame(args);
         }
+
+        #region Cmd Methods
+        /// <summary>
+        /// Command method for getting the specified variable value.
+        /// </summary>
+        /// <param name="objName">The name of the object to get the property of.</param>
+        /// <param name="propertyName">The name of the variable/property to get.</param>
+        public void GetValue(string objName, string propertyName)
+        {
+            if (objName.Equals("client", StringComparison.InvariantCultureIgnoreCase))
+            {
+                object? prop = GetType().GetProperty(propertyName);
+
+                //object val = prop?.GetValue(this);
+
+                Report("{0}: {1}", propertyName, prop);
+            }
+            else
+            {
+                //todo: pass to scene manager to check.
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Handle window resize events
@@ -170,6 +210,8 @@ namespace KirosEngine3
         protected override void OnUnload()
         {
             base.OnUnload();
+
+            DebugConsole.Instance?.Dispose();
         }
     }
 

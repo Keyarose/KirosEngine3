@@ -1,5 +1,6 @@
 ﻿using KirosEngine3.Camera;
 using KirosEngine3.Config;
+using KirosEngine3.Debug;
 using KirosEngine3.Input;
 using KirosEngine3.Math.Data;
 using KirosEngine3.Math.Matrix;
@@ -25,7 +26,6 @@ namespace KirosEngine3
         Text? testText;
         Cube? testCube;
         Sphere? testSphere;
-        Label? testLabel;
 
         TexturedQuad? testTexQ;
         CoordinateGrid? testGrid;
@@ -34,7 +34,6 @@ namespace KirosEngine3
         BaseCamera? camera;
 
         ScreenButton? testSButton;
-        TextBox? testTextBox;
 
         public TestClient(int width, int height) : base(width, height, "Test Client")
         {
@@ -59,6 +58,12 @@ namespace KirosEngine3
             //GL.Enable(EnableCap.DebugOutput);
             //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);//wireframe drawing
 
+            //cmd setup
+            CommandManager.RegisterCommand("enableGLDebugNotify", new Action(EnableGLDebugNotify));
+            CommandManager.RegisterCommand("disableGLDebugNotify", new Action(DisableGLDebugNotify));
+            CommandManager.RegisterCommand("setCam", new Action<int, int, int>((x, y, z) => camera!.Position = new Vec3(x, y, z)));
+            CommandManager.RegisterCommand("setCamf", new Action<float, float, float>((x, y, z) => camera!.Position = new Vec3(x, y, z)));
+
             //system control setup
             KeyboardEventManager.CurrentContext = "system";
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
@@ -82,10 +87,6 @@ namespace KirosEngine3
             testSphere.Init("pos");
             testSphere.Color = Color4.Blue;
 
-            testLabel = new Label(new(400f, 300f), "Label Test.");
-            testLabel.Init();
-            testLabel.Border = true;
-
             testGrid = CoordinateGrid.UnitGridXY;
             testGrid.Init();
 
@@ -100,18 +101,14 @@ namespace KirosEngine3
             testSButton = new ScreenButton(new Vec2(100.0f, 0.0f), Color4.Yellow, new Vec2(200f, 300f), "color");
             testSButton.Init();
 
-            testTextBox = new TextBox(new Vec2(200.0f, 200f), new Vec2(400f, 30f), "inputbox", null);
-            testTextBox.Init();
-            testTextBox.Border = true;
-
-            KeyboardEventManager.CurrentContext = testTextBox.InputContext;
 
             //testTexQ = new TexturedQuad(Quad.UnitQuad, "wall");
             testTexQ = new TexturedQuad([new(0f, 0f, 0f), new(200f, 0f, 0f), new(200f, 200f, 0f), new(0f, 200f, 0f)], [0, 1, 2, 2, 3, 0], "defaultFont");
             testTexQ.Init();
 
             //ToString testing
-            //Console.WriteLine(testQuad.ToString());
+            //foreach (var tex in Logger.ListLogs(7, 31))
+                //Console.WriteLine("Log: {0}, date: {1}", tex.Item1, tex.Item2);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -119,12 +116,7 @@ namespace KirosEngine3
             base.OnUpdateFrame(args);
 
             if (!IsFocused) { return; }
-            //check keyboard state and notify subscribers
-            KeyboardEventManager.Update(KeyboardState, args.Time);
-            MouseEventManager.Update(MouseState, args.Time);
-
-            testTextBox?.Update();
-            DebugConsole.Instance?.Update();
+            
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -155,8 +147,6 @@ namespace KirosEngine3
             //hud and 2d
             DebugConsole.Instance?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
-            testLabel?.DrawGL(viewMatrixes, TextureUnit.Texture0);
-            testTextBox?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             //end hud and 2d
 
             SwapBuffers();
@@ -170,7 +160,6 @@ namespace KirosEngine3
         {
             base.OnResize(e);
             //todo: handle components that make use of window size
-            GL.Viewport(0, 0, e.Width, e.Height);
         }
 
         protected override void OnUnload()
