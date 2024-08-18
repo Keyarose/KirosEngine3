@@ -20,7 +20,7 @@ namespace KirosEngine3
             {
                 ConfigManager.AddVar("ScreenWidth", "1200");
                 ConfigManager.AddVar("ScreenHeight", "900");
-                using Client client = new MathTestClient(1200, 900);
+                using Client client = new UITestClient(1200, 900);
                 client.Run();
             }
         }

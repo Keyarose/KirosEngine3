@@ -4,6 +4,7 @@ using KirosEngine3.Math.Matrix;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
 using KirosEngine3.Shaders;
+using KirosEngine3.Textures;
 using OpenTK.Graphics.OpenGL4;
 
 namespace KirosEngine3.UI
@@ -58,6 +59,23 @@ namespace KirosEngine3.UI
         /// The indices for the element's border.
         /// </summary>
         protected uint[] _borderIndices = [];
+        #endregion
+
+        #region Background Fields
+        /// <summary>
+        /// The color to use for the UI Element's background. Defaults to Clear.
+        /// </summary>
+        protected Color4 _backgroundColor = Color4.Clear;
+
+        /// <summary>
+        /// The texture to use for the UI Element's background if it has one.
+        /// </summary>
+        protected Texture? _backgroundTexture;
+
+        /// <summary>
+        /// The texture coordinates for the UI Element's background if it has one.
+        /// </summary>
+        protected Vec2[]? _backgroundTexCoords;
         #endregion
 
         /// <summary>
@@ -141,6 +159,21 @@ namespace KirosEngine3.UI
         public virtual Color4 BorderColor { get { return _borderColor; } set { _borderColor = value; } }
 
         /// <summary>
+        /// The color of the element's background.
+        /// </summary>
+        public virtual Color4 BackgroundColor { get { return _backgroundColor; } set { _backgroundColor = value; } }
+
+        /// <summary>
+        /// The texture of the element's background.
+        /// </summary>
+        public virtual Texture? BackgroundTexture { get { return _backgroundTexture; } set { _backgroundTexture = value; } }
+
+        /// <summary>
+        /// The texture coordinates of the element's background.
+        /// </summary>
+        public virtual Vec2[]? BackgroundTexCoords { get { return _backgroundTexCoords; } set { _backgroundTexCoords = value; } }
+
+        /// <summary>
         /// The parent UI Element to this one.
         /// </summary>
         public virtual UIElement? Parent { get { return _containingElement; } set { _containingElement = value; } }
@@ -200,6 +233,7 @@ namespace KirosEngine3.UI
             {
                 DrawBorderGL(vm);
             }
+            DrawBackgroundGL(vm, tu);
         }
 
         /// <summary>
@@ -215,9 +249,7 @@ namespace KirosEngine3.UI
         {
             if (!ShaderManager.TryGetShader(ShaderManager.DefaultColor2DShaderName, out Shader? sh))
             {
-                Console.WriteLine("Cannot draw border for {0} when default color shader is null.", GetType().Name);
-                Logger.WriteToLog("Cannot draw border for {0} when default color shader is null.", GetType().Name);
-                DebugConsole.WriteLine("Cannot draw border for {0} when default color shader is null.", GetType().Name);
+                Client.Report("Cannot draw border for {0} when default color shader is null.", GetType().Name);
 
                 return;
             }
@@ -240,6 +272,45 @@ namespace KirosEngine3.UI
             GL.DrawElements(PrimitiveType.Lines, _borderIndices.Length, DrawElementsType.UnsignedInt, 0);
 
             //GL.BindVertexArray(0);
+        }
+
+        /// <summary>
+        /// Draw the background of the UI Element.
+        /// </summary>
+        /// <param name="vm">The view matrices to use in rendering.</param>
+        /// <param name="tu">The texture unit to use in rendering.</param>
+        protected virtual void DrawBackgroundGL(ViewMatrixes vm, params TextureUnit[] tu)
+        {
+            //background is clear no rendering required.
+            if (_backgroundTexture == null && (_backgroundColor == Color4.Transparent || _borderColor == Color4.Clear)) { return; }
+
+            if (_backgroundTexture == null)
+            {
+                if (!ShaderManager.TryGetShader(ShaderManager.DefaultColor2DShaderName, out Shader? sh))
+                {
+                    Client.Report("Cannot draw background for {0} when default color shader is null.", GetType().Name);
+
+                    return;
+                }
+
+                sh.UseGL();
+                sh.SetUniformMat4GL("model", vm.Model);
+                sh.SetUniformMat4GL("proj", vm.UIOrtho);
+                sh.SetUniformVec4GL("aColor", (Vec4)_backgroundColor);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);//use the border vertices as they are the same data
+                GL.BufferData(BufferTarget.ArrayBuffer, Vertex2D.SizeInBytesU * _borderVerts.Length, _borderVerts, BufferUsageHint.StaticDraw);
+
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
+                GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * 6, [0, 1, 3, 3, 1, 2], BufferUsageHint.StaticDraw);
+
+                sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vertex2D.SizeInBytesU });
+                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+            }
+            else
+            {
+                //todo: draw with texture
+            }
         }
         #endregion
 

@@ -199,6 +199,11 @@ namespace KirosEngine3.Math.Data
         public static readonly Color4 Transparent = new Color4(255, 255, 255, 0);
 
         /// <summary>
+        /// Predefined color: Clear. Alias of Transparent.
+        /// </summary>
+        public static readonly Color4 Clear = Transparent;
+
+        /// <summary>
         /// A predefined color: Aqua.
         /// </summary>
         public static readonly Color4 Aqua = new Color4(0, 255, 255, 255);

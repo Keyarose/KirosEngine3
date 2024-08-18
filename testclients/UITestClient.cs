@@ -70,6 +70,9 @@ namespace KirosEngine3.testclients
 
             testScrollLog = new ScrollableTextLog(new(50f, 200f), new(300f, 200f), "scrollLog", null, 20);
             testScrollLog.Init();
+            testScrollLog.BackgroundColor = Color4.Green;
+            testScrollLog.Border = true;
+            testScrollLog.BorderColor = Color4.Red;
 
             testScrollLog.AddLine("test 1 test2 test #, test4 te5t %, ; test 77a");
             testScrollLog.AddLine("For score and two tons.");
