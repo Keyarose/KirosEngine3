@@ -256,6 +256,15 @@ namespace KirosEngine3.UI
             }
         }
 
+        /// <summary>
+        /// Add to the action to be performed when submitting text
+        /// </summary>
+        /// <param name="action"></param>
+        public void AddSubmitAction(TextBox.TextSubmissionAction action)
+        {
+            _textbox.ActionOnEnter += action;
+        }
+
         #region Dispose
         /// <summary>
         /// Deconstructor.

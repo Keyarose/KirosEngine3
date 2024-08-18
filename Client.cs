@@ -183,7 +183,7 @@ namespace KirosEngine3
                 object? prop = GetType().GetProperty(propertyName);
 
                 //object val = prop?.GetValue(this);
-
+                //todo: incomplete
                 Report("{0}: {1}", propertyName, prop);
             }
             else
