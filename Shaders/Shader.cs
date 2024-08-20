@@ -408,9 +408,7 @@ namespace KirosEngine3.Shaders
         {
             if (UVAttribName.Equals(string.Empty))
             {
-                Console.WriteLine("Shader: {0} does not have a UV attribute name defined.", Name);
-                Logger.WriteToLog("Shader: {0} does not have a UV attribute name defined.", Name);
-                DebugConsole.WriteLine("Shader: {0} does not have a UV attribute name defined.", Name);
+                Client.Report("Shader: {0} does not have a UV attribute name defined.", Name);
                 return;
             }
 
@@ -554,9 +552,7 @@ namespace KirosEngine3.Shaders
                 return;
             }
 
-            Console.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
-            Logger.WriteToLog("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
-            DebugConsole.WriteLine("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
+            Client.Report("Failed to acquire attribute location named: {0} in shader: {1}", name, _name);
         }
 
         /// <summary>

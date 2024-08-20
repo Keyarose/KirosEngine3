@@ -246,9 +246,11 @@ namespace KirosEngine3.Config
                         case "color2d":
                             ShaderManager.DefaultColor2DShaderName = shader.ShaderName;
                             break;
+                        case "texColor2d":
+                            ShaderManager.DefaultTexColor2DShaderName = shader.ShaderName;
+                            break;
                         default:
-                            Console.WriteLine("Shader defaultFor: {0} is not a handled case.", shader.DefaultFor);
-                            Logger.WriteToLog("Shader defaultFor: {0} is not a handled case.", shader.DefaultFor);
+                            Client.Report("Shader defaultFor: {0} is not a handled case.", shader.DefaultFor);
                             break;
                     }
                 }

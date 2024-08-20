@@ -15,6 +15,8 @@
   <ItemGroup>
     <None Remove=".gitignore" />
     <None Remove="Resources\Config\generalConfig.xml" />
+    <None Remove="Resources\Shaders\Pos2DTexColor.frag" />
+    <None Remove="Resources\Shaders\Pos2DTexColor.vert" />
     <None Remove="Resources\Shaders\PosShader.frag" />
     <None Remove="Resources\Shaders\PosShader.vert" />
     <None Remove="Resources\Shaders\TextureShader.frag" />

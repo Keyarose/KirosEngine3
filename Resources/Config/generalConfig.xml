@@ -30,6 +30,10 @@
       <shader name="pos2d" vertShader="Pos2DColor.vert" fragShader="Pos2DColor.frag" defaultFor="color2d">
         <shaderAttribute name="aPosition" type="position" value="vec2"/>
       </shader>
+      <shader name="pos2dtexcolor" vertShader="Pos2DTexColor.vert" fragShader="Pos2DTexColor.frag" defaultFor="texColor2d">
+        <shaderAttribute name="aPosition" type="position" value="vec2"/>
+        <shaderAttribute name="aUV" type="uv" value="vec2"/>
+      </shader>
     </shaders>
     <colors>
       <color name="clearColor" r="0.2" g="0.3" b="0.3" a="0.1"/>

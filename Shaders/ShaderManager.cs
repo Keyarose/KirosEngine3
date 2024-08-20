@@ -20,7 +20,7 @@ namespace KirosEngine3.Shaders
         private static string _defaultTextShaderName = string.Empty;
         private static string _defaultColorShaderName = string.Empty;
         private static string _defaultColor2DShaderName = string.Empty;
-        
+        private static string _defaultTexColor2DShaderName = string.Empty;
         private readonly Dictionary<string, Shader> _shaders = [];
 
         /// <summary>
@@ -71,8 +71,7 @@ namespace KirosEngine3.Shaders
                 }
                 else
                 {
-                    Console.WriteLine("Default Text Shader is not configured or the wrong name was used: {0}", _defaultTextShaderName);
-                    Logger.WriteToLog("Default Text Shader is not configured or the wrong name was used: {0}", _defaultTextShaderName);
+                    Client.Report("Default Text Shader is not configured or the wrong name was used: {0}", _defaultTextShaderName);
                     return null;
                 }
             }
@@ -110,8 +109,7 @@ namespace KirosEngine3.Shaders
                 }
                 else
                 {
-                    Console.WriteLine("Default Color Shader is not configured or the wrong name was used: {0}", _defaultColorShaderName);
-                    Logger.WriteToLog("Default Color Shader is not configured or the wrong name was used: {0}", _defaultColorShaderName);
+                    Client.Report("Default Color Shader is not configured or the wrong name was used: {0}", _defaultColorShaderName);
                     return null;
                 }
             }
@@ -142,8 +140,38 @@ namespace KirosEngine3.Shaders
                 }
                 else
                 {
-                    Console.WriteLine("Default 2D Color Shader is not configured or the wrong name was used: {0}", _defaultColor2DShaderName);
-                    Logger.WriteToLog("Default 2D Color Shader is not configured or the wrong name was used: {0}", _defaultColor2DShaderName);
+                    Client.Report("Default 2D Color Shader is not configured or the wrong name was used: {0}", _defaultColor2DShaderName);
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get or set the name of the default 2D textured color shader.
+        /// </summary>
+        public static string DefaultTexColor2DShaderName
+        {
+            get { return _defaultTexColor2DShaderName; }
+            set { _defaultTexColor2DShaderName = value; }
+        }
+
+        /// <summary>
+        /// The default shader for 2D textured color shading.
+        /// </summary>
+        public static Shader? DefaultTexColor2DShader
+        {
+            get
+            {
+                if (_defaultTexColor2DShaderName != string.Empty)
+                {
+                    if (TryGetShader(_defaultTexColor2DShaderName, out Shader? sh))//get the default color shader
+                        return sh;
+                    else
+                        throw new MissingConfigException(string.Format("Shader named: {0} not found despite supposedly having been loaded from config.", _defaultTexColor2DShaderName));
+                }
+                else
+                {
+                    Client.Report("Default 2D Textured Color Shader is not configured or the wrong name was used: {0}", _defaultTexColor2DShaderName);
                     return null;
                 }
             }

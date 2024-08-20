@@ -97,9 +97,7 @@ namespace KirosEngine3.Textures
                 return true;
             }
 
-            Logger.WriteToLog("Texture name: {0} is already in use. Use ReserveTexture instead.", name);
-            Console.WriteLine("Texture name: {0} is already in use. Use ReserveTexture instead.", name);
-            DebugConsole.WriteLine("Texture name: {0} is already in use. Use ReserveTexture instead.", name);
+            Client.Report("Texture name: {0} is already in use. Use ReserveTexture instead.", name);
 
             return false;
         }
@@ -178,9 +176,7 @@ namespace KirosEngine3.Textures
                 }
                 else if (Instance._reservations[name] < 0)
                 {
-                    Logger.WriteToLog("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name);
-                    Console.WriteLine("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name);
-                    DebugConsole.WriteLine("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name);
+                    Client.Report("Texture name: {0} has been released more than it has been reserved. Check the releases and reservations.", name);
                 }
             }
 
@@ -197,6 +193,8 @@ namespace KirosEngine3.Textures
         {
             if (Instance._textures.TryGetValue(name, out texture))
             { return true; }
+
+            //todo: check app resource manifest for a texture of the given name that might not have been loaded.
 
             texture = null;
             return false;
