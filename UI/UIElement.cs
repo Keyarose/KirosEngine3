@@ -1,6 +1,4 @@
-﻿using KirosEngine3.Debug;
-using KirosEngine3.Math.Data;
-using KirosEngine3.Math.Matrix;
+﻿using KirosEngine3.Math.Data;
 using KirosEngine3.Math.Vector;
 using KirosEngine3.Mesh;
 using KirosEngine3.Shaders;
@@ -87,6 +85,11 @@ namespace KirosEngine3.UI
         /// The vertex buffer object.
         /// </summary>
         protected int _VBO;
+
+        /// <summary>
+        /// The buffer object for secondary vertex data. i.e. Texture coordinates, normals, etc.
+        /// </summary>
+        protected int _VBO2;
 
         /// <summary>
         /// The index buffer object.
@@ -201,6 +204,7 @@ namespace KirosEngine3.UI
             GL.BindVertexArray(_VAO);
 
             _VBO = GL.GenBuffer();
+            _VBO2 = GL.GenBuffer();
             _EBO = GL.GenBuffer();
 
             GL.BindVertexArray(0);
@@ -254,7 +258,7 @@ namespace KirosEngine3.UI
                 return;
             }
 
-            //vertex array binding should happen in the sub class
+            //vertex array binding should happen in the sub class draw()
             //GL.BindVertexArray(_VAO);
 
             sh.UseGL();
@@ -298,6 +302,8 @@ namespace KirosEngine3.UI
                 sh.SetUniformMat4GL("proj", vm.UIOrtho);
                 sh.SetUniformVec4GL("aColor", (Vec4)_backgroundColor);
 
+                //vertex array should be bound in subclass draw()
+
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);//use the border vertices as they are the same data
                 GL.BufferData(BufferTarget.ArrayBuffer, Vertex2D.SizeInBytesU * _borderVerts.Length, _borderVerts, BufferUsageHint.StaticDraw);
 
@@ -307,9 +313,50 @@ namespace KirosEngine3.UI
                 sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vertex2D.SizeInBytesU });
                 GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
             }
+            else if (_backgroundTexCoords != null)
+            {
+                Shader? sh = ShaderManager.DefaultTexColor2DShader;
+                if (sh == null)
+                {
+                    Client.Report("Cannot draw textured background for {0} when default textured color shader is null.", GetType().Name);
+                    return;
+                }
+                if (tu.Length < 1 || tu.Length != sh.TextureUniforms.Length)
+                {
+                    Client.Report("Cannot draw textured background for {0}, as {0} texture uniform(s) are required.", GetType().Name, sh.TextureUniforms.Length);
+                    return;
+                }
+
+                _backgroundTexture.UseGL(tu[0]);
+
+                sh.UseGL();
+
+                string[] shTexUni = sh.TextureUniforms;
+                for (int i = 0; i < shTexUni.Length; i++)
+                {
+                    sh.SetUniformIntGL(shTexUni[i], Texture.TextureUnitToInt(tu[i]));
+                }
+
+                sh.SetUniformMat4GL("model", vm.Model);
+                sh.SetUniformMat4GL("proj", vm.UIOrtho);
+                sh.SetUniformVec4GL("aColor", (Vec4)_backgroundColor);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO);
+                GL.BufferData(BufferTarget.ArrayBuffer, Vertex2D.SizeInBytesU * _borderVerts.Length, _borderVerts, BufferUsageHint.StaticDraw);
+                sh.SetPositionAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vertex2D.SizeInBytesU });//set attrib before binding next buffer
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, _VBO2);
+                GL.BufferData(BufferTarget.ArrayBuffer, Vec2.SizeInBytesU * _backgroundTexCoords.Length, _backgroundTexCoords, BufferUsageHint.StaticDraw);
+                sh.SetUVAttribGL(new ShaderAttribSettings { Offset = 0, Size = 2, Stride = Vec2.SizeInBytesU });
+                
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, _EBO);
+                GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * 6, [0, 1, 3, 3, 1, 2], BufferUsageHint.StaticDraw);
+                
+                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+            }
             else
             {
-                //todo: draw with texture
+                Client.Report("Cannot draw textured background for {0}, as the texture coordinates are null.", GetType().Name);
             }
         }
         #endregion

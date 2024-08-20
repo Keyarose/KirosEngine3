@@ -50,9 +50,11 @@ namespace KirosEngine3.testclients
             GL.ClearColor((Color)new Color4(ConfigManager.Instance[ConfigKeys.D_CLEAR_COLOR_KEY]));
             GL.Enable(EnableCap.DepthTest);
 
-            KeyboardEventManager.CurrentContext = "system";
             KeyboardEventManager.SubscribeKeyboardEvent(KeyboardEventManager.GLOBAL_CONTEXT, Keys.Escape,
                 KeyboardEventType.KeyPressed, (object sender, KeyboardEventArgs args) => { Close(); });
+
+            TextureManager.TryAddTexture("debugTex", "Resources/Textures/wall.jpg");
+            TextureManager.LoadTexture("debugTex");
 
             camera = new BaseCamera(2.0f * Vec3.UnitZ, ClientSize.X, ClientSize.Y, .5f);
             camera.LookAt = Vec3.Zero;
@@ -70,9 +72,14 @@ namespace KirosEngine3.testclients
 
             testScrollLog = new ScrollableTextLog(new(50f, 200f), new(300f, 200f), "scrollLog", null, 20);
             testScrollLog.Init();
-            testScrollLog.BackgroundColor = Color4.Green;
             testScrollLog.Border = true;
             testScrollLog.BorderColor = Color4.Red;
+            testScrollLog.BackgroundColor = Color4.White;
+            if (TextureManager.TryGetTexture("debugTex", out Texture? tex))
+            {
+                testScrollLog.BackgroundTexture = tex;
+                testScrollLog.BackgroundTexCoords = [new(0f, 1f), new(1f, 1f), new(1f, 0f), new(0f, 0f)];
+            }
 
             testScrollLog.AddLine("test 1 test2 test #, test4 te5t %, ; test 77a");
             testScrollLog.AddLine("For score and two tons.");
@@ -110,7 +117,7 @@ namespace KirosEngine3.testclients
             testLabel?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             testText?.DrawGL(viewMatrixes, TextureUnit.Texture0);
             testTextBox?.DrawGL(viewMatrixes, TextureUnit.Texture0);
-            testScrollLog?.DrawGL(viewMatrixes, TextureUnit.Texture0);
+            testScrollLog?.DrawGL(viewMatrixes, [TextureUnit.Texture0, TextureUnit.Texture1]);
 
             SwapBuffers();
         }

@@ -175,7 +175,7 @@ namespace KirosEngine3.UI
             }
             vm.Model *= Matrix4.CreateTranslation(_position.AsVec3());
 
-            if (!_font.UseFont(tu))
+            if (!_font.UseFont([tu[0]]))
             {
                 Client.Report("Attempt to use font: {0} failed.", _font);
             }
@@ -188,13 +188,13 @@ namespace KirosEngine3.UI
             if (!_parentVAO)
                 GL.BindVertexArray(_VAO);
 
-            base.DrawGL(vm, tu);
+            base.DrawGL(vm, [tu[1]]);
 
             sh.UseGL();
 
             //set the shader uniforms
             string[] shTexUniforms = sh.TextureUniforms;
-            if (shTexUniforms.Length != tu.Length)
+            if (shTexUniforms.Length > tu.Length)
             {
                 Client.Report("Too few texture units provided to {0}, {1} are needed.", this, shTexUniforms.Length);
                 return;
